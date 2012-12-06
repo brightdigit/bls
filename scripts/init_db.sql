@@ -1,5 +1,3 @@
-set @basedirectory = '/home/leogdion';
-
 drop table if exists meta;
 drop table if exists import;
 
@@ -43,10 +41,3 @@ insert into import values('ap/ap.data.3.Food','ap_current');
 insert into import values('ap/ap.item','ap_item');
 insert into import values('ap/ap.series','ap_series');
 insert into import values('ap/ap.area','ap_area');
-
-select concat('drop table if exists ', table_name, ';') from meta group by table_name
-union
-select concat('create table ', table_name, '(', group_concat(concat_ws(' ',column_name, column_type, IF(nullable,'DEFAULT NULL','NOT NULL'))), ');') from meta group by table_name
-union
-select concat('load data local infile \'', @basedirectory, '/ftp.bls.gov/pub/time.series/', file_name,'\' into table ', table_name,  ' ignore 1 lines;') from import;
-
