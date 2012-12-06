@@ -43,20 +43,27 @@ function beginDownload() {
             for(var dirName in directories) {
               var copyDir = path.join(tmpDir, dirName);
               fs.mkdir(copyDir, function (error) {
-                for (var index = 0; index < directories[dirName].length; index++) {
-                  var fullFileName = path.join(copyDir, directories[dirName][index].file);
-                  var tableName = directories[dirName][index].table;
-                  var tmpFile = directories[dirName][index].tmpFile;
-                  console.log('downloading ' + 'ftp://ftp.bls.gov/pub/time.series/' + dirName + '/' + directories[dirName][index].file + '...');
-                  ftp.get('ftp://ftp.bls.gov/pub/time.series/' + dirName + '/' + directories[dirName][index].file, directories[dirName][index].tmpFile, function (error, result) {
-                    var filePath = path.sep === '\\' ? result.replace(/\\/g, '/') : result;
+                directories[dirName].forEach( function (value){
+                  var fullFileName = path.join(copyDir, value.file);
+                  var tableName = value.table;
+                  var tmpFile = value.tmpFile;
 
-                    connection.query('load data local infile \'' + filePath + '\' into table ' + tableName + ' ignore 1 lines;', function (error, results) {
-                      //console.log(results);
-                      console.log('error' + error);
-                      console.log(filePath);
+                  console.log('downloading ' + 'ftp://ftp.bls.gov/pub/time.series/' + dirName + '/' + value.file + ' for ' + value.table + '...');
+                  ftp.get('ftp://ftp.bls.gov/pub/time.series/' + dirName + '/' + value.file, value.tmpFile, function (error, result) {
+                    var filePath = path.sep === '\\' ? result.replace(/\\/g, '/') : result;
+                    var c = mysql.createConnection(settings);
+                    c.connect(function (error) {
+                      console.log(tableName + ': ' + tmpFile);
+                      //console.log('load data local infile \'' + filePath + '\' into table ' + tableName + ' ignore 1 lines;');
+                      c.query('load data local infile \'' + filePath + '\' into table ' + tableName + ' ignore 1 lines;', function (error, results) {
+                        console.log(results);
+                        console.log('error' + error);
+                      });
                     });
                   });
+                });
+                for (var index = 0; index < directories[dirName].length; index++) {
+
                 }
               });
             }
@@ -66,18 +73,26 @@ function beginDownload() {
     });
   });
 }
+
+var settings = {user : 'root', password : process.argv[process.argv.length - 1], database : 'bls', multipleStatements: true, debug : false};
 var ftpBaseDir = '/pub/time.series/';
 var tmpDir = path.join(os.tmpDir(), makeid());
 var dbName = 'bls';
-var connection = mysql.createConnection({user : 'root', password : process.argv[process.argv.length - 1], database : 'bls', multipleStatements: true});
+var connection = mysql.createConnection(settings);
+/*
+connection.query('load data local infile "C:/Users/LeoDion/AppData/Local/Temp/QkUGT/ap/ap.data.0.Current" into table ap_current ignore 1 lines;', function (error, results) {
+  console.log(results);
+  console.log(error);
+  process.exit();
+});
+*/
 
 fs.mkdir(tmpDir, function (error) {
-
-if (process.argv[1] == '-f') {
-  connection.query('DROP SCHEMA ' + dbName + '; CREATE SCHEMA ' + dbName + ';', function (error, results) {
+  if (process.argv[1] == '-f') {
+    connection.query('DROP SCHEMA ' + dbName + '; CREATE SCHEMA ' + dbName + ';', function (error, results) {
+      beginDownload();
+    });
+  } else {
     beginDownload();
-  });
-} else {
-  beginDownload();
-}
+  }
 });

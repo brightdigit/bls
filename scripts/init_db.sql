@@ -35,6 +35,7 @@ insert into meta values ('ap_area', 0, 'area_code', 'char(4)', false);
 insert into meta values ('ap_area', 1, 'area_name', 'varchar(255)', false);
 delete from import;
 
+insert into import values('ap/ap.data.0.Current','ap_current');
 insert into import values('ap/ap.data.1.HouseholdFuels','ap_current');
 insert into import values('ap/ap.data.2.Gasoline','ap_current');
 insert into import values('ap/ap.data.3.Food','ap_current');
