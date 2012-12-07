@@ -19,7 +19,7 @@ delete from meta;
 insert into meta values ('ap_current', 0, 'series_id', 'char(13)', false);
 insert into meta values ('ap_current', 1, 'year', 'char(4)', false);
 insert into meta values ('ap_current', 2, 'period', 'char(3)', false);
-insert into meta values ('ap_current', 3, 'value', 'decimal', false);
+insert into meta values ('ap_current', 3, 'value', 'decimal(8,4)', false);
 insert into meta values ('ap_current', 4, 'footnote_codes', 'char(45)', true);
 insert into meta values ('ap_series', 0, 'series_id', 'char(13)', false);
 insert into meta values ('ap_series', 1, 'area_code', 'char(4)', false);
