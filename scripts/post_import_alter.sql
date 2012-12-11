@@ -45,3 +45,7 @@ ALTER TABLE `ap_area`
 
 ALTER TABLE `ap_item` 
 	ADD PRIMARY KEY (`item_code`);
+
+GRANT SELECT ON bls.* TO 'bls_user'@'localhost' identified by 'HhI*+5oP:(X~}@-';
+
+-- select description, LOCATE('gallon', description),LOCATE('gal.', description),LOCATE('lb.', description), LOCATE('liter', description), LOCATE('ounces', description) from ap_item;
