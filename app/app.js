@@ -118,16 +118,17 @@ bls.prototype = {
 	  var pathSplit = components.path.split('.');
 	  console.log(components);
 	  if (req.url == '/') {
-		fs.readFile(path.join('static', 'index.html'), function (err, data) {
+		fs.readFile(path.join(__dirname, 'static', 'index.html'), function (err, data) {
 	  		if (err) {
 	  			res.writeHead(404);
 	  		} else {
 	  			res.writeHead(200, {'Content-Type' : 'text/html'});
 	  		}
+
 	  		res.end(data);
 	  	});	
 	  } else if (mimeType = mimeTypes[pathSplit[pathSplit.length - 1]]) {
-	  	fs.readFile(path.join('static', components.path), function (err, data) {
+	  	fs.readFile(path.join(__dirname, 'static', components.path), function (err, data) {
 	  		if (err) {
 	  			res.writeHead(404);
 	  		} else {
