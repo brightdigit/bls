@@ -4,8 +4,14 @@
 
 /data?item=area=begin-date=end-date=count=
 
-select floor((time*6)/12), ((time*6)/12 - floor((time*6)/12))*12, avg(value) from (
-select *, round((year*12 + period)/6) as time from ap_current order by year, period) data group by time;
+select start_date, DATE_ADD(start_date, interval 6 month) as end_date, value from (
+select str_to_date(concat(floor((time*6)/12),'-',cast( ((time*6)/12 - floor((time*6)/12))*12 as unsigned) + 1,'-01'), '%Y-%m-%d') as start_date, avg(value) as value from (
+select value, floor((year*12 + (period-1))/6) as time from ap_current 
+inner join ap_series on ap_current.series_id = ap_series.series_id
+where (ap_series.item_code = 'FD2101' and ap_series.area_code = '0200'
+and str_to_date(concat(year, '-', period, '-01'), '%Y-%m-%d') between '2000-07-01' and '2006-10-04')
+order by year, period
+) data group by time) as valuez;
 
 /areas?item=
 HhI*+5oP:(X~}@-
@@ -105,6 +111,15 @@ bls.controllers = {
 		'inner join ap_area on ap_series.area_code = ap_area.area_code',
 		'where item_code = :item or :item is NULL',  
 		'group by ap_area.area_code, area_name order by area_name'], {'item' : null}),
+	'data' : new controller(
+		['select start_date, DATE_ADD(start_date, interval :months month) as end_date, value from (',
+		'select str_to_date(concat(floor((time*:months)/12),'-',cast( ((time*:months)/12 - floor((time*:months)/12))*12 as unsigned) + 1,\'-01\'), \'%Y-%m-%d\') as start_date, avg(value) as value from (',
+		'select value, floor((year*12 + (period-1))/:months) as time from ap_current ',
+		'inner join ap_series on ap_current.series_id = ap_series.series_id',
+		'where (ap_series.item_code = :item and ap_series.area_code = :area',
+		'and str_to_date(concat(year, \'-\', period, \'-01\'), \'%Y-%m-%d\') between :start_date and :end_date)',
+		'order by year, period',
+		') data group by time) as valuez limit 100 offset :offset'])
 };
 
 bls.prototype = {
