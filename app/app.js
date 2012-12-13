@@ -98,7 +98,13 @@ bls.controllers = {
 		'inner join ap_series on ap_current.series_id = ap_series.series_id',    
 		'inner join ap_item on ap_series.item_code = ap_item.item_code',    
 		'where area_code = :area or :area is NULL',    
-		'group by ap_item.item_code, description order by description'], {'area' : null})
+		'group by ap_item.item_code, description order by description'], {'area' : null}),
+	'areas' : new controller(
+		['select ap_area.area_code, area_name, count(*) as count from ap_current',
+		'inner join ap_series on ap_current.series_id = ap_series.series_id',
+		'inner join ap_area on ap_series.area_code = ap_area.area_code',
+		'where item_code = :item or :item is NULL',  
+		'group by ap_area.area_code, area_name order by area_name'], {'item' : null}),
 };
 
 bls.prototype = {
