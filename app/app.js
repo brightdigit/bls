@@ -42,14 +42,16 @@ connection.config.queryFormat = function (query, values) {
   }.bind(this));
 };
 
-var controller = function () {
-  
+var controller = function (queryFormat, defaultParameters) {
+  this.queryFormat = this.initializeFormat(queryFormat);
+  this.defaultParameters = defaultParameters ? defaultParameters : this.defaultParameter;
 };
 
 controller.prototype = {
   process : function (parameters, res) {
-  	parameters.area = parameters.area ? parameters.area : null;
-  	connection.query('select ap_item.item_code, description, count(*) as count from ap_current inner join ap_series on ap_current.series_id = ap_series.series_id    inner join ap_item on ap_series.item_code = ap_item.item_code    where area_code = :area or :area is NULL    group by ap_item.item_code, description order by description' , parameters, function (error, results) {
+  	parameters = this.translate(parameters);
+  	//parameters.area = parameters.area ? parameters.area : null;
+  	connection.query(this.queryFormat , parameters, function (error, results) {
     	if (error) {
     		console.log(error);
     		res.writeHead(500);
@@ -62,10 +64,21 @@ controller.prototype = {
   	//return parameters;
   },
   translate : function (parameters) {
+  	for (var name in this.defaultParameters) {
+  		parameters[name] = typeof parameters[name] === "undefined" ? this.defaultParameters[name] : parameters[name];
+  	}
   	return parameters;
   },
-
-
+  queryFormat : undefined,
+  defaultParameters : {},
+  initializeFormat : function (queryFormat) {
+  	var type = typeof queryFormat;
+  	if (type === "string") {
+  		return queryFormat;
+  	} else if (type === "object" && Array.isArray(queryFormat)) {
+  		return queryFormat.join('\n');
+  	}
+  }
 };
 
 var items = function () {
@@ -79,8 +92,13 @@ var bls = function () {
 };
 
 bls.controllers = {
-	'test' : new controller()
-
+	//'test' : new controller(),
+	'items' : new controller(
+		['select ap_item.item_code, description, count(*) as count from ap_current', 
+		'inner join ap_series on ap_current.series_id = ap_series.series_id',    
+		'inner join ap_item on ap_series.item_code = ap_item.item_code',    
+		'where area_code = :area or :area is NULL',    
+		'group by ap_item.item_code, description order by description'], {'area' : null})
 };
 
 bls.prototype = {

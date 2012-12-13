@@ -81,6 +81,7 @@ function beginDownload() {
                                       } else {                                 
                                         if (results.every(function (value) {return value[0].count === 0;})) {
                                           console.log('done.'); 
+                                          // go through each description and clean up the text
                                           process.exit(0);
                                         } else {
                                           console.log('warning data integrity check failed');
