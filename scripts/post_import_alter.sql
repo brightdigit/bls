@@ -29,21 +29,21 @@ ALTER TABLE `ap_series` CHANGE COLUMN `begin_year` `begin_year` YEAR NOT NULL  ,
 
 ALTER TABLE `ap_current` CHANGE COLUMN `year` `year` year NOT NULL  , CHANGE COLUMN `period` `period` TINYINT NOT NULL  ;
 
-ALTER TABLE `ap_current` 
-	ADD PRIMARY KEY (`series_id`, `year`, `period`) 
-	, ADD INDEX `series` (`series_id` ASC) 
-	, ADD INDEX `month` (`year` ASC) 
+ALTER TABLE `ap_current`
+	ADD PRIMARY KEY (`series_id`, `year`, `period`)
+	, ADD INDEX `series` (`series_id` ASC)
+	, ADD INDEX `month` (`year` ASC)
 	, ADD INDEX `year` (`period` ASC);
 
-ALTER TABLE `ap_series` 
-	ADD PRIMARY KEY (`series_id`) 
-	, ADD INDEX `item` (`item_code` ASC) 
+ALTER TABLE `ap_series`
+	ADD PRIMARY KEY (`series_id`)
+	, ADD INDEX `item` (`item_code` ASC)
 	, ADD INDEX `area` (`area_code` ASC);
 
-ALTER TABLE `ap_area` 
+ALTER TABLE `ap_area`
 	ADD PRIMARY KEY (`area_code`);
 
-ALTER TABLE `ap_item` 
+ALTER TABLE `ap_item`
 	ADD PRIMARY KEY (`item_code`);
 
 drop table  if exists measurements;
@@ -77,7 +77,8 @@ create table ap_item_measurement (
     value float NOT NULL
 );
 
-insert into ap_item_measurement (item_code, priority, value) 
+/*
+insert into ap_item_measurement (item_code, priority, value)
 select item_code, priority, 0 + CASE WHEN amount_str = 'one-half' or amount_str = '1/2' THEN 0.5 WHEN amount_str = 'per' then 1 WHEN LOCATE('(', amount_str) = 1 THEN SUBSTRING(amount_str, 1-length(amount_str)) WHEN STRCMP(amount_str + 0,amount_str) = 0 then amount_str else 1 END as value from (
 select ap_item.item_code, substring(ap_item.description from ind-
 locate(' ', reverse(substring(ap_item.description, 1, labels.ind-1)))+1 for locate(' ', reverse(substring(ap_item.description, 1, labels.ind-1))) - 1) as amount_str
@@ -87,6 +88,7 @@ select *, LOCATE(CONCAT(' ',keyword), description) as ind from ap_item, measurem
 where ind > 0
 group by item_code
 ) labels on ap_item.item_code = labels.item_code) amount;
+*/
 
 -- select description, LOCATE('gallon', description),LOCATE('gal.', description),LOCATE('lb.', description), LOCATE('liter', description), LOCATE('ounces', description) from ap_item;
 
