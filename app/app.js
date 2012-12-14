@@ -42,7 +42,11 @@ connection.config.queryFormat = function (query, values) {
   if (!values) return query;
   return query.replace(/\:(\w+)/g, function (txt, key) {
     if (values.hasOwnProperty(key)) {
-      return this.escape(values[key]);
+      if (parseInt(values[key]) % 1 === 0) {
+      	return values[key];
+      } else {
+      	return this.escape(values[key]);
+      }
     }
     return txt;
   }.bind(this));
@@ -113,11 +117,11 @@ bls.controllers = {
 		'group by ap_area.area_code, area_name order by area_name'], {'item' : null}),
 	'data' : new controller(
 		['select start_date, DATE_ADD(start_date, interval :months month) as end_date, value from (',
-		'select str_to_date(concat(floor((time*:months)/12),'-',cast( ((time*:months)/12 - floor((time*:months)/12))*12 as unsigned) + 1,\'-01\'), \'%Y-%m-%d\') as start_date, avg(value) as value from (',
+		'select str_to_date(concat(floor((time*:months)/12),\'-\',cast( ((time*:months)/12 - floor((time*:months)/12))*12 as unsigned) + 1,\'-01\'), \'%Y-%m-%d\') as start_date, avg(value) as value from (',
 		'select value, floor((year*12 + (period-1))/:months) as time from ap_current ',
 		'inner join ap_series on ap_current.series_id = ap_series.series_id',
 		'where (ap_series.item_code = :item and ap_series.area_code = :area',
-		'and str_to_date(concat(year, \'-\', period, \'-01\'), \'%Y-%m-%d\') between :start_date and :end_date)',
+		'and str_to_date(concat(year, \'-\', period, \'-01\'), \'%Y-%m-%d\') between \':start_date\' and \':end_date\')',
 		'order by year, period',
 		') data group by time) as valuez limit 100 offset :offset'])
 };
@@ -156,7 +160,6 @@ bls.prototype = {
 	  	var controller = bls.controllers[command];
 	  	if (controller) {
 		  	controller.process(components.query, res);
-		    //res.end(JSON.stringify());
 	  	} else {
 	  		res.writeHead(404);
 	  		res.end();
