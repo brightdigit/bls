@@ -30,7 +30,8 @@ var mimeTypes = {
     "png": "image/png",
     "js": "text/javascript",
     "css": "text/css",
-	"ico": "image/x-icon"};
+	"ico": "image/x-icon",
+	"pde": "text/plain"};
 
 var connection = mysql.createConnection({
 	user : 'bls_user',
