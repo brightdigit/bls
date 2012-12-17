@@ -21,6 +21,10 @@
         <link rel="stylesheet" href="css/main.css">
 
         <script src="js/modernizr-2.6.2-respond-1.1.0.min.js"></script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+        <script>window.jQuery || document.write('<script src="js/jquery-1.8.3.min.js"><\/script>')</script>
+        <script src="js/processing-1.4.1.min.js"></script>
+        <script src="js/bls.js"></script>
     </head>
     <body>
         <!--[if lt IE 7]>
@@ -53,13 +57,21 @@
         <div class="container">
 
             <!-- Main hero unit for a primary marketing message or call to action -->
+<!--            
             <div class="hero-unit">
                 <h1>bls/dv</h1>
                 <p>This is a data visualization tool for the <a href="http://bls.gov/">Bureau of Labor Statistics</a> data.</p>
                 <p><a class="btn btn-primary btn-large">Let's Go</a>
                 <a class="btn btn-seconday btn-large">Learn more &raquo;</a></p>
             </div>
-
+-->
+            <div class="row">
+                <div id="container" class="span12">
+                    <script>
+                        bls.initialize();
+                    </script>
+                </div>
+            </div>
             <!-- Example row of columns -->
             <div class="row">
                 <div class="span4">
@@ -87,12 +99,8 @@
 
         </div> <!-- /container -->
 
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-        <script>window.jQuery || document.write('<script src="js/jquery-1.8.3.min.js"><\/script>')</script>
-
         <script src="js/bootstrap.min.js"></script>
 
-        <script src="js/main.js"></script>
 
         <script>
             var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
