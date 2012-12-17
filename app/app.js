@@ -6,7 +6,7 @@
 
 select start_date, DATE_ADD(start_date, interval 6 month) as end_date, value from (
 select str_to_date(concat(floor((time*6)/12),'-',cast( ((time*6)/12 - floor((time*6)/12))*12 as unsigned) + 1,'-01'), '%Y-%m-%d') as start_date, avg(value) as value from (
-select value, floor((year*12 + (period-1))/6) as time from ap_current 
+select value, floor((year*12 + (period-1))/6) as time from ap_current
 inner join ap_series on ap_current.series_id = ap_series.series_id
 where (ap_series.item_code = 'FD2101' and ap_series.area_code = '0200'
 and str_to_date(concat(year, '-', period, '-01'), '%Y-%m-%d') between '2000-07-01' and '2006-10-04')
@@ -36,14 +36,16 @@ var mimeTypes = {
 var connection = mysql.createConnection({
 	user : 'bls_user',
 	password : 'HhI*+5oP:(X~}@-',
-	database: 'bls'
+	database: 'bls',
+   debug : true
 });
 
 connection.config.queryFormat = function (query, values) {
   if (!values) return query;
   return query.replace(/\:(\w+)/g, function (txt, key) {
     if (values.hasOwnProperty(key)) {
-      if (parseInt(values[key]) % 1 === 0) {
+      console.log(values[key] + ': ' + typeof(values[key]))
+      if (parseInt(values[key]).toString() === values[key]) {
       	return values[key];
       } else {
       	return this.escape(values[key]);
@@ -105,16 +107,16 @@ var bls = function () {
 bls.controllers = {
 	//'test' : new controller(),
 	'items' : new controller(
-		['select ap_item.item_code, description, count(*) as count from ap_current', 
-		'inner join ap_series on ap_current.series_id = ap_series.series_id',    
-		'inner join ap_item on ap_series.item_code = ap_item.item_code',    
-		'where area_code = :area or :area is NULL',    
+		['select ap_item.item_code, description, count(*) as count from ap_current',
+		'inner join ap_series on ap_current.series_id = ap_series.series_id',
+		'inner join ap_item on ap_series.item_code = ap_item.item_code',
+		'where area_code = :area or :area is NULL',
 		'group by ap_item.item_code, description order by description'], {'area' : null}),
 	'areas' : new controller(
 		['select ap_area.area_code, area_name, count(*) as count from ap_current',
 		'inner join ap_series on ap_current.series_id = ap_series.series_id',
 		'inner join ap_area on ap_series.area_code = ap_area.area_code',
-		'where item_code = :item or :item is NULL',  
+		'where item_code = :item or :item is NULL',
 		'group by ap_area.area_code, area_name order by area_name'], {'item' : null}),
 	'data' : new controller(
 		['select start_date, DATE_ADD(start_date, interval :months month) as end_date, value from (',
@@ -122,7 +124,7 @@ bls.controllers = {
 		'select value, floor((year*12 + (period-1))/:months) as time from ap_current ',
 		'inner join ap_series on ap_current.series_id = ap_series.series_id',
 		'where (ap_series.item_code = :item and ap_series.area_code = :area',
-		'and str_to_date(concat(year, \'-\', period, \'-01\'), \'%Y-%m-%d\') between \':start_date\' and \':end_date\')',
+		'and str_to_date(concat(year, \'-\', period, \'-01\'), \'%Y-%m-%d\') between :start_date and :end_date)',
 		'order by year, period',
 		') data group by time) as valuez limit 100 offset :offset'])
 };
@@ -146,7 +148,7 @@ bls.prototype = {
 	  		}
 
 	  		res.end(data);
-	  	});	
+	  	});
 	  } else if (mimeType = mimeTypes[pathSplit[pathSplit.length - 1]]) {
 	  	fs.readFile(path.join(__dirname, 'static', components.path), function (err, data) {
 	  		if (err) {
