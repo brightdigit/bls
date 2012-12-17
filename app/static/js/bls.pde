@@ -5,3 +5,7 @@ void setup() {
   ellipse(50, 50, 25, 25);
   println("hello web!");
 }
+
+void loadData (data) {
+	println(data[0].x);
+}
