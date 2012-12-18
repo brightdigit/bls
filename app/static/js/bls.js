@@ -1,4 +1,18 @@
 var bls = {
+  load: function () {
+    var that = this;
+     //setTimeout( function () {
+        var pjs = Processing.getInstanceById(that.container.find('canvas').attr('id'));
+        pjs.size(that.container.width(), 200);
+        $(window).resize(function () {
+          pjs.size(that.container.width(), 200);
+          pjs.update();
+        });
+        bls.request({item : 'FD2101', area : '0000', startDate : new Date(2000, 0, 1), endDate : new Date()}, function (request) {
+          pjs.loadData(request.data);
+        });
+      //}, 500);
+  },
   getRandomId : function () {
     var id = "";
       var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -11,12 +25,13 @@ var bls = {
     return id;
   },
   initialize : function () {
+    var that = this;
     var script = document.getElementsByTagName('script')[(document.getElementsByTagName('script').length-1)];
-    var container = $(script.parentNode);
+    this.container = $(script.parentNode);
     $(document).ready(function () {
       $('input.daterangepicker').daterangepicker();
       var canvas = $('<canvas id="' + bls.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
-      container.append(canvas);
+       that.container.append(canvas);
       $.get('items', function (data) {
         var itemsSelector = $('.items');
         data.forEach(function (value) {
@@ -30,17 +45,7 @@ var bls = {
           areaSelector.append('<option value="' + value.area_code + '">' + value.area_name + '</option>');
         });
       });
-      setTimeout( function () {
-        var pjs = Processing.getInstanceById(canvas.attr('id'));
-        pjs.size(container.width(), 200);
-        $(window).resize(function () {
-          pjs.size(container.width(), 200);
-          pjs.update();
-        });
-        bls.request({item : 'FD2101', area : '0000', startDate : new Date(2000, 0, 1), endDate : new Date()}, function (request) {
-          pjs.loadData(request.data);
-        });
-      }, 500);
+
     });
   },
   request : function (parameters, callback) {
