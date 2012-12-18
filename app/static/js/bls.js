@@ -19,6 +19,11 @@ var bls = {
       container.append(canvas);
       setTimeout( function () {
         var pjs = Processing.getInstanceById(canvas.attr('id'));
+        pjs.size(container.width(), 200);
+        $(window).resize(function () {
+          pjs.size(container.width(), 200);
+          pjs.update();
+        });
         bls.request({item : 'FD2101', area : '0000', startDate : new Date(2000, 0, 1), endDate : new Date()}, function (request) {
           pjs.loadData(request.data);
         });

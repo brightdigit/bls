@@ -13,7 +13,7 @@ class Coordinate {
 }
 
 void setup() {
-  size(200, 200);
+  //size(200, 200);
   background(255);
 }
 
@@ -35,6 +35,25 @@ void loadData (data) {
 
 	x_offset = x_min * x_scale;
 	y_offset = y_min * y_scale;
+}
+
+void update () {
+	float y_min = 100000000, y_max = 0;
+	int x_min, x_max;
+
+	for (int index = 0; index < coordinates.length; index++) {
+		y_min = min(y_min, coordinates[index].y);
+		y_max = max(y_max, coordinates[index].y);
+	}
+	x_min = coordinates[0].x[0];
+	x_max = coordinates[coordinates.length - 1].x[1];
+
+	x_scale = width/(x_max - x_min);
+	y_scale = (height-100)/(y_max - y_min);
+
+	x_offset = x_min * x_scale;
+	y_offset = y_min * y_scale;
+	redraw();
 }
 
 int getUnixTime(dateStr) {

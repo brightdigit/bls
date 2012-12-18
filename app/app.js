@@ -44,7 +44,6 @@ connection.config.queryFormat = function (query, values) {
   if (!values) return query;
   return query.replace(/\:(\w+)/g, function (txt, key) {
     if (values.hasOwnProperty(key)) {
-      console.log(values[key] + ': ' + typeof(values[key]))
       if (parseInt(values[key]).toString() === values[key]) {
       	return values[key];
       } else {
@@ -138,7 +137,6 @@ bls.prototype = {
 	  var mimeType;
 	  var components = url.parse(req.url, true);
 	  var pathSplit = components.path.split('.');
-	  console.log(components);
 	  if (req.url == '/') {
 		fs.readFile(path.join(__dirname, 'static', 'index.html'), function (err, data) {
 	  		if (err) {
