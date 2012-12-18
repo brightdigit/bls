@@ -16,6 +16,7 @@ PFont font;
 Coordinate [] coordinates;
 float x_scale, y_scale;
 float x_offset, y_offset;
+boolean isMouseOver = false;
 
 void setup() {
   background(255);
@@ -80,9 +81,11 @@ background(255);
 			line(coordinates[index].x[1]*x_scale - x_offset, height - coordinates[index].y*y_scale + y_offset - 50, coordinates[index+1].x[0]*x_scale - x_offset, height - coordinates[index+1].y*y_scale + y_offset - 50);
 		}
 	}
-	fill(0);
-	text(mouseX, 100, 100);
-	text(mouseY, 100, 120);
+	if (isMouseOver) {
+		fill(0);
+		text(mouseX, 100, 100);
+		text(mouseY, 100, 120);
+	}
 }
 
 void mouseMoved () {
@@ -90,5 +93,10 @@ void mouseMoved () {
 }
 
 void mouseOver() {
+	isMouseOver = true;
+}
+
+void mouseOut () {
+	isMouseOver = false;
 	
 }
