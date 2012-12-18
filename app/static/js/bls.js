@@ -17,6 +17,19 @@ var bls = {
       $('input.daterangepicker').daterangepicker();
       var canvas = $('<canvas id="' + bls.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
       container.append(canvas);
+      $.get('items', function (data) {
+        var itemsSelector = $('.items');
+        data.forEach(function (value) {
+          itemsSelector.append('<option value="' + value.item_code + '">' + value.description + '</option>');
+        });
+      });
+
+      $.get('areas', function (data) {
+        var areaSelector = $('.areas');
+        data.forEach(function (value) {
+          areaSelector.append('<option value="' + value.area_code + '">' + value.area_name + '</option>');
+        });
+      });
       setTimeout( function () {
         var pjs = Processing.getInstanceById(canvas.attr('id'));
         pjs.size(container.width(), 200);

@@ -31,7 +31,8 @@ var mimeTypes = {
     "js": "text/javascript",
     "css": "text/css",
 	"ico": "image/x-icon",
-	"pde": "text/plain"};
+	"pde": "text/plain",
+	"ttf": "font/opentype"};
 
 var connection = mysql.createConnection({
 	user : 'bls_user',
