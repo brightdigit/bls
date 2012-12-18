@@ -7,5 +7,5 @@ void setup() {
 }
 
 void loadData (data) {
-	println(data[0].x);
+	println(data[0]);
 }

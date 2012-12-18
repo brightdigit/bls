@@ -124,7 +124,7 @@ bls.controllers = {
 		'select value, floor((year*12 + (period-1))/:months) as time from ap_current ',
 		'inner join ap_series on ap_current.series_id = ap_series.series_id',
 		'where (ap_series.item_code = :item and ap_series.area_code = :area',
-		'and str_to_date(concat(year, \'-\', period, \'-01\'), \'%Y-%m-%d\') between :start_date and :end_date)',
+		'and str_to_date(concat(year, \'-\', period, \'-01\'), \'%Y-%m-%d\') between :startDate and :endDate)',
 		'order by year, period',
 		') data group by time) as valuez limit 100 offset :offset'])
 };
