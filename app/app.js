@@ -37,7 +37,7 @@ var connection = mysql.createConnection({
 	user : 'bls_user',
 	password : 'HhI*+5oP:(X~}@-',
 	database: 'bls',
-   debug : true
+   debug : false
 });
 
 connection.config.queryFormat = function (query, values) {
@@ -119,7 +119,7 @@ bls.controllers = {
 		'where item_code = :item or :item is NULL',
 		'group by ap_area.area_code, area_name order by area_name'], {'item' : null}),
 	'data' : new controller(
-		['select start_date, DATE_ADD(start_date, interval :months month) as end_date, value from (',
+		['select start_date as startDate, DATE_ADD(start_date, interval :months month) as endDate, value from (',
 		'select str_to_date(concat(floor((time*:months)/12),\'-\',cast( ((time*:months)/12 - floor((time*:months)/12))*12 as unsigned) + 1,\'-01\'), \'%Y-%m-%d\') as start_date, avg(value) as value from (',
 		'select value, floor((year*12 + (period-1))/:months) as time from ap_current ',
 		'inner join ap_series on ap_current.series_id = ap_series.series_id',
