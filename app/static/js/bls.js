@@ -60,6 +60,7 @@ var bls = {
         data.forEach(function (value) {
           itemsSelector.append('<option value="' + value.item_code + '">' + value.description + '</option>');
         });
+        itemsSelector.chosen();
       });
 
       $.get('areas', function (data) {
@@ -67,8 +68,16 @@ var bls = {
         data.forEach(function (value) {
           areaSelector.append('<option value="' + value.area_code + '">' + value.area_name + '</option>');
         });
+        areaSelector.chosen();
       });
 
+    });
+    $('.btn[type="reset"]').click( function () {
+      var form = $(this).parents('form');
+      form[0].reset();
+      form.children('select').each (function () {
+        this.selectedIndex = 0;
+      });
     });
   },
   request : function (parameters, callback) {
