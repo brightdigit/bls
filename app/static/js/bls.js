@@ -1,27 +1,23 @@
 var bls = {
   load: function () {
     var that = this;
-     //setTimeout( function () {
-        var pjs = Processing.getInstanceById(that.container.find('canvas').attr('id'));
-        pjs.size(that.container.width(), 200);
-        $(window).resize(function () {
-          pjs.size(that.container.width(), 200);
-          pjs.update();
-        });
-        bls.request({item : 'FD2101', area : '0000', startDate : new Date(2000, 0, 1), endDate : new Date()}, function (request) {
-          pjs.loadData(request.data);
-        });
-      //}, 500);
+    var pjs = Processing.getInstanceById(that.container.find('canvas').attr('id'));
+    pjs.size(that.container.width(), 200);
+    $(window).resize(function () {
+      pjs.size(that.container.width(), 200);
+      pjs.update();
+    });
+    bls.request({item : 'FD2101', area : '0000', startDate : new Date(2000, 0, 1), endDate : new Date()}, function (request) {
+      pjs.loadData(request.data);
+    });
   },
   getRandomId : function () {
     var id = "";
-      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
     do {
         for( var i=0; i < 5; i++ )
             id += possible.charAt(Math.floor(Math.random() * possible.length));
     } while ($('#' + id).length > 0);
-
     return id;
   },
   initialize : function () {
@@ -59,7 +55,7 @@ bls.DataRequest = function (parameters, totalPoints) {
   this.totalPoints = totalPoints ? totalPoints : this.totalPoints;
   this.parameters = this.calculateParameters(parameters);
 };
-// http://localhost:3000/data?item=FD2101&area=0000&months=3&start_date=2000-01-01&end_date=2012-12-01&offset=0
+
 bls.DataRequest.prototype = {
   parameters : undefined,
   totalPoints : 1000,

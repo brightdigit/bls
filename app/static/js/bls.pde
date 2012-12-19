@@ -17,6 +17,7 @@ Coordinate [] coordinates;
 float x_scale, y_scale;
 float x_offset, y_offset;
 boolean isMouseOver = false;
+int [] monthLengths = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
 void setup() {
   background(255);
@@ -73,19 +74,57 @@ int getUnixTime(dateStr) {
 	return unix;
 }
 
+int getMonthLength (year, month) {
+	bool leapDay = isLeapYear(year) && int(month) == 2;
+	return monthLengths[int(month) - 1] + (leapDay?1:0);
+}
+
+bool isLeapYear (year) {
+	return year % 4 == 0 && year % 100 > 0;
+}
+
+String getDate(unix) {
+	int [] dateComponents = new int [3];
+
+	dateComponents[0] = unix / 86400 / 365.25 + 1970;
+	dateComponents[1] = (unix / 86400 / 365.25 * 12) % 12;
+	dateComponents[2] = (unix / 86400) % (365.25) % getMonthLength(dateComponents[0], dateComponents[1]);
+
+	return join(nf(dateComponents,2), '-');
+}
+
 void draw() {
-background(255);
+	background(255);
 	if (coordinates) {
+		if (isMouseOver) {
+			float x_value = (mouseX + x_offset)/x_scale;
+			float y_value = find_y(x_value);
+			int y_pos = height-y_value*y_scale + y_offset - 50;
+			String date =getDate(x_value);
+			fill(0);
+			text(date, 10, 20);
+			text(y_value, 10, 40);
+			stroke(164);
+			fill(164);
+			text(date, mouseX + 10, y_pos - 30);
+			text(y_value, mouseX + 10, y_pos - 10);
+			line(mouseX, 0, mouseX,  height);
+			line(0, y_pos, width, y_pos);
+		}
+		stroke(0);
 		for (int index = 0; index < coordinates.length - 1; index++) {
 			line(coordinates[index].x[0]*x_scale - x_offset, height - coordinates[index].y*y_scale + y_offset - 50, coordinates[index].x[1]*x_scale - x_offset, height - coordinates[index].y*y_scale + y_offset - 50);
 			line(coordinates[index].x[1]*x_scale - x_offset, height - coordinates[index].y*y_scale + y_offset - 50, coordinates[index+1].x[0]*x_scale - x_offset, height - coordinates[index+1].y*y_scale + y_offset - 50);
 		}
 	}
-	if (isMouseOver) {
-		fill(0);
-		text(mouseX, 100, 100);
-		text(mouseY, 100, 120);
+}
+
+float find_y (x_value) {	
+	float y;
+	for (int index = 0; index < coordinates.length && coordinates[index].x[0] < x_value; index++) {
+		y = coordinates[index].y;
 	}
+	return y;
 }
 
 void mouseMoved () {
