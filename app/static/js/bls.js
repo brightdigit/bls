@@ -48,6 +48,22 @@ var bls = {
     var request = new bls.DataRequest(parameters);
     request.on('end', callback);
     request.start();
+  },
+  getDateTime : function (unixTimestamp) {
+    var date = new Date(unixTimestamp*1000);
+    return date;
+    //return [date.getFullYear(), date.getMonth() + 1, date.getDate()];
+  },
+  getUnixTime : function (arg) {
+    var date;
+    if (typeof(arg) === 'object' && arg.length >= 3) {
+      date = new Date(arg[0], arg[1]-1, arg[2]);
+    } else if (typeof(arg) === 'string') {
+      date = new Date(arg);
+    } else {
+      throw 'date argument is of invalid type: '+ typeof(arg);
+    }
+    return date.valueOf()/1000.00;
   }
 };
 
@@ -91,7 +107,7 @@ bls.DataRequest.prototype = {
     var that = this;
     if (!this.data) {
       this.data = [];
-    } 
+    }
     this.data = this.data.concat(data);
     if (data.length >= 100) {
       var parameters = request.parameters;

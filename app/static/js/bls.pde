@@ -8,7 +8,7 @@ class Coordinate {
 		x[0] = getUnixTime(data.startDate);
 		x[1] = getUnixTime(data.endDate);
 		y = data.value;
-	}	
+	}
 }
 
 PFont font;
@@ -66,31 +66,13 @@ void update () {
 }
 
 int getUnixTime(dateStr) {
-	String[] dateTimeSplit = split(dateStr, 'T');
-	int[] dateComponents = int(split(dateTimeSplit[0], '-'));
-	int unix = (dateComponents[0] - 1970) * 86400 * 365.25;
-	unix = unix + (dateComponents[1] - 1) * 86400 * 365.25 /12;
-	unix = unix + (dateComponents[2] - 1) * 86400;
-	return unix;
-}
-
-int getMonthLength (year, month) {
-	bool leapDay = isLeapYear(year) && int(month) == 2;
-	return monthLengths[int(month) - 1] + (leapDay?1:0);
-}
-
-bool isLeapYear (year) {
-	return year % 4 == 0 && year % 100 > 0;
+	return bls.getUnixTime(dateStr);
 }
 
 String getDate(unix) {
-	int [] dateComponents = new int [3];
-
-	dateComponents[0] = unix / 86400 / 365.25 + 1970;
-	dateComponents[1] = (unix / 86400 / 365.25 * 12) % 12;
-	dateComponents[2] = (unix / 86400) % (365.25) % getMonthLength(dateComponents[0], dateComponents[1]);
-
-	return join(nf(dateComponents,2), '-');
+	Object date = bls.getDateTime(unix);
+	int [] values = {date.getFullYear(), date.getMonth() + 1, date.getDate()};
+	return join(nf(values,2), '-');
 }
 
 void draw() {
@@ -105,7 +87,7 @@ void draw() {
 			text(date, 10, 20);
 			text(y_value, 10, 40);
 			stroke(164);
-			fill(164);
+			fill(64);
 			text(date, mouseX + 10, y_pos - 30);
 			text(y_value, mouseX + 10, y_pos - 10);
 			line(mouseX, 0, mouseX,  height);
@@ -119,7 +101,7 @@ void draw() {
 	}
 }
 
-float find_y (x_value) {	
+float find_y (x_value) {
 	float y;
 	for (int index = 0; index < coordinates.length && coordinates[index].x[0] < x_value; index++) {
 		y = coordinates[index].y;
@@ -128,7 +110,7 @@ float find_y (x_value) {
 }
 
 void mouseMoved () {
-	
+
 }
 
 void mouseOver() {
@@ -137,5 +119,5 @@ void mouseOver() {
 
 void mouseOut () {
 	isMouseOver = false;
-	
+
 }
