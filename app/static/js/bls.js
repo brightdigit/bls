@@ -1,14 +1,28 @@
 var bls = {
+  margin : 100,
+  onresize : function () {
+      var height = $(window).height() - this.container.position().top - $('.bottom').height();
+      if (height < 200) {
+        height = 200;
+        $('.bottom').hide();//('absolute');
+        console.log('absolute');
+      } else {
+        $('.bottom').show();//('absolute');
+      }
+      console.log($('.bottom').height());
+      console.log(height);
+      this.pjs.size(this.container.width(), height);
+  },
   load: function () {
     var that = this;
-    var pjs = Processing.getInstanceById(that.container.find('canvas').attr('id'));
-    pjs.size(that.container.width(), 200);
+    this.pjs = Processing.getInstanceById(that.container.find('canvas').attr('id'));
+    that.onresize();
     $(window).resize(function () {
-      pjs.size(that.container.width(), 200);
-      pjs.update();
+      that.onresize();
+      that.pjs.update();
     });
     bls.request({item : 'FD2101', area : '0000', startDate : new Date(2000, 0, 1), endDate : new Date()}, function (request) {
-      pjs.loadData(request.data);
+      that.pjs.loadData(request.data);
     });
   },
   getRandomId : function () {
@@ -20,11 +34,24 @@ var bls = {
     } while ($('#' + id).length > 0);
     return id;
   },
+  updateView : function (evt) {
+    var hash = evt ? $(evt.srcElement).attr('href') : (window.location.hash ? window.location.hash : '#home');
+    $('.link').parent('li').removeClass('active');
+    $('.link[href="' + hash + '"]').parent('li').addClass('active');
+    $('.container > *.active[id]').fadeOut( function () {
+      $(this).removeClass('active');
+    });
+    $(hash).fadeIn(function () {
+      $(this).addClass('active');
+    });
+  },
   initialize : function () {
     var that = this;
     var script = document.getElementsByTagName('script')[(document.getElementsByTagName('script').length-1)];
     this.container = $(script.parentNode);
     $(document).ready(function () {
+      $('.link').click(bls.updateView);
+      bls.updateView();
       $('input.daterangepicker-control').daterangepicker();
       var canvas = $('<canvas id="' + bls.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
        that.container.append(canvas);

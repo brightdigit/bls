@@ -4,9 +4,32 @@
    Author's custom styles
    ========================================================================== */
 
+.container > .bottom{
+ 	position: fixed; 
+ 	bottom: 0px;
+ }
+
+.container > .bottom.absolute{
+ 	position: absolute; 
+ 	top: 300px;
+ }
+
+.container > *[id] {
+	display: none;
+	position: absolute;
+}
 
 
+@media (max-width: 480px) { 
+	.container *[id]{
+		position: static;
+	}
+	.container > .bottom{
+	 	position: static; 
+	 	display: block !important;
+	 }
 
+}
 
 
 
