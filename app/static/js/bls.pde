@@ -11,6 +11,8 @@ class Coordinate {
 	}
 }
 
+int xPos, yPos;
+
 PFont font;
 
 Coordinate [] coordinates;
@@ -79,7 +81,7 @@ void draw() {
 	background(255);
 	if (coordinates) {
 		if (isMouseOver) {
-			float x_value = (mouseX + x_offset)/x_scale;
+			float x_value = (xPos + x_offset)/x_scale;
 			float y_value = find_y(x_value);
 			int y_pos = height-y_value*y_scale + y_offset - 50;
 			String date =getDate(x_value);
@@ -88,9 +90,9 @@ void draw() {
 			text(y_value, 10, 40);
 			stroke(164);
 			fill(64);
-			text(date, mouseX + 10, y_pos - 30);
-			text(y_value, mouseX + 10, y_pos - 10);
-			line(mouseX, 0, mouseX,  height);
+			text(date, xPos + 10, y_pos - 30);
+			text(y_value, xPos + 10, y_pos - 10);
+			line(xPos, 0, xPos,  height);
 			line(0, y_pos, width, y_pos);
 		}
 		stroke(0);
@@ -109,8 +111,17 @@ float find_y (x_value) {
 	return y;
 }
 
-void mouseMoved () {
+void touchStart(TouchEvent touchEvent) {
+	xPos = touchEvent.touches[0].offsetX;
+	isMouseOver = true;
+}
 
+void touchEnd(TouchEvent touchEvent) {
+	isMouseOver = false;
+}
+
+void touchMove(TouchEvent touchEvent) {
+	xPos = touchEvent.touches[0].offsetX;
 }
 
 void mouseOver() {
@@ -119,5 +130,8 @@ void mouseOver() {
 
 void mouseOut () {
 	isMouseOver = false;
+}
 
+void mouseMoved () {
+	xPos = mouseX;
 }
