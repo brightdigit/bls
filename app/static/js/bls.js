@@ -25,7 +25,7 @@ var bls = {
     var script = document.getElementsByTagName('script')[(document.getElementsByTagName('script').length-1)];
     this.container = $(script.parentNode);
     $(document).ready(function () {
-      $('input.daterangepicker').daterangepicker();
+      $('input.daterangepicker-control').daterangepicker();
       var canvas = $('<canvas id="' + bls.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
        that.container.append(canvas);
       $.get('items', function (data) {
