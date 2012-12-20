@@ -24,7 +24,7 @@ int [] monthLengths = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 void setup() {
   background(255);
   font = createFont("fonts/fixed_01.ttf");
-  textFont(font, 8);
+  textFont(font, 12);
   bls.load();
 }
 
