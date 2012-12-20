@@ -2,7 +2,8 @@ var http = require('http'),
   url = require('url'),
   fs = require('fs'),
   path = require('path'),
-  mysql = require('mysql');
+  mysql = require('mysql'),
+  less = require('less');
 
 var mimeTypes = {
   "html": "text/html",
@@ -13,7 +14,8 @@ var mimeTypes = {
   "css": "text/css",
   "ico": "image/x-icon",
   "pde": "text/plain",
-  "ttf": "font/opentype"
+  "ttf": "font/opentype",
+  "less": "stylesheet/less"
 };
 
 var connection = mysql.createConnection({
@@ -105,6 +107,7 @@ bls.prototype = {
     var mimeType;
     var components = url.parse(req.url, true);
     var pathSplit = components.path.split('.');
+    console.log(req.url);
     if(req.url == '/') {
       fs.readFile(path.join(__dirname, 'static', 'index.html'), function(err, data) {
         if(err) {
@@ -116,6 +119,27 @@ bls.prototype = {
         }
 
         res.end(data);
+      });
+    } else if(req.url == '/less/bootstrap.css') {
+      fs.readFile(path.join(__dirname, 'static', 'less', 'bootstrap.less'), function (err, data) {
+        if (err) {
+          res.writeHead(404);
+          res.end();
+        } else {
+          less.render(data.toString(), function (e, css) {
+            if (e) {
+              res.writeHead(500, {
+                'Content-Type': 'text/html'
+              });
+              res.end(e);
+            } else {
+              res.writeHead(200, {
+                'Content-Type': 'text/css'
+              });
+              res.end(css);
+            }
+          });
+        }
       });
     } else if(mimeType = mimeTypes[pathSplit[pathSplit.length - 1]]) {
       fs.readFile(path.join(__dirname, 'static', components.path), function(err, data) {
