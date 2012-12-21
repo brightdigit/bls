@@ -36,7 +36,7 @@ var bls = {
         that.pjs.loadData(request.data);
       }
       $('.alerts .alert').alert('close');
-      if (request.data.length <= 0) {
+      if (false && request.data.length <= 0) {
         $('<div class="alert fade in"><a class="close" data-dismiss="alert" href="#">&times;</a>Sorry there is no data available for this selection.</div>').appendTo(
         $('.' + bls.lastChanged + '-alert')).alert();
       }
@@ -105,6 +105,18 @@ var bls = {
         itemsSelector.val(bls.defaults.item);//.find('option[value="7471A"]').attr('selected', true);
         itemsSelector.chosen();
         itemsSelector.change( function (e) {
+          $.get('areas?item=' + itemsSelector.val(), function (data) {
+            var areaSelector = $('.areas');
+            var val = areaSelector.val();
+            var first = $(areaSelector.children()[0]).clone();
+            areaSelector.empty();
+            areaSelector.append(first);
+            data.forEach(function(value) {
+              areaSelector.append('<option value="' + value.area_code + '">' + value.area_name + '</option>');
+            });
+            areaSelector.val(val);
+            areaSelector.trigger("liszt:updated");
+          });
           bls.update(e, $(this));
         });
       });
@@ -117,6 +129,19 @@ var bls = {
         areaSelector.val(bls.defaults.area);
         areaSelector.chosen();
         areaSelector.change( function (e) {
+          $.get('items?area=' + areaSelector.val(), function (data) {
+            var itemsSelector = $('.items');
+            var val = itemsSelector.val();
+            var first = $(itemsSelector.children()[0]).clone();
+            itemsSelector.empty();
+            itemsSelector.append(first);
+            data.forEach(function(value) {
+              itemsSelector.append('<option value="' + value.item_code + '">' + value.description + '</option>');
+            });
+            itemsSelector.val(val);
+            itemsSelector.trigger("liszt:updated");
+
+          });
           bls.update(e, $(this));
         });
       });
