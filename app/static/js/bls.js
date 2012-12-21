@@ -37,16 +37,18 @@ var bls = {
     }, function(request) {
       if (request.data) {
         that.pjs.loadData(request.data);
-        var result = {startDate : undefined, endDate : undefined};
-        request.data.forEach( function (value) {
-          var startDate = new Date(value.startDate),
-            endDate = new Date(value.endDate);
-          result.startDate = result.startDate ? new Date(Math.min.call(null, result.startDate, startDate)) : startDate;
-          result.endDate = result.endDate ? new Date(Math.max.call(null, result.endDate, endDate)) : endDate;
-        });
-        result.startDate = bls.toUTC(result.startDate);
-        result.endDate = bls.toUTC(result.endDate);
-        $('#dateRange').val([result.startDate.toString(bls.defaults.daterangepicker.format),result.endDate.toString(bls.defaults.daterangepicker.format)].join(' - '));
+        if (request.data.length > 0) {
+          var result = {startDate : undefined, endDate : undefined};
+          request.data.forEach( function (value) {
+            var startDate = new Date(value.startDate),
+              endDate = new Date(value.endDate);
+            result.startDate = result.startDate ? new Date(Math.min.call(null, result.startDate, startDate)) : startDate;
+            result.endDate = result.endDate ? new Date(Math.max.call(null, result.endDate, endDate)) : endDate;
+          });
+          result.startDate = bls.toUTC(result.startDate);
+          result.endDate = bls.toUTC(result.endDate);
+          $('#dateRange').val([result.startDate.toString(bls.defaults.daterangepicker.format),result.endDate.toString(bls.defaults.daterangepicker.format)].join(' - '));
+        }
       }
       that.busy.fadeOut();
       $('input,select').removeAttr('disabled');
