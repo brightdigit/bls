@@ -2,67 +2,73 @@
 <!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title></title>
-    <meta name="descriptin" content="">
-    <meta name="viewport" content="width=device-width">
-
-    <style>
-      body {
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+    <!--<![endif]-->
+    <head>
+        <meta name="generator" content="HTML Tidy for HTML5 (experimental) for Windows https://github.com/w3c/tidy-html5/tree/c63cc39">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title></title>
+        <meta name="descriptin" content="">
+        <meta name="viewport" content="width=device-width">
+        <style>
+body {
         padding-top: 60px;
         padding-bottom: 40px;
-      }
-    </style>
-    <link rel="stylesheet/less" type="text/css" href="less/bootstrap.less" />
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" type="text/css" href="css/daterangepicker.css" />
-
-    <script src="js/modernizr-2.6.2-respond-1.1.0.min.js"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-    <script>window.jQuery || document.write('<script src="js/jquery-1.8.3.min.js"><\/script>')</script>
-    <script src="js/processing-1.4.1.min.js"></script>
-
-    <script type="text/javascript" src="js/less-1.3.1.min.js"></script>
-    <script type="text/javascript" src="js/date.js"></script>
-    <script type="text/javascript" src="js/daterangepicker.js"></script>
-    <script type="text/javascript" src="js/chosen.jquery.js"></script>
-    <script src="js/bls.js"></script>
-  </head>
-  <body>
-    <!--[if lt IE 7]>
+        }
+        </style>
+        <link rel="stylesheet/less" type="text/css" href="less/bootstrap.less">
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" type="text/css" href="css/daterangepicker.css">
+        <script src="js/modernizr-2.6.2-respond-1.1.0.min.js">
+</script>
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js">
+</script>
+        <script>
+window.jQuery || document.write('<script src="js/jquery-1.8.3.min.js"><\/script>')
+        </script>
+        <script src="js/processing-1.4.1.min.js">
+</script>
+        <script type="text/javascript" src="js/less-1.3.1.min.js">
+</script>
+        <script type="text/javascript" src="js/date.js">
+</script>
+        <script type="text/javascript" src="js/daterangepicker.js">
+</script>
+        <script type="text/javascript" src="js/chosen.jquery.js">
+</script>
+        <script src="js/bls.js">
+</script>
+    </head>
+    <body>
+        <!--[if lt IE 7]>
       <p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
     <![endif]-->
-
-    <!-- This code is taken from http://twitter.github.com/bootstrap/examples/hero.html -->
-
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
-          <a class="brand" href="#home">bls/dv</a>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li class="active"><a class="link" href="#home">Home</a></li>
-              <li><a class="link" href="#about">About</a></li>
-              <li><a class="link" href="#contact">Contact</a></li>
-
-            </ul>
-          </div><!--/.nav-collapse -->
+        <!-- This code is taken from http://twitter.github.com/bootstrap/examples/hero.html -->
+        <div class="navbar navbar-inverse navbar-fixed-top">
+            <div class="navbar-inner">
+                <div class="container">
+                    <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"></a> <a class="brand" href="#home">bls/dv</a>
+                    <div class="nav-collapse collapse">
+                        <ul class="nav">
+                            <li class="active">
+                                <a class="link" href="#home">Home</a>
+                            </li>
+                            <li>
+                                <a class="link" href="#about">About</a>
+                            </li>
+                            <li>
+                                <a class="link" href="#contact">Contact</a>
+                            </li>
+                        </ul>
+                    </div><!--/.nav-collapse -->
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-
-    <div class="container">
-
-      <!-- Main hero unit for a primary marketing message or call to action -->
-<!--
+        <div class="container">
+            <!-- Main hero unit for a primary marketing message or call to action -->
+            <!--
       <div class="hero-unit">
         <h1>bls/dv</h1>
         <p>This is a data visualization tool for the <a href="http://bls.gov/">Bureau of Labor Statistics</a> data.</p>
@@ -70,47 +76,45 @@
         <a class="btn btn-seconday btn-large">Learn more &raquo;</a></p>
       </div>
 -->
-    <div id="home">
-      <div class="controls-row">
-        <form>
-          <fieldset>
-            <div class="control-group">
-              <div class="controls controls-row">
-              <!--<button type="reset" class="btn span2">Reset</button>-->
-                <div class="span3">
-                      <select class="areas chosen-control">
-                        <option>Select Area...</option>
-                      </select>
+            <div id="home">
+                <form>
+                    <fieldset>
+                        <div class="control-group">
+                            <div class="controls controls-row">
+                                <!--<button type="reset" class="btn span2">Reset</button>-->
+                                <div class="span3">
+                                    <select class="areas chosen-control">
+                                        <option>
+                                            Select Area...
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="span3">
+                                    <select class="items chosen-control">
+                                        <option>
+                                            Select Item...
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="input-prepend span3">
+                                    <input class="daterangepicker-control" type="text" name="reservation" id="reservation">
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+                <div class="row alerts">
+                    <div class="span3 areas-alert"></div>
+                    <div class="span3 items-alert"></div>
+                    <div class="daterangepicker-control-alert span3"></div>
+                </div>
+                <div class="row">
+                    <div id="container" class="span12">
+                        <script>
+bls.initialize();
+                        </script>
                     </div>
-                <div class="span3">
-                      <select class="items chosen-control">
-                        <option>Select Item...</option>
-                      </select>
-                    </div>
-                <div class="input-prepend span3">
-                  <span class="add-on"><i class="icon-calendar"></i></span><input class="daterangepicker-control"  type="text" name="reservation" id="reservation" />
-                </div>
-              </div>
-            </div>
-          </fieldset>
-        </form>
-      </div>
-              <div class="row alerts">
-                <div class="span3 areas-alert">
-                </div>
-                <div class="span3 items-alert">
-                </div>
-                <div class="daterangepicker-control-alert span3">
-                </div>
-              </div> 
-      <div class="row">
-        <div id="container" class="span12">
-          <script>
-            bls.initialize();
-          </script>
-        </div>
-      </div>
-      <!--
+                </div><!--
       <div class="row">
         <div class="span4">
           <h2>Heading</h2>
@@ -129,32 +133,28 @@
         </div>
       </div>
 -->
-      </div>
-
-      <div id="about">
-        about
-      </div>
-
-      <div id="contact">
-        contact
-      </div>
-      <div class="bottom row">
-            <hr class="span12">
-
-            <footer class="span12">
-              <p>&copy; Company 2012</p>
-            </footer>
-      </div>
-    </div> <!-- /container -->
-
-    <script src="js/bootstrap.min.js"></script>
-
-
-    <script>
-      var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
-      (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
-      g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
-      s.parentNode.insertBefore(g,s)}(document,'script'));
-    </script>
-  </body>
+            </div>
+            <div id="about">
+                about
+            </div>
+            <div id="contact">
+                contact
+            </div>
+            <div class="bottom row">
+                <hr class="span12">
+                <footer class="span12">
+                    <p>
+                        © Company 2012
+                    </p>
+                </footer>
+            </div><!-- /container -->
+            <script src="js/bootstrap.min.js">
+</script> <script>
+var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+            (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+            g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+            s.parentNode.insertBefore(g,s)}(document,'script'));
+            </script>
+        </div>
+    </body>
 </html>
