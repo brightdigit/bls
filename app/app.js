@@ -132,9 +132,7 @@ bls.prototype = {
         res.end(data);
       });
     } else if(requireReferer && (!req.headers['referer'] || req.headers['referer'].indexOf('http://' + req.headers['host'] + '/') !== 0)) {
-      res.writeHead(500, {
-        'Content-Type': 'text/html'
-      });
+      res.writeHead(400);
       res.end();
     } else {
       var command = components.pathname.substr(components.path.lastIndexOf('/') + 1);

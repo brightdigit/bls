@@ -29,12 +29,16 @@ var bls = {
       that.onresize();
       that.pjs.update();
     });
-    bls.request({
+    var parameters = {
       item: $('.items').val(),
       area: $('.areas').val(),
       startDate: bls.current.startDate ? bls.current.startDate : bls.defaults.daterangepicker.startDate,
       endDate: bls.current.endDate ? bls.current.endDate : bls.defaults.daterangepicker.endDate
-    }, function(request) {
+    };
+    for (var name in parameters) {
+      $.cookie(name, parameters[name]);
+    }
+    bls.request(parameters, function(request) {
       if (request.data) {
         that.pjs.loadData(request.data);
         if (request.data.length > 0) {
@@ -104,6 +108,10 @@ var bls = {
     item : '7471A'
   },
   initialize: function() {
+    bls.defaults.item = $.cookie('item') || bls.defaults.item;
+    bls.defaults.area = $.cookie('area') || bls.defaults.area;
+    bls.defaults.startDate = (new Date($.cookie('startDate'))) || bls.defaults.startDate;
+    bls.defaults.endDate = (new Date($.cookie('endDate'))) || bls.defaults.endDate;
     var that = this;
     var script = document.getElementsByTagName('script')[(document.getElementsByTagName('script').length - 1)];
     this.container = $(script.parentNode);
