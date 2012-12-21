@@ -29,23 +29,27 @@ void setup() {
 }
 
 void loadData (data) {
-	float y_min = 100000000, y_max = 0;
-	int x_min, x_max;
-	Coordinate [] cleanData = new Object [data.length];
-	for (int index = 0; index < data.length; index++) {
-		cleanData[index] = new Coordinate(data[index]);
-		y_min = min(y_min, cleanData[index].y);
-		y_max = max(y_max, cleanData[index].y);
+	if (data.length > 0) {
+		float y_min = 100000000, y_max = 0;
+		int x_min, x_max;
+		Coordinate [] cleanData = new Object [data.length];
+		for (int index = 0; index < data.length; index++) {
+			cleanData[index] = new Coordinate(data[index]);
+			y_min = min(y_min, cleanData[index].y);
+			y_max = max(y_max, cleanData[index].y);
+		}
+		x_min = cleanData[0].x[0];
+		x_max = cleanData[cleanData.length - 1].x[1];
+		coordinates = cleanData;
+
+		x_scale = width/(x_max - x_min);
+		y_scale = (height-100)/(y_max - y_min);
+
+		x_offset = x_min * x_scale;
+		y_offset = y_min * y_scale;
+	} else { 
+		coordinates = {};
 	}
-	x_min = cleanData[0].x[0];
-	x_max = cleanData[cleanData.length - 1].x[1];
-	coordinates = cleanData;
-
-	x_scale = width/(x_max - x_min);
-	y_scale = (height-100)/(y_max - y_min);
-
-	x_offset = x_min * x_scale;
-	y_offset = y_min * y_scale;
 }
 
 void update () {
@@ -80,7 +84,7 @@ String getDate(unix) {
 void draw() {
 	background(255);
 	if (coordinates) {
-		if (isMouseOver) {
+		if (isMouseOver && coordinates.length > 0) {
 			float x_value = (xPos + x_offset)/x_scale;
 			float y_value = find_y(x_value);
 			int y_pos = height-y_value*y_scale + y_offset - 50;
