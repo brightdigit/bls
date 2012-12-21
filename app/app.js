@@ -2,8 +2,7 @@ var http = require('http'),
   url = require('url'),
   fs = require('fs'),
   path = require('path'),
-  mysql = require('mysql'),
-  less = require('less');
+  mysql = require('mysql');
 
 var mimeTypes = {
   "html": "text/html",

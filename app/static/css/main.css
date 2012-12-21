@@ -20,6 +20,10 @@
 }
 
 
+.container > *[id].active {
+	position: static;
+}
+
 @media (max-width: 480px) { 
 	.container *[id]{
 		position: static;

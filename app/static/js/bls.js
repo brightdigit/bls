@@ -5,12 +5,9 @@ var bls = {
     if(height < 200) {
       height = 200;
       $('.bottom').hide(); //('absolute');
-      console.log('absolute');
     } else {
       $('.bottom').show(); //('absolute');
     }
-    console.log($('.bottom').height());
-    console.log(height);
     this.pjs.size(this.container.width(), height);
   },
   load: function() {
@@ -22,9 +19,9 @@ var bls = {
       that.pjs.update();
     });
     bls.request({
-      item: 'FD2101',
+      item: '7471A',
       area: '0000',
-      startDate: new Date(2000, 0, 1),
+      startDate: new Date(1970, 0, 1),
       endDate: new Date()
     }, function(request) {
       that.pjs.loadData(request.data);
@@ -46,9 +43,23 @@ var bls = {
     $('.container > *.active[id]').fadeOut(function() {
       $(this).removeClass('active');
     });
+    $(hash).addClass('active');
     $(hash).fadeIn(function() {
-      $(this).addClass('active');
     });
+  },
+  defaults : {
+    daterangepicker : {startDate : (new Date(1978, 0, 1)), endDate : (new Date()), format : 'yyyy-MM-dd', 
+      ranges : {
+        '6 months ago' : [Date.today().addMonths(-6), new Date()],
+        'Year to date' : [Date.today().set({day : 1, month : 1}), new Date()],
+        '1 year ago' : [Date.today().addYears(-1), new Date()],
+        '5 years ago' : [Date.today().addYears(-5), new Date()],
+        '10 years ago' : [Date.today().addYears(-10), new Date()],
+        '20 years ago' : [Date.today().addYears(-20), new Date()],
+        'All' : [(new Date(1978, 0, 1)), new Date()],
+    }},
+    area : '0000',
+    item : '7471A'
   },
   initialize: function() {
     var that = this;
@@ -57,7 +68,9 @@ var bls = {
     $(document).ready(function() {
       $('.link').click(bls.updateView);
       bls.updateView();
-      $('input.daterangepicker-control').daterangepicker();
+      var options = bls.defaults.daterangepicker;
+      var drp = $('input.daterangepicker-control').daterangepicker(options);
+      drp.val([options.startDate.toString(options.format), options.endDate.toString(options.format)].join(' - '));
       var canvas = $('<canvas id="' + bls.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
       that.container.append(canvas);
       $.get('items', function(data) {
@@ -65,6 +78,7 @@ var bls = {
         data.forEach(function(value) {
           itemsSelector.append('<option value="' + value.item_code + '">' + value.description + '</option>');
         });
+        itemsSelector.val(bls.defaults.item);//.find('option[value="7471A"]').attr('selected', true);
         itemsSelector.chosen();
       });
 
@@ -73,16 +87,16 @@ var bls = {
         data.forEach(function(value) {
           areaSelector.append('<option value="' + value.area_code + '">' + value.area_name + '</option>');
         });
+        areaSelector.val(bls.defaults.area);
         areaSelector.chosen();
       });
 
     });
-    $('.btn[type="reset"]').click(function() {
-      var form = $(this).parents('form');
-      form[0].reset();
-      form.children('select').each(function() {
-        this.selectedIndex = 0;
-      });
+    $('.btn[type="reset"]').click(function(e) {
+      e.preventDefault();
+      $('.items').val(bls.defaults.item);
+      $('.areas').val(bls.defaults.area);
+      $('input.daterangepicker-control').daterangepicker(bls.defaults.daterangepicker);
     });
   },
   request: function(parameters, callback) {
