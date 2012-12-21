@@ -22,6 +22,8 @@ var bls = {
     var that = this;
     this.pjs = Processing.getInstanceById(that.container.find('canvas').attr('id'));
     that.onresize();
+    $('input,select').attr('disabled', '');
+    $('.chosen-control').trigger("liszt:updated");
     $(window).resize(function() {
       that.onresize();
       that.pjs.update();
@@ -35,6 +37,8 @@ var bls = {
       if (request.data) {
         that.pjs.loadData(request.data);
       }
+      $('input,select').removeAttr('disabled');
+      $('.chosen-control').trigger("liszt:updated");
       $('.alerts .alert').alert('close');
       if (false && request.data.length <= 0) {
         $('<div class="alert fade in"><a class="close" data-dismiss="alert" href="#">&times;</a>Sorry there is no data available for this selection.</div>').appendTo(
@@ -68,7 +72,7 @@ var bls = {
     endDate : undefined
   },
   defaults : {
-    daterangepicker : {startDate : (new Date(1978, 0, 1)), endDate : (new Date()), format : 'yyyy-MM-dd', 
+    daterangepicker : {startDate : (new Date(1978, 0, 1)), endDate : (new Date()), format : 'yyyy-MM-dd',
       ranges : {
         '6 months ago' : [Date.today().addMonths(-6), new Date()],
         'Year to date' : [Date.today().set({day : 1, month : 1}), new Date()],
@@ -105,7 +109,8 @@ var bls = {
         itemsSelector.val(bls.defaults.item);//.find('option[value="7471A"]').attr('selected', true);
         itemsSelector.chosen();
         itemsSelector.change( function (e) {
-          $.get('areas?item=' + itemsSelector.val(), function (data) {
+          var value = itemsSelector.val();
+          $.get('areas' + (value&&('?item=' + value)), function (data) {
             var areaSelector = $('.areas');
             var val = areaSelector.val();
             var first = $(areaSelector.children()[0]).clone();
@@ -129,7 +134,8 @@ var bls = {
         areaSelector.val(bls.defaults.area);
         areaSelector.chosen();
         areaSelector.change( function (e) {
-          $.get('items?area=' + areaSelector.val(), function (data) {
+          var value = areaSelector.val();
+          $.get('items' + (value&&('?area=' + value)), function (data) {
             var itemsSelector = $('.items');
             var val = itemsSelector.val();
             var first = $(itemsSelector.children()[0]).clone();
@@ -140,7 +146,6 @@ var bls = {
             });
             itemsSelector.val(val);
             itemsSelector.trigger("liszt:updated");
-
           });
           bls.update(e, $(this));
         });
