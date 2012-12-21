@@ -37,6 +37,16 @@ var bls = {
     }, function(request) {
       if (request.data) {
         that.pjs.loadData(request.data);
+        var result = {startDate : undefined, endDate : undefined};
+        request.data.forEach( function (value) {
+          var startDate = new Date(value.startDate),
+            endDate = new Date(value.endDate);
+          result.startDate = result.startDate ? new Date(Math.min.call(null, result.startDate, startDate)) : startDate;
+          result.endDate = result.endDate ? new Date(Math.max.call(null, result.endDate, endDate)) : endDate;
+        });
+        result.startDate = bls.toUTC(result.startDate);
+        result.endDate = bls.toUTC(result.endDate);
+        $('#dateRange').val([result.startDate.toString(bls.defaults.daterangepicker.format),result.endDate.toString(bls.defaults.daterangepicker.format)].join(' - '));
       }
       that.busy.fadeOut();
       $('input,select').removeAttr('disabled');
@@ -47,6 +57,10 @@ var bls = {
         $('.' + bls.lastChanged + '-alert')).alert();
       }
     });
+  },
+  toUTC : function (d) {
+    utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+    return new Date(utc);
   },
   lastChanged : undefined,
   getRandomId: function() {
