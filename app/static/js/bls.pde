@@ -47,7 +47,7 @@ void loadData (data) {
 
 		x_offset = x_min * x_scale;
 		y_offset = y_min * y_scale;
-	} else { 
+	} else {
 		coordinates = {};
 	}
 }
@@ -93,11 +93,11 @@ void draw() {
 			String date =getDate(x_value);
 			fill(0);
 			text(date, 10, 20);
-			text(y_value, 10, 40);
+			text("$" + nf(y_value, 1, 3), 10, 40);
 			stroke(164);
 			fill(64);
 			text(date, xPos + 10, y_pos - 30);
-			text(y_value, xPos + 10, y_pos - 10);
+			text("$" + nf(y_value, 1, 3), xPos + 10, y_pos - 10);
 			line(xPos, 0, xPos,  height);
 			line(0, y_pos, width, y_pos);
 		}

@@ -24,6 +24,8 @@ var connection = mysql.createConnection({
   debug: false
 });
 
+var requireReferer = true;
+
 connection.config.queryFormat = function(query, values) {
   if(!values) return query;
   return query.replace(/\:(\w+)/g, function(txt, key) {
@@ -46,7 +48,6 @@ var controller = function(queryFormat, defaultParameters) {
 controller.prototype = {
   process: function(parameters, res) {
     parameters = this.translate(parameters);
-    //parameters.area = parameters.area ? parameters.area : null;
     connection.query(this.queryFormat, parameters, function(error, results) {
       if(error) {
         console.log(error);
@@ -59,7 +60,6 @@ controller.prototype = {
         res.end(JSON.stringify(results));
       }
     });
-    //return parameters;
   },
   translate: function(parameters) {
     for(var name in this.defaultParameters) {
@@ -107,6 +107,7 @@ bls.prototype = {
     var components = url.parse(req.url, true);
     var pathSplit = components.path.split('.');
     console.log(req.url);
+
     if(req.url == '/') {
       fs.readFile(path.join(__dirname, 'static', 'index.html'), function(err, data) {
         if(err) {
@@ -119,27 +120,6 @@ bls.prototype = {
 
         res.end(data);
       });
-    } else if(req.url == '/less/bootstrap.css') {
-      fs.readFile(path.join(__dirname, 'static', 'less', 'bootstrap.less'), function (err, data) {
-        if (err) {
-          res.writeHead(404);
-          res.end();
-        } else {
-          less.render(data.toString(), function (e, css) {
-            if (e) {
-              res.writeHead(500, {
-                'Content-Type': 'text/html'
-              });
-              res.end(e);
-            } else {
-              res.writeHead(200, {
-                'Content-Type': 'text/css'
-              });
-              res.end(css);
-            }
-          });
-        }
-      });
     } else if(mimeType = mimeTypes[pathSplit[pathSplit.length - 1]]) {
       fs.readFile(path.join(__dirname, 'static', components.path), function(err, data) {
         if(err) {
@@ -151,6 +131,11 @@ bls.prototype = {
         }
         res.end(data);
       });
+    } else if(requireReferer && (!req.headers['referer'] || req.headers['referer'].indexOf('http://' + req.headers['host'] + '/') !== 0)) {
+      res.writeHead(500, {
+        'Content-Type': 'text/html'
+      });
+      res.end();
     } else {
       var command = components.pathname.substr(components.path.lastIndexOf('/') + 1);
       var controller = bls.controllers[command];
