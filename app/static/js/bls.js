@@ -11,6 +11,11 @@ var bls = {
     this.pjs.size(this.container.width(), height);
   },
   update : function (e, src) {
+    var classNames = ['areas', 'items', 'daterangepicker-control'];
+    var cls = src.attr('class').split(/\s+/).filter( function (value) { return classNames.some( function (other) {
+      return other===value;
+    }); } )[0];
+    bls.lastChanged = cls;
     bls.load();
   },
   load: function() {
@@ -30,8 +35,14 @@ var bls = {
       if (request.data) {
         that.pjs.loadData(request.data);
       }
+      $('.alerts .alert').alert('close');
+      if (request.data.length <= 0) {
+        $('<div class="alert fade in"><a class="close" data-dismiss="alert" href="#">&times;</a>Sorry there is no data available for this selection.</div>').appendTo(
+        $('.' + bls.lastChanged + '-alert')).alert();
+      }
     });
   },
+  lastChanged : undefined,
   getRandomId: function() {
     var id = "";
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -81,7 +92,7 @@ var bls = {
       var drp = $('input.daterangepicker-control').daterangepicker(options, function (start, end) {
         bls.current.startDate = start;
         bls.current.endDate = end;
-        bls.update();
+        bls.update(this, this.element);
       });
       drp.val([options.startDate.toString(options.format), options.endDate.toString(options.format)].join(' - '));
       var canvas = $('<canvas id="' + bls.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
@@ -94,7 +105,7 @@ var bls = {
         itemsSelector.val(bls.defaults.item);//.find('option[value="7471A"]').attr('selected', true);
         itemsSelector.chosen();
         itemsSelector.change( function (e) {
-          bls.update(e, this);
+          bls.update(e, $(this));
         });
       });
 
@@ -106,7 +117,7 @@ var bls = {
         areaSelector.val(bls.defaults.area);
         areaSelector.chosen();
         areaSelector.change( function (e) {
-          bls.update(e, this);
+          bls.update(e, $(this));
         });
       });
 
