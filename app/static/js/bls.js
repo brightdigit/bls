@@ -10,6 +10,9 @@ var bls = {
     }
     this.pjs.size(this.container.width(), height);
   },
+  update : function (e, src) {
+    bls.load();
+  },
   load: function() {
     var that = this;
     this.pjs = Processing.getInstanceById(that.container.find('canvas').attr('id'));
@@ -19,12 +22,14 @@ var bls = {
       that.pjs.update();
     });
     bls.request({
-      item: '7471A',
-      area: '0000',
-      startDate: new Date(1970, 0, 1),
-      endDate: new Date()
+      item: $('.items').val(),
+      area: $('.areas').val(),
+      startDate: bls.current.startDate ? bls.current.startDate : bls.defaults.daterangepicker.startDate,
+      endDate: bls.current.endDate ? bls.current.endDate : bls.defaults.daterangepicker.endDate
     }, function(request) {
-      that.pjs.loadData(request.data);
+      if (request.data) {
+        that.pjs.loadData(request.data);
+      }
     });
   },
   getRandomId: function() {
@@ -46,6 +51,10 @@ var bls = {
     $(hash).addClass('active');
     $(hash).fadeIn(function() {
     });
+  },
+  current : {
+    startDate : undefined,
+    endDate : undefined
   },
   defaults : {
     daterangepicker : {startDate : (new Date(1978, 0, 1)), endDate : (new Date()), format : 'yyyy-MM-dd', 
@@ -69,7 +78,11 @@ var bls = {
       $('.link').click(bls.updateView);
       bls.updateView();
       var options = bls.defaults.daterangepicker;
-      var drp = $('input.daterangepicker-control').daterangepicker(options);
+      var drp = $('input.daterangepicker-control').daterangepicker(options, function (start, end) {
+        bls.current.startDate = start;
+        bls.current.endDate = end;
+        bls.update();
+      });
       drp.val([options.startDate.toString(options.format), options.endDate.toString(options.format)].join(' - '));
       var canvas = $('<canvas id="' + bls.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
       that.container.append(canvas);
@@ -80,6 +93,9 @@ var bls = {
         });
         itemsSelector.val(bls.defaults.item);//.find('option[value="7471A"]').attr('selected', true);
         itemsSelector.chosen();
+        itemsSelector.change( function (e) {
+          bls.update(e, this);
+        });
       });
 
       $.get('areas', function(data) {
@@ -89,6 +105,9 @@ var bls = {
         });
         areaSelector.val(bls.defaults.area);
         areaSelector.chosen();
+        areaSelector.change( function (e) {
+          bls.update(e, this);
+        });
       });
 
     });
