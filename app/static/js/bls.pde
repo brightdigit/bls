@@ -53,6 +53,7 @@ void loadData (data) {
 }
 
 void update () {
+	if (coordinates && coordinates.length > 0) {
 	float y_min = 100000000, y_max = 0;
 	int x_min, x_max;
 
@@ -69,6 +70,7 @@ void update () {
 	x_offset = x_min * x_scale;
 	y_offset = y_min * y_scale;
 	redraw();
+	}
 }
 
 int getUnixTime(dateStr) {
