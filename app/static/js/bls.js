@@ -22,6 +22,7 @@ var bls = {
     var that = this;
     this.pjs = Processing.getInstanceById(that.container.find('canvas').attr('id'));
     that.onresize();
+      that.busy.fadeIn();
     $('input,select').attr('disabled', '');
     $('.chosen-control').trigger("liszt:updated");
     $(window).resize(function() {
@@ -37,6 +38,7 @@ var bls = {
       if (request.data) {
         that.pjs.loadData(request.data);
       }
+      that.busy.fadeOut();
       $('input,select').removeAttr('disabled');
       $('.chosen-control').trigger("liszt:updated");
       $('.alerts .alert').alert('close');
@@ -89,6 +91,7 @@ var bls = {
     var that = this;
     var script = document.getElementsByTagName('script')[(document.getElementsByTagName('script').length - 1)];
     this.container = $(script.parentNode);
+    this.busy = $('<div id="fadingBarsG"><div id="fadingBarsG_1" class="fadingBarsG"></div><div id="fadingBarsG_2" class="fadingBarsG"></div><div id="fadingBarsG_3" class="fadingBarsG"></div><div id="fadingBarsG_4" class="fadingBarsG"></div><div id="fadingBarsG_5" class="fadingBarsG"></div><div id="fadingBarsG_6" class="fadingBarsG"></div><div id="fadingBarsG_7" class="fadingBarsG"></div><div id="fadingBarsG_8" class="fadingBarsG"></div></div>').appendTo(this.container);
     $(document).ready(function() {
       $('.link').click(bls.updateView);
       bls.updateView();
