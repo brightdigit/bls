@@ -14,7 +14,8 @@ var mimeTypes = {
   "ico": "image/x-icon",
   "pde": "text/plain",
   "ttf": "font/opentype",
-  "less": "stylesheet/less"
+  "less": "stylesheet/less",
+  "svg": "image/svg+xml"
 };
 
 var connection = mysql.createConnection({
