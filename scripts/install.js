@@ -16,17 +16,17 @@ function makeid()
     return text;
 }
 
-/*
-select concat('drop table if exists ', table_name, ';') from meta group by table_name
-union
-select concat('create table ', table_name, '(', group_concat(concat_ws(' ',column_name, column_type, IF(nullable,'DEFAULT NULL','NOT NULL'))), ');') from meta group by table_name
-union
-select concat('load data local infile \'', @basedirectory, '/ftp.bls.gov/pub/time.series/', file_name,'\' into table ', table_name,  ' ignore 1 lines;') from import;
-*/
-
 function beginDownload() {
   connection.query('CREATE SCHEMA IF NOT EXISTS ' + dbName + ';', function (error, results) {
+    if (error) {
+      console.log(error);
+      process.exit(1);
+    }
     connection.changeUser({database : dbName}, function (error) {
+      if (error) {
+        console.log(error);
+        process.exit(1);
+      }
       fs.readFile(path.resolve(__dirname, 'init_db.sql'), 'UTF-8', function (error, data) {
         connection.query(data, function (error, results) {
           connection.query("select concat('create table ', table_name, '(', group_concat(concat_ws(' ',column_name, column_type, IF(nullable,'DEFAULT NULL','NOT NULL'))), ');') as value from meta group by table_name", function (error, results) {
@@ -72,20 +72,20 @@ function beginDownload() {
                               connection.query(data, function (error){
                                 if (error) {
                                   throw error;
-                                } else {                                  
+                                } else {
                                   fs.readFile(path.resolve(__dirname, 'verify_integrity.sql'), 'UTF-8', function (error, data) {
                                     console.log('verifying data integrity...');
                                     connection.query(data, function (error, results){
                                       if (error) {
                                         throw error;
-                                      } else {                                 
+                                      } else {
                                         if (results.every(function (value) {return value[0].count === 0;})) {
-                                          console.log('done.'); 
+                                          console.log('done.');
                                           // go through each description and clean up the text
                                           process.exit(0);
                                         } else {
                                           console.log('warning data integrity check failed');
-                                          console.log('done.'); 
+                                          console.log('done.');
                                           process.exit(1);
                                         }
                                       }
@@ -118,6 +118,10 @@ var connection = mysql.createConnection(settings);
 fs.mkdir(tmpDir, function (error) {
   if (process.argv[2] == '-f') {
     connection.query('DROP SCHEMA ' + dbName + '; CREATE SCHEMA ' + dbName + ';', function (error, results) {
+      if (error) {
+        console.log(error);
+        process.exit(1);
+      }
       console.log('Schema dropped.');
       beginDownload();
     });
