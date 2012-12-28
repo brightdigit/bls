@@ -76,15 +76,20 @@ create table ap_item_measurement (
     priority tinyint NOT NULL,
     value float NOT NULL
 );
+
+drop table if exists ap_item_matches;
 create table ap_item_matches as (select item_code from ap_item);
 
 delete from ap_item_matches where item_code = '709112';
 delete from ap_item_matches where item_code = '709213';
 
+drop table if exists ap_item_matches_mapping;
 create table ap_item_matches_mapping as (select item_code as root_code, item_code from ap_item_matches);
 
 insert into ap_item_matches_mapping values ('709111','709112'),('709212','709213');
 
+
+drop table if exists ap_item_inactive;
 create table ap_item_inactive (
 	item_code char(6) NOT NULL PRIMARY KEY
 );
@@ -135,9 +140,11 @@ insert into ap_item_inactive values
 ('74713'),
 ('715212');
 
+
+drop table if exists ap_item_groups;
+
 create table ap_item_groups (
 group_name varchar(127) primary key);
-
 
 insert into ap_item_groups values 
 ('grains'),
@@ -148,6 +155,8 @@ insert into ap_item_groups values
 ('condiments'),
 ('drinks'),
 ('energy');
+
+drop table if exists ap_item_grouping;
 
 create table ap_item_grouping (
 	item_code char(6) PRIMARY KEY,
@@ -266,6 +275,8 @@ INSERT into ap_item_grouping values ('FD4101', 'meat');
 INSERT into ap_item_grouping values ('FF1101', 'meat');
 INSERT into ap_item_grouping values ('FL2101', 'fruits and vegatables');
 
+drop table if exists ap_item_names;
+
 create table ap_item_names (
 	item_code char(6) PRIMARY KEY,
 	name varchar(127) NOT NULL
@@ -315,8 +326,8 @@ INSERT into ap_item_names values ('709112', 'milk');
 INSERT into ap_item_names values ('709212', 'milk');
 INSERT into ap_item_names values ('709213', 'milk');
 INSERT into ap_item_names values ('710111', 'butter');
-INSERT into ap_item_names values ('710211', 'american processed cheese');
-INSERT into ap_item_names values ('710212', 'cheddar cheese');
+INSERT into ap_item_names values ('710211', 'cheese');
+INSERT into ap_item_names values ('710212', 'cheese');
 INSERT into ap_item_names values ('710411', 'ice cream');
 INSERT into ap_item_names values ('711111', 'apples');
 INSERT into ap_item_names values ('711211', 'bananas');
@@ -373,15 +384,17 @@ INSERT into ap_item_names values ('74715', 'gasoline');
 INSERT into ap_item_names values ('74716', 'gasoline');
 INSERT into ap_item_names values ('74717', 'automotive diesel fuel');
 INSERT into ap_item_names values ('7471A', 'gasoline');
-INSERT into ap_item_names values ('FC1101', 'all uncooked ground beef');
-INSERT into ap_item_names values ('FC2101', 'all uncooked beef roasts');
-INSERT into ap_item_names values ('FC3101', 'all uncooked beef steaks');
-INSERT into ap_item_names values ('FC4101', 'all uncooked other beef (excluding veal)');
-INSERT into ap_item_names values ('FD2101', 'all ham (excluding canned ham and luncheon slices)');
-INSERT into ap_item_names values ('FD3101', 'all pork chops');
-INSERT into ap_item_names values ('FD4101', 'all other pork (excluding canned ham and luncheon slices)');
+INSERT into ap_item_names values ('FC1101', 'ground beef');
+INSERT into ap_item_names values ('FC2101', 'beef roast');
+INSERT into ap_item_names values ('FC3101', 'steak');
+INSERT into ap_item_names values ('FC4101', 'other beef (excluding veal)');
+INSERT into ap_item_names values ('FD2101', 'ham');
+INSERT into ap_item_names values ('FD3101', 'pork chops');
+INSERT into ap_item_names values ('FD4101', 'other pork');
 INSERT into ap_item_names values ('FF1101', 'chicken breast');
 INSERT into ap_item_names values ('FL2101', 'lettuce');
+
+drop table if exists ap_item_types;
 
 create table ap_item_types (
 	item_code char(6),
@@ -516,5 +529,19 @@ INSERT into ap_item_types values ('709111', 'fortified');
 INSERT into ap_item_types values ('709112', 'fortified');
 INSERT into ap_item_types values ('720222', 'any origin');
 INSERT into ap_item_types values ('720311', 'any origin');
+INSERT into ap_item_types values ('FC3101', 'all');
+INSERT into ap_item_types values ('FC3101', 'uncooked');
+INSERT into ap_item_types values ('FC2101', 'all');
+INSERT into ap_item_types values ('FC2101', 'uncooked');
+INSERT into ap_item_types values ('FC4101', 'all');
+INSERT into ap_item_types values ('FC4101', 'uncooked');
+INSERT into ap_item_types values ('FC4101', 'excluding veal');
+INSERT into ap_item_types values ('FC1101', 'all');
+INSERT into ap_item_types values ('FC1101', 'uncooked');
+INSERT into ap_item_types values ('FD2101', 'excluding canned ham and luncheon slices');
+INSERT into ap_item_types values ('FD3101', 'all pork chops');
+INSERT into ap_item_types values ('FD4101', 'excluding canned ham and luncheon slices');
+INSERT into ap_item_types values ('710211', 'american processed');
+INSERT into ap_item_types values ('710212', 'cheddar');
 
 GRANT SELECT ON bls.* TO 'bls_user'@'localhost' identified by 'HhI*+5oP:(X~}@-';

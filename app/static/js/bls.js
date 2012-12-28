@@ -169,7 +169,7 @@ var bls = {
             itemsSelector.empty();
             itemsSelector.append(first);
             data.forEach(function(value) {
-              itemsSelector.append('<option value="' + value.item_code + '">' + value.description + '</option>');
+              itemsSelector.append('<option value="' + value.item_code + '">' + value.name + '</option>');
             });
             itemsSelector.val(val);
             itemsSelector.trigger("liszt:updated");

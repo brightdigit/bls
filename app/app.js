@@ -4,6 +4,7 @@ var http = require('http'),
   path = require('path'),
   mysql = require('mysql');
 
+console.log(JSON.parse('["test"]'))
 var mimeTypes = {
   "html": "text/html",
   "jpeg": "image/jpeg",
@@ -25,7 +26,7 @@ var connection = mysql.createConnection({
   debug: false
 });
 
-var requireReferer = true;
+var requireReferer = false;
 
 connection.config.queryFormat = function(query, values) {
   if(!values) return query;
@@ -41,13 +42,16 @@ connection.config.queryFormat = function(query, values) {
   }.bind(this));
 };
 
-var controller = function(queryFormat, defaultParameters) {
+var controller = function(queryFormat, defaultParameters, groupNames, jsonFields) {
     this.queryFormat = this.initializeFormat(queryFormat);
     this.defaultParameters = defaultParameters ? defaultParameters : this.defaultParameter;
+    this.groupNames = groupNames || this.groupNames;
+    this.jsonFields = jsonFields || this.jsonFields;
   };
 
 controller.prototype = {
   process: function(parameters, res) {
+    var that = this;
     parameters = this.translate(parameters);
     connection.query(this.queryFormat, parameters, function(error, results) {
       if(error) {
@@ -55,12 +59,50 @@ controller.prototype = {
         res.writeHead(500);
         res.end();
       } else {
+        var data = controller.prototype.groupBy(
+          controller.prototype.jsonConvert(results, that.jsonFields), that.groupNames);
         res.writeHead(200, {
           'Content-Type': 'application/json'
         });
-        res.end(JSON.stringify(results));
+        res.end(JSON.stringify(data));
       }
     });
+  },
+  jsonConvert : function(results, jsonFields) {
+    if (jsonFields) {
+      return results.map(function (value) {
+        var field, newValue = {};
+        for (field in value) {
+          //console.log(field + ': ' + value[field]);
+
+          if (typeof(value[field]) === 'string' && jsonFields.some(function (name) {console.log(name);return name === field;})) {
+            console.log(value[field]);
+            newValue[field] = JSON.parse(value[field]);
+          } else {
+            newValue[field] = value[field];
+          }
+        }
+        return newValue;
+      });
+    } else {
+      return results;
+    }
+  },
+  groupBy : function (results, groupNames) {
+    var data = {};
+    if (groupNames) {
+      results.forEach(function (value) {
+        var groupName =value[groupNames[0]];
+        if (!data[groupName]) {
+          data[groupName] = [];
+        }
+        delete value[groupNames[0]];
+        data[groupName].push(value);
+      });
+      return data;
+    } else {
+      return results;
+    }
   },
   translate: function(parameters) {
     for(var name in this.defaultParameters) {
@@ -70,6 +112,7 @@ controller.prototype = {
   },
   queryFormat: undefined,
   defaultParameters: {},
+  groupNames : [],
   initializeFormat: function(queryFormat) {
     var type = typeof queryFormat;
     if(type === "string") {
@@ -87,9 +130,21 @@ var bls = function() {
 bls.controllers = {
   //'test' : new controller(),
   'items': new controller(
-  ['select ap_item.item_code, description, count(*) as count from ap_current', 'inner join ap_series on ap_current.series_id = ap_series.series_id', 'inner join ap_item on ap_series.item_code = ap_item.item_code', 'where area_code = :area or :area is NULL', 'group by ap_item.item_code, description order by description'], {
+  ['select ap_item_matches_mapping.root_code as item_code, ap_item_names.name, group_name, concat(\'["\',group_concat(distinct ap_item_types.type_name separator \'","\'), \'"]\') as type_names, count(*) as count',
+'from ap_current inner join ap_series on ap_current.series_id = ap_series.series_id',
+'inner join ap_item on ap_series.item_code = ap_item.item_code',
+'inner join ap_item_matches_mapping on ap_item.item_code = ap_item_matches_mapping.item_code',
+'inner join ap_item_names on ap_item_matches_mapping.root_code = ap_item_names.item_code',
+'left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code',
+'left join ap_item_grouping on ap_item.item_code = ap_item_grouping.item_code',
+'left join ap_item_types on ap_item.item_code = ap_item_types.item_code',
+'where area_code = :area or :area is NULL',
+'and ap_item_inactive.item_code is null',
+'group by ap_item_matches_mapping.root_code order by ap_item_names.name'], {
     'area': null
-  }),
+  }, ['group_name'], [
+      'type_names'
+    ]),
   'areas': new controller(
   ['select ap_area.area_code, area_name, count(*) as count from ap_current', 'inner join ap_series on ap_current.series_id = ap_series.series_id', 'inner join ap_area on ap_series.area_code = ap_area.area_code', 'where item_code = :item or :item is NULL', 'group by ap_area.area_code, area_name order by area_name'], {
     'item': null
