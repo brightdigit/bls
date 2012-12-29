@@ -69,6 +69,24 @@ function beginDownload() {
                           if (count === 0) {
                             fs.readFile(path.resolve(__dirname, 'post_import_alter.sql'), 'UTF-8', function (error, data) {
                               console.log('cleaning up data...');
+                              /*
+                              select item_code, qty_str, label
+from (
+SELECT ap_item.item_code, 
+RIGHT(LEFT(description, LOCATE(CONCAT(' ', keyword), description)-1), LOCATE(' ', REVERSE(LEFT(description, LOCATE(CONCAT(' ', keyword), description)-1)))-1) as qty_str,
+measurements.label
+ FROM ap_item 
+left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code
+inner join (SELECT ap_item.item_code, min(priority) as priority FROM ap_item 
+left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code, measurements
+where 
+LOCATE(CONCAT(' ', keyword), description) > 0 and ap_item_inactive.item_code is null
+group by ap_item.item_code) priorities
+on ap_item.item_code = priorities.item_code, measurements
+
+where ap_item_inactive.item_code is null
+and measurements.priority = priorities.priority) unparsed_qty;
+*/
                               connection.query(data, function (error){
                                 if (error) {
                                   throw error;
