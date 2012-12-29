@@ -5,6 +5,25 @@ var ftp = require('ftp-get'),
   fs = require('fs'),
   spawn = require('child_process').spawn;
 
+/*
+var qtyParseQuery = "
+select item_code, qty_str, label
+from (
+SELECT ap_item.item_code,
+RIGHT(LEFT(description, LOCATE(CONCAT(' ', keyword), description)-1), LOCATE(' ', REVERSE(LEFT(description, LOCATE(CONCAT(' ', keyword), description)-1)))-1) as qty_str,
+measurements.label
+ FROM ap_item
+left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code
+inner join (SELECT ap_item.item_code, min(priority) as priority FROM ap_item
+left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code, measurements
+where
+LOCATE(CONCAT(' ', keyword), description) > 0 and ap_item_inactive.item_code is null
+group by ap_item.item_code) priorities
+on ap_item.item_code = priorities.item_code, measurements
+where ap_item_inactive.item_code is null
+and measurements.priority = priorities.priority) unparsed_qty";
+*/
+
 function makeid()
 {
     var text = "";
@@ -14,6 +33,10 @@ function makeid()
         text += possible.charAt(Math.floor(Math.random() * possible.length));
 
     return text;
+}
+
+function parseValue () {
+  return 1;
 }
 
 function beginDownload() {
@@ -69,47 +92,42 @@ function beginDownload() {
                           if (count === 0) {
                             fs.readFile(path.resolve(__dirname, 'post_import_alter.sql'), 'UTF-8', function (error, data) {
                               console.log('cleaning up data...');
-                              /*
-                              select item_code, qty_str, label
-from (
-SELECT ap_item.item_code, 
-RIGHT(LEFT(description, LOCATE(CONCAT(' ', keyword), description)-1), LOCATE(' ', REVERSE(LEFT(description, LOCATE(CONCAT(' ', keyword), description)-1)))-1) as qty_str,
-measurements.label
- FROM ap_item 
-left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code
-inner join (SELECT ap_item.item_code, min(priority) as priority FROM ap_item 
-left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code, measurements
-where 
-LOCATE(CONCAT(' ', keyword), description) > 0 and ap_item_inactive.item_code is null
-group by ap_item.item_code) priorities
-on ap_item.item_code = priorities.item_code, measurements
-
-where ap_item_inactive.item_code is null
-and measurements.priority = priorities.priority) unparsed_qty;
-*/
-                              connection.query(data, function (error){
-                                if (error) {
-                                  throw error;
-                                } else {
-                                  fs.readFile(path.resolve(__dirname, 'verify_integrity.sql'), 'UTF-8', function (error, data) {
-                                    console.log('verifying data integrity...');
-                                    connection.query(data, function (error, results){
-                                      if (error) {
-                                        throw error;
-                                      } else {
-                                        if (results.every(function (value) {return value[0].count === 0;})) {
-                                          console.log('done.');
-                                          // go through each description and clean up the text
-                                          process.exit(0);
+                              connection.query(data, function (error, results){
+                                var quantities = results[results.length - 1].map(
+                                  function (value) {
+                                    return '(' + [
+                                      "'" + value.item_code + "'",
+                                      value.priority,
+                                      parseValue(value.value)
+                                    ].join(',') + ')';
+                                  }
+                                );
+                                console.log(quantities);
+                                var query = connection.query('INSERT INTO ap_item_measurement (`item_code`, `priority`,`value`) VALUES ' + quantities.join(', '), function (error) {
+                                  if (error) {
+                                    throw error;
+                                  } else {
+                                    fs.readFile(path.resolve(__dirname, 'verify_integrity.sql'), 'UTF-8', function (error, data) {
+                                      console.log('verifying data integrity...');
+                                      connection.query(data, function (error, results){
+                                        if (error) {
+                                          throw error;
                                         } else {
-                                          console.log('warning data integrity check failed');
-                                          console.log('done.');
-                                          process.exit(1);
+                                          if (results.every(function (value) {return value[0].count === 0;})) {
+                                            console.log('done.');
+                                            // go through each description and clean up the text
+                                            process.exit(0);
+                                          } else {
+                                            console.log('warning data integrity check failed');
+                                            console.log('done.');
+                                            process.exit(1);
+                                          }
                                         }
-                                      }
+                                      });
                                     });
-                                  });
-                                }
+                                  }
+                                });
+                                console.log(query.sql);
                               });
                             });
                           }

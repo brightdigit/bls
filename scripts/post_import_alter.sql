@@ -94,7 +94,7 @@ create table ap_item_inactive (
 	item_code char(6) NOT NULL PRIMARY KEY
 );
 
-insert into ap_item_inactive values 
+insert into ap_item_inactive values
 ('702112'),
 ('702611'),
 ('703211'),
@@ -146,7 +146,7 @@ drop table if exists ap_item_groups;
 create table ap_item_groups (
 group_name varchar(127) primary key);
 
-insert into ap_item_groups values 
+insert into ap_item_groups values
 ('grains'),
 ('snacks'),
 ('meat'),
@@ -545,3 +545,21 @@ INSERT into ap_item_types values ('710211', 'american processed');
 INSERT into ap_item_types values ('710212', 'cheddar');
 
 GRANT SELECT ON bls.* TO 'bls_user'@'localhost' identified by 'HhI*+5oP:(X~}@-';
+
+select item_code, qty_str, priority
+from (
+SELECT ap_item.item_code,
+RIGHT(LEFT(description, LOCATE(CONCAT(' ', keyword), description)-1), LOCATE(' ', REVERSE(LEFT(description, LOCATE(CONCAT(' ', keyword), description)-1)))-1) as qty_str,
+measurements.label,
+measurements.priority
+ FROM ap_item
+left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code
+inner join (SELECT ap_item.item_code, min(priority) as priority FROM ap_item
+left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code, measurements
+where
+LOCATE(CONCAT(' ', keyword), description) > 0 and ap_item_inactive.item_code is null
+group by ap_item.item_code) priorities
+on ap_item.item_code = priorities.item_code, measurements
+
+where ap_item_inactive.item_code is null
+and measurements.priority = priorities.priority) unparsed_qty;
