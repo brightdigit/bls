@@ -5,25 +5,6 @@ var ftp = require('ftp-get'),
   fs = require('fs'),
   spawn = require('child_process').spawn;
 
-/*
-var qtyParseQuery = "
-select item_code, qty_str, label
-from (
-SELECT ap_item.item_code,
-RIGHT(LEFT(description, LOCATE(CONCAT(' ', keyword), description)-1), LOCATE(' ', REVERSE(LEFT(description, LOCATE(CONCAT(' ', keyword), description)-1)))-1) as qty_str,
-measurements.label
- FROM ap_item
-left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code
-inner join (SELECT ap_item.item_code, min(priority) as priority FROM ap_item
-left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code, measurements
-where
-LOCATE(CONCAT(' ', keyword), description) > 0 and ap_item_inactive.item_code is null
-group by ap_item.item_code) priorities
-on ap_item.item_code = priorities.item_code, measurements
-where ap_item_inactive.item_code is null
-and measurements.priority = priorities.priority) unparsed_qty";
-*/
-
 function makeid()
 {
     var text = "";
@@ -35,7 +16,26 @@ function makeid()
     return text;
 }
 
-function parseValue () {
+function parseValue (str) {
+  // if is a fraction
+  if (str.indexOf('/') >= 0) {
+    console.log(str + ': fraction');
+    return str.split('/').reduce(function (prev, current, index) {
+      if (index === 0) {
+        return current;
+      } else {
+        return prev/current;
+      }
+    });
+  // if it contains per
+  } else if (str.indexOf('per') >= 0) {
+    console.log(str + ': per');
+    return 1;
+  // if it can be parsed as an float
+  } else {
+    console.log(str + ': float');
+    return parseFloat(str.match(/\d+(?:[.,]\d+)?/));
+  }
   return 1;
 }
 
@@ -98,7 +98,7 @@ function beginDownload() {
                                     return '(' + [
                                       "'" + value.item_code + "'",
                                       value.priority,
-                                      parseValue(value.value)
+                                      parseValue(value.qty_str)
                                     ].join(',') + ')';
                                   }
                                 );
