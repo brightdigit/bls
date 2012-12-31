@@ -19,7 +19,6 @@ function makeid()
 function parseValue (str) {
   // if is a fraction
   if (str.indexOf('/') >= 0) {
-    console.log(str + ': fraction');
     return str.split('/').reduce(function (prev, current, index) {
       if (index === 0) {
         return current;
@@ -29,11 +28,9 @@ function parseValue (str) {
     });
   // if it contains per
   } else if (str.indexOf('per') >= 0) {
-    console.log(str + ': per');
     return 1;
   // if it can be parsed as an float
   } else {
-    console.log(str + ': float');
     return parseFloat(str.match(/\d+(?:[.,]\d+)?/));
   }
   return 1;
@@ -93,6 +90,7 @@ function beginDownload() {
                             fs.readFile(path.resolve(__dirname, 'post_import_alter.sql'), 'UTF-8', function (error, data) {
                               console.log('cleaning up data...');
                               connection.query(data, function (error, results){
+                                console.log('parsing quantities...');
                                 var quantities = results[results.length - 1].map(
                                   function (value) {
                                     return '(' + [
@@ -102,8 +100,7 @@ function beginDownload() {
                                     ].join(',') + ')';
                                   }
                                 );
-                                console.log(quantities);
-                                var query = connection.query('INSERT INTO ap_item_measurement (`item_code`, `priority`,`value`) VALUES ' + quantities.join(', '), function (error) {
+                                connection.query('INSERT INTO ap_item_measurement (`item_code`, `priority`,`value`) VALUES ' + quantities.join(', '), function (error) {
                                   if (error) {
                                     throw error;
                                   } else {
@@ -127,7 +124,6 @@ function beginDownload() {
                                     });
                                   }
                                 });
-                                console.log(query.sql);
                               });
                             });
                           }

@@ -4,7 +4,6 @@ var http = require('http'),
   path = require('path'),
   mysql = require('mysql');
 
-console.log(JSON.parse('["test"]'))
 var mimeTypes = {
   "html": "text/html",
   "jpeg": "image/jpeg",
@@ -26,7 +25,7 @@ var connection = mysql.createConnection({
   debug: false
 });
 
-var requireReferer = false;
+var requireReferer = true;
 
 connection.config.queryFormat = function(query, values) {
   if(!values) return query;
@@ -50,7 +49,7 @@ var controller = function(queryFormat, defaultParameters, groupNames, jsonFields
   };
 
 controller.prototype = {
-  process: function(parameters, res) {
+  process: function(parameters, res, req) {
     var that = this;
     parameters = this.translate(parameters);
     connection.query(this.queryFormat, parameters, function(error, results) {
@@ -75,8 +74,7 @@ controller.prototype = {
         for (field in value) {
           //console.log(field + ': ' + value[field]);
 
-          if (typeof(value[field]) === 'string' && jsonFields.some(function (name) {console.log(name);return name === field;})) {
-            console.log(value[field]);
+          if (typeof(value[field]) === 'string' && jsonFields.some(function (name) {return name === field;})) {
             newValue[field] = JSON.parse(value[field]);
           } else {
             newValue[field] = value[field];
@@ -90,14 +88,23 @@ controller.prototype = {
   },
   groupBy : function (results, groupNames) {
     var data = {};
-    if (groupNames) {
+    if (groupNames && groupNames.length > 0) {
       results.forEach(function (value) {
-        var groupName =value[groupNames[0]];
-        if (!data[groupName]) {
-          data[groupName] = [];
+        var curGroup = data;
+        var groups = groupNames.map(function (name) { return value[name];});
+        for (var index = 0; index < groups.length; index++) {
+          console.log(groups[index]);
+          if (!curGroup[groups[index]]) {
+            curGroup[groups[index]] = [];
+          }
+          delete value[groups[index]];
+          curGroup = curGroup[groups[index]];
+        console.log(curGroup);
         }
-        delete value[groupNames[0]];
-        data[groupName].push(value);
+        //console.log(curGroup);
+        //delete value[groupNames[0]];
+        curGroup.push(value);
+        console.log(curGroup);
       });
       return data;
     } else {
@@ -130,11 +137,13 @@ var bls = function() {
 bls.controllers = {
   //'test' : new controller(),
   'items': new controller(
-  ['select ap_item_matches_mapping.root_code as item_code, ap_item_names.name, group_name, concat(\'["\',group_concat(distinct ap_item_types.type_name separator \'","\'), \'"]\') as type_names, count(*) as count',
+  ['select ap_item_matches_mapping.root_code as item_code, ap_item_names.name, group_name, concat(\'["\',group_concat(distinct ap_item_types.type_name separator \'","\'), \'"]\') as type_names, count(*) as count,',
+  'ap_item_measurement.priority as measure_type, ap_item_measurement.value',
 'from ap_current inner join ap_series on ap_current.series_id = ap_series.series_id',
 'inner join ap_item on ap_series.item_code = ap_item.item_code',
 'inner join ap_item_matches_mapping on ap_item.item_code = ap_item_matches_mapping.item_code',
 'inner join ap_item_names on ap_item_matches_mapping.root_code = ap_item_names.item_code',
+'left join ap_item_measurement on ap_item.item_code = ap_item_measurement.item_code',
 'left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code',
 'left join ap_item_grouping on ap_item.item_code = ap_item_grouping.item_code',
 'left join ap_item_types on ap_item.item_code = ap_item_types.item_code',
@@ -142,7 +151,7 @@ bls.controllers = {
 'and ap_item_inactive.item_code is null',
 'group by ap_item_matches_mapping.root_code order by ap_item_names.name'], {
     'area': null
-  }, ['group_name'], [
+  }, ['group_name', 'name'], [
       'type_names'
     ]),
   'areas': new controller(
@@ -187,14 +196,14 @@ bls.prototype = {
         }
         res.end(data);
       });
-    } else if(requireReferer && (!req.headers['referer'] || req.headers['referer'].indexOf('http://' + req.headers['host'] + '/') !== 0)) {
+    } else if(requireReferer && req.connection.remoteAddress !== '127.0.0.1' && (!req.headers['referer'] || req.headers['referer'].indexOf('http://' + req.headers['host'] + '/') !== 0)) {
       res.writeHead(400);
       res.end();
     } else {
       var command = components.pathname.substr(components.path.lastIndexOf('/') + 1);
       var controller = bls.controllers[command];
       if(controller) {
-        controller.process(components.query, res);
+        controller.process(components.query, res, req);
       } else {
         res.writeHead(404);
         res.end();
