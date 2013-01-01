@@ -58,22 +58,46 @@ controller.prototype = {
         res.writeHead(500);
         res.end();
       } else {
-        var data = controller.prototype.groupBy(
-          controller.prototype.jsonConvert(results, that.jsonFields), that.groupNames);
+        var data = controller.prototype.groupBy(controller.prototype.jsonConvert(results, that.jsonFields), that.groupNames);
+        console.log('data-raw');
+        console.log(JSON.stringify(data));
+        console.log(data);
         res.writeHead(200, {
           'Content-Type': 'application/json'
         });
-        res.end(JSON.stringify(data));
+        res.end(data);
       }
     });
+  },
+  stringify : function (object) {
+    var comps = [];
+      console.log(object);
+    if (Object.prototype.toString.call( object ) === '[object Array]') {
+      for (var index = 0; index < object.length; index++) {
+        comps.push(controller.prototype.stringify(object[key]));
+        comps.push(", ");
+      }
+    } else if (typeof(object) === 'object') {
+      console.log(object);
+      for (var key in object) {
+        if (object.hasOwnProperty(key)) {
+          comps.push("'");
+          comps.push(key);
+          comps.push("' : ");
+          comps.push(controller.prototype.stringify(object[key]));
+          comps.push(", ");
+        }
+      }
+    } else {
+      return JSON.stingify(object);
+    }
+    return comps.join('');
   },
   jsonConvert : function(results, jsonFields) {
     if (jsonFields) {
       return results.map(function (value) {
         var field, newValue = {};
         for (field in value) {
-          //console.log(field + ': ' + value[field]);
-
           if (typeof(value[field]) === 'string' && jsonFields.some(function (name) {return name === field;})) {
             newValue[field] = JSON.parse(value[field]);
           } else {
@@ -94,18 +118,19 @@ controller.prototype = {
         var groups = groupNames.map(function (name) { return value[name];});
         for (var index = 0; index < groups.length; index++) {
           console.log(groups[index]);
-          if (!curGroup[groups[index]]) {
+          if (curGroup[groups[index]] === undefined) {
             curGroup[groups[index]] = [];
           }
           delete value[groups[index]];
           curGroup = curGroup[groups[index]];
-        console.log(curGroup);
         }
-        //console.log(curGroup);
-        //delete value[groupNames[0]];
         curGroup.push(value);
-        console.log(curGroup);
+        console.log('data');
+        console.log(data);
+        //console.log(value);
       });
+        console.log('data');
+        console.log(data);
       return data;
     } else {
       return results;
