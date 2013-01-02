@@ -120,7 +120,9 @@ controller.prototype = {
           if (curGroup[groups[index]] === undefined) {
             curGroup[groups[index]] = [];
           }
-          delete value[groups[index]];
+          // this doesn't work
+          //console.log('deleting groups[p')
+          delete value[groupNames[index]];
           curGroup = curGroup[groups[index]];
         }
         curGroup.push(value);

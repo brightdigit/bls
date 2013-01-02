@@ -130,9 +130,16 @@ var bls = {
       that.container.append(canvas);
       $.get('items', function(data) {
         var itemsSelector = $('.items');
-        data.forEach(function(value) {
-          itemsSelector.append('<option value="' + value.item_code + '">' + value.description + '</option>');
-        });
+        for (var groupName in data) {
+          var optGroup = $('<optgroup label="' + groupName + '"/>')
+          for (var itemName in data[groupName]) {
+            var value = data[groupName][itemName].length > 1 || data[groupName][itemName][0].type_names ?
+              JSON.stringify(data[groupName][itemName].map(function (item) {var result = {}; result[item.item_code] = item.type_names; return result;})) :
+              data[groupName][itemName][0].item_code;
+            $('<option>' + itemName + '</option>').appendTo(optGroup).val(value);
+          }
+          optGroup.appendTo(itemsSelector);
+        }
         itemsSelector.val(bls.defaults.item);//.find('option[value="7471A"]').attr('selected', true);
         itemsSelector.chosen();
         itemsSelector.change( function (e) {
