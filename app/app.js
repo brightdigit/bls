@@ -59,37 +59,36 @@ controller.prototype = {
         res.end();
       } else {
         var data = controller.prototype.groupBy(controller.prototype.jsonConvert(results, that.jsonFields), that.groupNames);
-        console.log('data-raw');
-        console.log(JSON.stringify(data));
-        console.log(data);
         res.writeHead(200, {
           'Content-Type': 'application/json'
         });
-        res.end(data);
+        res.end(controller.prototype.stringify(data));
       }
     });
   },
   stringify : function (object) {
     var comps = [];
-      console.log(object);
-    if (Object.prototype.toString.call( object ) === '[object Array]') {
+    if (Object.prototype.toString.call( object ) === '[object Array]' && object.length) {
+      comps.push('[');
       for (var index = 0; index < object.length; index++) {
-        comps.push(controller.prototype.stringify(object[key]));
+        comps.push(controller.prototype.stringify(object[index]));
         comps.push(", ");
       }
+      comps[comps.length - 1] = ']';
     } else if (typeof(object) === 'object') {
-      console.log(object);
+      comps.push('{');
       for (var key in object) {
-        if (object.hasOwnProperty(key)) {
-          comps.push("'");
+        if (object.hasOwnProperty(key) && typeof(object[key]) !== 'undefined' && object[key] !== null && Object.prototype.toString.call(object[key]) !== '[object Function]') {
+          comps.push("\"");
           comps.push(key);
-          comps.push("' : ");
+          comps.push("\" : ");
           comps.push(controller.prototype.stringify(object[key]));
           comps.push(", ");
         }
       }
+      comps[comps.length - 1] = '}';
     } else {
-      return JSON.stingify(object);
+      return JSON.stringify(object);
     }
     return comps.join('');
   },
@@ -117,7 +116,7 @@ controller.prototype = {
         var curGroup = data;
         var groups = groupNames.map(function (name) { return value[name];});
         for (var index = 0; index < groups.length; index++) {
-          console.log(groups[index]);
+          //console.log(groups[index]);
           if (curGroup[groups[index]] === undefined) {
             curGroup[groups[index]] = [];
           }
@@ -125,12 +124,12 @@ controller.prototype = {
           curGroup = curGroup[groups[index]];
         }
         curGroup.push(value);
-        console.log('data');
-        console.log(data);
+        //console.log('data');
+        //console.log(data);
         //console.log(value);
       });
-        console.log('data');
-        console.log(data);
+        //console.log('data');
+        //console.log(data);
       return data;
     } else {
       return results;
