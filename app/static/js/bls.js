@@ -105,7 +105,21 @@ var bls = {
         'All' : [(new Date(1978, 0, 1)), new Date()],
     }},
     area : '0000',
-    item : '7471A'
+    item : '[{"74714":["unleaded regular"]},{"74715":["unleaded midgrade"]},{"74716":["unleaded premium"]},{"7471A":["all types"]}]'
+  },
+  updateItems : function (data) {
+    var itemsSelector = $('.items');
+    for (var groupName in data) {
+      var optGroup = $('<optgroup label="' + groupName + '"/>')
+      for (var itemName in data[groupName]) {
+        var value = data[groupName][itemName].length > 1 || data[groupName][itemName][0].type_names ?
+          JSON.stringify(data[groupName][itemName].map(function (item) {var result = {}; result[item.item_code] = item.type_names; return result;})) :
+          data[groupName][itemName][0].item_code;
+        $('<option>' + itemName + '</option>').appendTo(optGroup).val(value);
+      }
+      optGroup.appendTo(itemsSelector);
+    }
+    itemsSelector.chosen();
   },
   initialize: function() {
     bls.defaults.item = $.cookie('item') || bls.defaults.item;
@@ -129,7 +143,9 @@ var bls = {
       var canvas = $('<canvas id="' + bls.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
       that.container.append(canvas);
       $.get('items', function(data) {
-        var itemsSelector = $('.items');
+    var itemsSelector = $('.items');
+        that.updateItems(data);
+        /*
         for (var groupName in data) {
           var optGroup = $('<optgroup label="' + groupName + '"/>')
           for (var itemName in data[groupName]) {
@@ -140,7 +156,8 @@ var bls = {
           }
           optGroup.appendTo(itemsSelector);
         }
-        itemsSelector.val(bls.defaults.item);//.find('option[value="7471A"]').attr('selected', true);
+        */
+        //itemsSelector.val(bls.defaults.item);//.find('option[value="7471A"]').attr('selected', true);
         itemsSelector.chosen();
         itemsSelector.change( function (e) {
           var value = itemsSelector.val();

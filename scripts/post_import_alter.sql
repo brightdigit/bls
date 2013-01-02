@@ -543,6 +543,11 @@ INSERT into ap_item_types values ('FD3101', 'all pork chops');
 INSERT into ap_item_types values ('FD4101', 'excluding canned ham and luncheon slices');
 INSERT into ap_item_types values ('710211', 'american processed');
 INSERT into ap_item_types values ('710212', 'cheddar');
+insert into ap_item_types values ('72601', '40 therms');
+insert into ap_item_types values ('72610', 'per KWH');
+insert into ap_item_types values ('72611', '100 therms');
+insert into ap_item_types values ('72620', '1 therm');
+insert into ap_item_types values ('72621', 'per 500 KWH');
 
 GRANT SELECT ON bls.* TO 'bls_user'@'localhost' identified by 'HhI*+5oP:(X~}@-';
 
