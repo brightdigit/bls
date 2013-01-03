@@ -143,7 +143,7 @@ var bls = {
       var canvas = $('<canvas id="' + bls.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
       that.container.append(canvas);
       $.get('items', function(data) {
-    var itemsSelector = $('.items');
+        var itemsSelector = $('.items');
         that.updateItems(data);
         /*
         for (var groupName in data) {
@@ -157,7 +157,7 @@ var bls = {
           optGroup.appendTo(itemsSelector);
         }
         */
-        //itemsSelector.val(bls.defaults.item);//.find('option[value="7471A"]').attr('selected', true);
+        itemsSelector.val(bls.defaults.item);//.find('option[value="7471A"]').attr('selected', true);
         itemsSelector.chosen();
         itemsSelector.change( function (e) {
           var value = itemsSelector.val();
