@@ -121,6 +121,20 @@ var bls = {
     }
     itemsSelector.chosen();
   },
+  updateAreas : function (data) {
+    var itemsSelector = $('.areas');
+    for (var groupName in data) {
+      var optGroup = $('<optgroup label="' + groupName + '"/>')
+      for (var itemName in data[groupName]) {
+        var value = data[groupName][itemName].length > 1 || data[groupName][itemName][0].type_names ?
+          JSON.stringify(data[groupName][itemName].map(function (item) {var result = {}; result[item.item_code] = item.type_names; return result;})) :
+          data[groupName][itemName][0].item_code;
+        $('<option>' + itemName + '</option>').appendTo(optGroup).val(value);
+      }
+      optGroup.appendTo(itemsSelector);
+    }
+    itemsSelector.chosen();
+  },
   initialize: function() {
     bls.defaults.item = $.cookie('item') || bls.defaults.item;
     bls.defaults.area = $.cookie('area') || bls.defaults.area;
@@ -179,9 +193,7 @@ var bls = {
 
       $.get('areas', function(data) {
         var areaSelector = $('.areas');
-        data.forEach(function(value) {
-          areaSelector.append('<option value="' + value.area_code + '">' + value.area_name + '</option>');
-        });
+        that.updateAreas(data);
         areaSelector.val(bls.defaults.area);
         areaSelector.chosen();
         areaSelector.change( function (e) {
@@ -314,8 +326,11 @@ bls.PacketRequest.prototype = {
   },
   start: function() {
     var that = this;
+      that.callback(that, []);
+      /*
     $.get('data', this.formatParameters(this.parameters), function(data) {
       that.callback(that, data);
     });
+*/
   }
 };
