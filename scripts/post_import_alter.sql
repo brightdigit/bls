@@ -549,6 +549,83 @@ insert into ap_item_types values ('72611', '100 therms');
 insert into ap_item_types values ('72620', '1 therm');
 insert into ap_item_types values ('72621', 'per 500 KWH');
 
+create table ap_area_groupings  (
+	area_group_id tinyint auto_increment primary key,
+	area_group_name varchar(255) not null,
+	ordering tinyint unsigned not null default 255
+);
+
+insert into ap_area_groupings values (1, 'Urban Areas', 1), 
+(3, 'Size A Averages', 255),  
+(2, 'Urban Averages', 255), 
+(4, 'Class Grouping', 255);
+
+create table ap_area_groups (
+	area_code char(4) primary key,
+	area_group_id tinyint not null
+);
+
+INSERT INTO `ap_area_groups` VALUES 
+('0000',2),
+('0100',2),
+('0200',2),
+('0300',2),
+('0400',2),
+('A000',4),
+('A100',4),
+('A101',1),
+('A102',1),
+('A103',1),
+('A104',1),
+('A105',1),
+('A106',1),
+('A200',4),
+('A207',1),
+('A208',1),
+('A209',1),
+('A210',1),
+('A211',1),
+('A212',1),
+('A213',1),
+('A214',1),
+('A300',4),
+('A311',1),
+('A315',1),
+('A316',1),
+('A317',1),
+('A318',1),
+('A319',1),
+('A320',1),
+('A400',4),
+('A421',1),
+('A422',1),
+('A423',1),
+('A424',1),
+('A425',1),
+('A426',1),
+('A427',1),
+('A433',1),
+('B000',4),
+('B100',4),
+('B200',4),
+('B300',4),
+('B400',4),
+('C000',4),
+('C100',4),
+('C200',4),
+('C300',4),
+('C400',4),
+('D000',4),
+('D100',4),
+('D200',4),
+('D300',4),
+('D400',4),
+('X000',4),
+('X100',4),
+('X200',4),
+('X300',4),
+('X400',4);
+
 GRANT SELECT ON bls.* TO 'bls_user'@'localhost' identified by 'HhI*+5oP:(X~}@-';
 
 select item_code, qty_str, priority
