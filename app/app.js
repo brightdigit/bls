@@ -196,9 +196,15 @@ bls.controllers = {
       'type_names'
     ]),
   'areas': new bls.controller(
-  ['select ap_area.area_code, area_name, count(*) as count from ap_current', 'inner join ap_series on ap_current.series_id = ap_series.series_id', 'inner join ap_area on ap_series.area_code = ap_area.area_code', 'where item_code = :item or :item is NULL', 'group by ap_area.area_code, area_name order by area_name'], {
+  ['select ap_area.area_code, area_name, area_group_name, count(*) as count from ap_current', 
+  'inner join ap_series on ap_current.series_id = ap_series.series_id', 
+  'inner join ap_area on ap_series.area_code = ap_area.area_code', 
+  'left join ap_area_groups on ap_area.area_code = ap_area_groups.area_code',
+  'left join ap_area_groupings on ap_area_groups.area_group_id = ap_area_groupings.area_group_id',
+  'where item_code = :item or :item is NULL', 
+  'group by ap_area.area_code, area_name order by ap_area_groupings.ordering, area_name'], {
     'item': null
-  }),
+  }, ['area_group_name']),
   'data': new bls.controller(
   ['select start_date as startDate, DATE_ADD(start_date, interval :months month) as endDate, value from (', 'select str_to_date(concat(floor((time*:months)/12),\'-\',cast( ((time*:months)/12 - floor((time*:months)/12))*12 as unsigned) + 1,\'-01\'), \'%Y-%m-%d\') as start_date, avg(value) as value from (', 'select value, floor((year*12 + (period-1))/:months) as time from ap_current ', 'inner join ap_series on ap_current.series_id = ap_series.series_id', 'where (ap_series.item_code = :item and ap_series.area_code = :area', 'and str_to_date(concat(year, \'-\', period, \'-01\'), \'%Y-%m-%d\') between :startDate and :endDate)', 'order by year, period', ') data group by time) as valuez limit 100 offset :offset'])
 };
