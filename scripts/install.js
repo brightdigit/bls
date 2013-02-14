@@ -5,6 +5,11 @@ var ftp = require('ftp-get'),
   fs = require('fs'),
   spawn = require('child_process').spawn;
 
+if (process.argv.length < 3) {
+  console.log(process.argv[0] + ' ' + __filename + ' (-f) dbpassword');
+  process.exit(1); 
+}
+
 function makeid()
 {
     var text = "";
