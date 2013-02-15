@@ -135,16 +135,53 @@ var bls = {
     }
     itemsSelector.chosen();
   },
+  findContainer : function () {
+    var script = document.getElementsByTagName('script')[(document.getElementsByTagName('script').length - 1)];
+    return $(script.parentNode);
+  },
+  onDocumentReady : function () {
+    var that = this;
+    $('.link').click(bls.updateView);
+    bls.updateView();
+    var options = bls.defaults.daterangepicker;
+    var drp = $('input.daterangepicker-control').daterangepicker(options, function (start, end) {
+      bls.current.startDate = start;
+      bls.current.endDate = end;
+      bls.update(this, this.element);
+    });
+    drp.val([options.startDate.toString(options.format), options.endDate.toString(options.format)].join(' - '));
+    var canvas = $('<canvas id="' + bls.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
+    this.container.append(canvas);
+      var dataDrivens = $('.data-driven');
+      var semaphore = $.map(new Array(dataDrivens.length), function () { return false; });
+      dataDrivens.loadData( function () {
+        var lastone = -1;
+        if (semaphore.every(function (value, index) {lastone = index; return value;})) {
+          that.onDataDrivenComplete();
+        } else {
+          semaphore[lastone] = true;
+          if (lastone === semaphore.length-1) {
+            that.onDataDrivenComplete();
+          }
+        }
+      });
+  },
+  onDataDrivenComplete : function () {
+    alert('test');
+  },
   initialize: function() {
     bls.defaults.item = $.cookie('item') || bls.defaults.item;
     bls.defaults.area = $.cookie('area') || bls.defaults.area;
     bls.defaults.startDate = (new Date($.cookie('startDate'))) || bls.defaults.startDate;
     bls.defaults.endDate = (new Date($.cookie('endDate'))) || bls.defaults.endDate;
     var that = this;
-    var script = document.getElementsByTagName('script')[(document.getElementsByTagName('script').length - 1)];
-    this.container = $(script.parentNode);
+    //var script = document.getElementsByTagName('script')[(document.getElementsByTagName('script').length - 1)];
+    this.container = bls.findContainer(); //$(script.parentNode);
     this.busy = $('<div id="fadingBarsG"><div id="fadingBarsG_1" class="fadingBarsG"></div><div id="fadingBarsG_2" class="fadingBarsG"></div><div id="fadingBarsG_3" class="fadingBarsG"></div><div id="fadingBarsG_4" class="fadingBarsG"></div><div id="fadingBarsG_5" class="fadingBarsG"></div><div id="fadingBarsG_6" class="fadingBarsG"></div><div id="fadingBarsG_7" class="fadingBarsG"></div><div id="fadingBarsG_8" class="fadingBarsG"></div></div>').appendTo(this.container);
     $(document).ready(function() {
+      that.onDocumentReady();
+      /*
+
       $('.link').click(bls.updateView);
       bls.updateView();
       var options = bls.defaults.daterangepicker;
@@ -156,21 +193,19 @@ var bls = {
       drp.val([options.startDate.toString(options.format), options.endDate.toString(options.format)].join(' - '));
       var canvas = $('<canvas id="' + bls.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
       that.container.append(canvas);
+      var dataDrivens = $('.data-driven');
+      var semaphore = $.map(new Array(dataDrivens.length), function () { return false; });
+      dataDrivens.loadData( function () {
+        var lastone = -1;
+        if (semaphore.every(function (value, index) {lastone = index; return value;})) {
+          that.onDataDrivenComplete();
+        } else {
+          semaphore[lastone] = true;
+        }
+      });
       $.get('items', function(data) {
         var itemsSelector = $('.items');
         that.updateItems(data);
-        /*
-        for (var groupName in data) {
-          var optGroup = $('<optgroup label="' + groupName + '"/>')
-          for (var itemName in data[groupName]) {
-            var value = data[groupName][itemName].length > 1 || data[groupName][itemName][0].type_names ?
-              JSON.stringify(data[groupName][itemName].map(function (item) {var result = {}; result[item.item_code] = item.type_names; return result;})) :
-              data[groupName][itemName][0].item_code;
-            $('<option>' + itemName + '</option>').appendTo(optGroup).val(value);
-          }
-          optGroup.appendTo(itemsSelector);
-        }
-        */
         itemsSelector.val(bls.defaults.item);//.find('option[value="7471A"]').attr('selected', true);
         itemsSelector.chosen();
         itemsSelector.change( function (e) {
@@ -213,7 +248,7 @@ var bls = {
           bls.update(e, $(this));
         });
       });
-
+      */
     });
     $('.btn[type="reset"]').click(function(e) {
       e.preventDefault();
@@ -334,3 +369,23 @@ bls.PacketRequest.prototype = {
 */
   }
 };
+
+bls.DataDrivenSelect = function(jq) {
+  this.jq = jq;
+};
+
+bls.DataDrivenSelect.prototype = {
+  jq : undefined,
+  loadData : function (callback) {
+    callback(this.jq);
+  }
+};
+
+(function($){
+    $.fn.loadData = function(callback){
+      this.each(function () {
+        var dds = new bls.DataDrivenSelect(this);
+        dds.loadData(callback);
+      });
+    };
+})(jQuery);
