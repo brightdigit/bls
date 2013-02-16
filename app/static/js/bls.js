@@ -265,7 +265,6 @@ var bls = {
   getDateTime: function(unixTimestamp) {
     var date = new Date(unixTimestamp * 1000);
     return date;
-    //return [date.getFullYear(), date.getMonth() + 1, date.getDate()];
   },
   getUnixTime: function(arg) {
     var date;
@@ -370,14 +369,44 @@ bls.PacketRequest.prototype = {
   }
 };
 
-bls.DataDrivenSelect = function(jq) {
-  this.jq = jq;
+bls.DataDrivenSelect = function(element) {
+  this.jq = $(element);
 };
 
 bls.DataDrivenSelect.prototype = {
   jq : undefined,
   loadData : function (callback) {
-    callback(this.jq);
+    var that = this;
+    $.get(this.jq.data('src'), function (data) {
+      that.update(data);
+      callback(this.jq);
+    });
+  },
+  update : function (data) {
+    var valuefield = this.jq.data('valuefield');
+    var textfield = this.jq.data('textfield');
+    for (var groupName in data) {
+      var optGroup = $('<optgroup label="' + groupName + '"/>')
+      for (var key in data[groupName]) {
+        var option;
+        if ($.isArray(data[groupName][key])) {
+          var value = {};
+          $.each(data[groupName][key], function () {
+              value[this[valuefield]] = this[textfield];
+          });
+          $('<option>' + key + '</option>').appendTo(optGroup).val(JSON.stringify(value));
+        } else {
+          $('<option>' + data[groupName][key][textfield] + '</option>').appendTo(optGroup).val(data[groupName][key][valuefield]);
+        }/*
+        var value = data[key][itemName].length > 1 || data[key][itemName][0].type_names ?
+          JSON.stringify(data[groupName][itemName].map(function (item) {var result = {}; result[item.item_code] = item.type_names; return result;})) :
+          data[groupName][itemName][0].item_code;
+        $('<option>' + itemName + '</option>').appendTo(optGroup).val(value);
+        */
+      }
+      optGroup.appendTo(this.jq);
+    }
+    this.jq.chosen();
   }
 };
 

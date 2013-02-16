@@ -79,6 +79,11 @@ function beginDownload() {
 
                       console.log('downloading ' + dirName + '/' + value.file + ' for ' + value.table + '...');
                       ftp.get('ftp://ftp.bls.gov/pub/time.series/' + dirName + '/' + value.file, value.tmpFile, function (error, result) {
+                        if (error) {
+                          console.log('error downloading file ' + value.file);
+                          console.log(error);
+                          process.exit(1);
+                        }
                         var filePath = path.sep === '\\' ? result.replace(/\\/g, '/') : result;
                         var sql = 'load data local infile \'' + filePath + '\' into table ' + tableName + ' ignore 1 lines;';
                         console.log('importing ' + value.file + ' to ' + value.table);
