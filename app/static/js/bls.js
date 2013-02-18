@@ -107,6 +107,7 @@ var bls = {
     area : '0000',
     item : '[{"74714":["unleaded regular"]},{"74715":["unleaded midgrade"]},{"74716":["unleaded premium"]},{"7471A":["all types"]}]'
   },
+  /*
   updateItems : function (data) {
     var itemsSelector = $('.items');
     for (var groupName in data) {
@@ -135,12 +136,14 @@ var bls = {
     }
     itemsSelector.chosen();
   },
+  */
   findContainer : function () {
     var script = document.getElementsByTagName('script')[(document.getElementsByTagName('script').length - 1)];
     return $(script.parentNode);
   },
   onDocumentReady : function () {
     var that = this;
+    that.busy = $('#fadingBarsG').appendTo(that.container);
     $('.link').click(bls.updateView);
     bls.updateView();
     var options = bls.defaults.daterangepicker;
@@ -175,80 +178,9 @@ var bls = {
     bls.defaults.startDate = (new Date($.cookie('startDate'))) || bls.defaults.startDate;
     bls.defaults.endDate = (new Date($.cookie('endDate'))) || bls.defaults.endDate;
     var that = this;
-    //var script = document.getElementsByTagName('script')[(document.getElementsByTagName('script').length - 1)];
-    this.container = bls.findContainer(); //$(script.parentNode);
-    this.busy = $('<div id="fadingBarsG"><div id="fadingBarsG_1" class="fadingBarsG"></div><div id="fadingBarsG_2" class="fadingBarsG"></div><div id="fadingBarsG_3" class="fadingBarsG"></div><div id="fadingBarsG_4" class="fadingBarsG"></div><div id="fadingBarsG_5" class="fadingBarsG"></div><div id="fadingBarsG_6" class="fadingBarsG"></div><div id="fadingBarsG_7" class="fadingBarsG"></div><div id="fadingBarsG_8" class="fadingBarsG"></div></div>').appendTo(this.container);
-    $(document).ready(function() {
+    this.container = bls.findContainer();
+     $(document).ready(function() {
       that.onDocumentReady();
-      /*
-
-      $('.link').click(bls.updateView);
-      bls.updateView();
-      var options = bls.defaults.daterangepicker;
-      var drp = $('input.daterangepicker-control').daterangepicker(options, function (start, end) {
-        bls.current.startDate = start;
-        bls.current.endDate = end;
-        bls.update(this, this.element);
-      });
-      drp.val([options.startDate.toString(options.format), options.endDate.toString(options.format)].join(' - '));
-      var canvas = $('<canvas id="' + bls.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
-      that.container.append(canvas);
-      var dataDrivens = $('.data-driven');
-      var semaphore = $.map(new Array(dataDrivens.length), function () { return false; });
-      dataDrivens.loadData( function () {
-        var lastone = -1;
-        if (semaphore.every(function (value, index) {lastone = index; return value;})) {
-          that.onDataDrivenComplete();
-        } else {
-          semaphore[lastone] = true;
-        }
-      });
-      $.get('items', function(data) {
-        var itemsSelector = $('.items');
-        that.updateItems(data);
-        itemsSelector.val(bls.defaults.item);//.find('option[value="7471A"]').attr('selected', true);
-        itemsSelector.chosen();
-        itemsSelector.change( function (e) {
-          var value = itemsSelector.val();
-          $.get('areas' + (value&&('?item=' + value)), function (data) {
-            var areaSelector = $('.areas');
-            var val = areaSelector.val();
-            var first = $(areaSelector.children()[0]).clone();
-            areaSelector.empty();
-            areaSelector.append(first);
-            data.forEach(function(value) {
-              areaSelector.append('<option value="' + value.area_code + '">' + value.area_name + '</option>');
-            });
-            areaSelector.val(val);
-            areaSelector.trigger("liszt:updated");
-          });
-          bls.update(e, $(this));
-        });
-      });
-
-      $.get('areas', function(data) {
-        var areaSelector = $('.areas');
-        that.updateAreas(data);
-        areaSelector.val(bls.defaults.area);
-        areaSelector.chosen();
-        areaSelector.change( function (e) {
-          var value = areaSelector.val();
-          $.get('items' + (value&&('?area=' + value)), function (data) {
-            var itemsSelector = $('.items');
-            var val = itemsSelector.val();
-            var first = $(itemsSelector.children()[0]).clone();
-            itemsSelector.empty();
-            itemsSelector.append(first);
-            data.forEach(function(value) {
-              itemsSelector.append('<option value="' + value.item_code + '">' + value.name + '</option>');
-            });
-            itemsSelector.val(val);
-            itemsSelector.trigger("liszt:updated");
-          });
-          bls.update(e, $(this));
-        });
-      });
-      */
     });
     $('.btn[type="reset"]').click(function(e) {
       e.preventDefault();
