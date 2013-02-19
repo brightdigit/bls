@@ -334,6 +334,6 @@ bls.DataDrivenSelect.prototype = {
       });
     };
     $.fn.getString = function () {
-      return typeof(this.selector) === "string" ? this.selector : JSON.stringify(this.get(0));
+      return (typeof(this.selector) === "string" && this.selector.length > 0) ? this.selector : JSON.stringify(this.get(0));
     };
 })(jQuery);
