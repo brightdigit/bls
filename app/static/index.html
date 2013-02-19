@@ -77,14 +77,14 @@ window.jQuery || document.write('<script src="js/jquery-1.8.3.min.js"><\/script>
               <div class="controls controls-row">
                 <!--<button type="reset" class="btn span2">Reset</button>-->
                 <div class="span3">
-                  <select class="areas chosen-control data-driven" data-src="areas" data-valuefield="area_code" data-textfield="area_name" data-default="0000" data-cookie="area" disabled>
+                  <select name="area" class="areas chosen-control data-driven" data-src="areas" data-valuefield="area_code" data-textfield="area_name" data-default="0000" data-cookie="area" disabled>
                     <option value="">
                       Select Area...
                     </option>
                   </select>
                 </div>
-                <div class="span3">
-                  <select class="items chosen-control data-driven" data-src="items" data-valuefield="item_code" data-textfield="type_names" data-default="{&quot;74714&quot;:[&quot;unleaded regular&quot;],&quot;74715&quot;:[&quot;unleaded midgrade&quot;],&quot;74716&quot;:[&quot;unleaded premium&quot;],&quot;7471A&quot;:[&quot;all types&quot;]}" data-cookie="item" disabled>
+                <div class="span5">
+                  <select name="item" class="items chosen-control data-driven" data-src="items" data-valuefield="item_code" data-textfield="type_names" data-default="{&quot;74714&quot;:[&quot;unleaded regular&quot;],&quot;74715&quot;:[&quot;unleaded midgrade&quot;],&quot;74716&quot;:[&quot;unleaded premium&quot;],&quot;7471A&quot;:[&quot;all types&quot;]}" data-cookie="item" disabled>
                     <option value="">
                       Select Item...
                     </option>
@@ -138,6 +138,14 @@ var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
       s.parentNode.insertBefore(g,s)}(document,'script'));
       </script>
       <div id="cache">
+        <div id="subselector" class="btn-group">
+          <a class="dropdown-toggle selected-value button" data-toggle="dropdown" href="#">
+            <!--<i class="icon-chevron-down"></i>-->
+          </a>
+          <ul class="dropdown-menu">
+            <!-- dropdown menu links -->
+          </ul>
+        </div>
         <div id="fadingBarsG"><div id="fadingBarsG_1" class="fadingBarsG"></div><div id="fadingBarsG_2" class="fadingBarsG"></div><div id="fadingBarsG_3" class="fadingBarsG"></div><div id="fadingBarsG_4" class="fadingBarsG"></div><div id="fadingBarsG_5" class="fadingBarsG"></div><div id="fadingBarsG_6" class="fadingBarsG"></div><div id="fadingBarsG_7" class="fadingBarsG"></div><div id="fadingBarsG_8" class="fadingBarsG"></div></div>
       </div>
     </div>

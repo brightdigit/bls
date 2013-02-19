@@ -1,5 +1,17 @@
+(function($){
+    $.fn.loadData = function(callback){
+      this.each(function () {
+        var dds = new bls.DataDrivenSelect(this);
+        dds.loadData(callback);
+      });
+    };
+})(jQuery);
+
 var bls = {
   margin: 100,
+  getString : function (value) {
+      return (typeof(value) === "string" && value.length > 0) ? value : JSON.stringify(value);
+  },
   onresize: function() {
     var height = $(window).height() - this.container.position().top - $('.bottom').height();
     if(height < 200) {
@@ -143,8 +155,10 @@ var bls = {
 
   },
   initialize: function() {
+    /*
     bls.defaults.item = $.cookie('item') || bls.defaults.item;
     bls.defaults.area = $.cookie('area') || bls.defaults.area;
+    */
     bls.defaults.startDate = (new Date($.cookie('startDate'))) || bls.defaults.startDate;
     bls.defaults.endDate = (new Date($.cookie('endDate'))) || bls.defaults.endDate;
     var that = this;
@@ -152,12 +166,14 @@ var bls = {
      $(document).ready(function() {
       that.onDocumentReady();
     });
+     /*
     $('.btn[type="reset"]').click(function(e) {
       e.preventDefault();
       $('.items').val(bls.defaults.item);
       $('.areas').val(bls.defaults.area);
       $('input.daterangepicker-control').daterangepicker(bls.defaults.daterangepicker);
     });
+    */
   },
   request: function(parameters, callback) {
     var request = new bls.DataRequest(parameters);
@@ -275,6 +291,11 @@ bls.PacketRequest.prototype = {
 bls.DataDrivenSelect = function(element) {
   var that = this;
   this.jq = $(element);
+  this.name = this.jq.attr('name');
+  this.jq.removeAttr('name');
+  this.subdd = $('#subselector').clone().removeAttr('id').appendTo(
+    this.jq.parent());
+  this.subdd.find('.dropdown-toggle').dropdown();
   this.jq.change( function (evt) {
     that.onChange(evt);
   });
@@ -283,7 +304,36 @@ bls.DataDrivenSelect = function(element) {
 bls.DataDrivenSelect.prototype = {
   jq : undefined,
   onChange : function (evt) {
-
+    var value, first = true;
+    var that = this;
+    try {
+      value = JSON.parse(this.jq.val());
+    } catch (ex) {
+      console.log(ex);
+    }
+    this.subdd.find('ul').empty();
+    value = value || this.jq.val();
+    if (typeof(value) === 'object') {
+      for (var code in value) {
+        //this.subdd              
+        var label = $('<label>').addClass('radio');
+        $('<input type="radio">').attr('name', this.name).attr('id', this.name + '_' + code).val(code).prop('checked', first).appendTo(label);
+        label.append(value[code].join(','));
+        first = false;
+        label.appendTo('<li>').appendTo(this.subdd.find('ul'));
+      }
+      this.subdd.find('.dropdown-menu input, .dropdown-menu label').click(function(e) {
+          e.stopPropagation();
+      });
+      this.subdd.find('.dropdown-menu input').change(function () {
+        that.subdd.find('.selected-value').text(that.subdd.find('input:checked').parent().text());
+      });
+        that.subdd.find('.selected-value').text(that.subdd.find('input:checked').parent().text());
+      this.subdd.find('.dropdown-toggle').dropdown();
+      this.subdd.show();
+    } else {
+      this.subdd.hide();
+    }
   },
   loadData : function (callback) {
     var that = this;
@@ -309,7 +359,7 @@ bls.DataDrivenSelect.prototype = {
               return false;
             }
           });
-          $('<option>' + key + '</option>').appendTo(optGroup).val($(value).getString());
+          $('<option>' + key + '</option>').appendTo(optGroup).val(bls.getString(value));
         } else {
           $('<option>' + data[groupName][key][textfield] + '</option>').appendTo(optGroup).val(data[groupName][key][valuefield]);
         }
@@ -321,19 +371,8 @@ bls.DataDrivenSelect.prototype = {
   },
   setDefault : function () {
     var value = $.cookie(this.jq.data('cookie')) || this.jq.data('default');
-    value = $(value).getString();
+    value = bls.getString(value);
     this.jq.val(value);
+    this.onChange();
   }
 };
-
-(function($){
-    $.fn.loadData = function(callback){
-      this.each(function () {
-        var dds = new bls.DataDrivenSelect(this);
-        dds.loadData(callback);
-      });
-    };
-    $.fn.getString = function () {
-      return (typeof(this.selector) === "string" && this.selector.length > 0) ? this.selector : JSON.stringify(this.get(0));
-    };
-})(jQuery);
