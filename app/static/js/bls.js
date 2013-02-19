@@ -311,7 +311,7 @@ bls.DataDrivenSelect.prototype = {
     } catch (ex) {
       console.log(ex);
     }
-    this.subdd.find('ul').empty();
+    var list = this.subdd.find('ul').empty();
     value = value || this.jq.val();
     if (typeof(value) === 'object') {
       for (var code in value) {
@@ -320,7 +320,7 @@ bls.DataDrivenSelect.prototype = {
         $('<input type="radio">').attr('name', this.name).attr('id', this.name + '_' + code).val(code).prop('checked', first).appendTo(label);
         label.append(value[code].join(','));
         first = false;
-        label.appendTo('<li>').appendTo(this.subdd.find('ul'));
+        label.appendTo('<li>').appendTo(list);
       }
       this.subdd.find('.dropdown-menu input, .dropdown-menu label').click(function(e) {
           e.stopPropagation();
@@ -331,6 +331,13 @@ bls.DataDrivenSelect.prototype = {
         that.subdd.find('.selected-value').text(that.subdd.find('input:checked').parent().text());
       this.subdd.find('.dropdown-toggle').dropdown();
       this.subdd.show();
+      this.subdd.find('i').toggle(list.children().length > 1);
+      this.subdd.find('a').click(function (e) {
+        if (list.children().length < 2) {
+          e.stopPropagation();
+          return false;
+        }
+      });//.attr('disabled', ? 'disabled': '');
     } else {
       this.subdd.hide();
     }

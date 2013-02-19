@@ -35,6 +35,10 @@
 
 }
 
+.subselector {
+	margin-left: 5px;
+}
+
 #cache {
 	display: none;
 }
