@@ -273,11 +273,18 @@ bls.PacketRequest.prototype = {
 };
 
 bls.DataDrivenSelect = function(element) {
+  var that = this;
   this.jq = $(element);
+  this.jq.change( function (evt) {
+    that.onChange(evt);
+  });
 };
 
 bls.DataDrivenSelect.prototype = {
   jq : undefined,
+  onChange : function (evt) {
+
+  },
   loadData : function (callback) {
     var that = this;
     $.get(this.jq.data('src'), function (data) {
@@ -300,13 +307,7 @@ bls.DataDrivenSelect.prototype = {
           $('<option>' + key + '</option>').appendTo(optGroup).val(JSON.stringify(value));
         } else {
           $('<option>' + data[groupName][key][textfield] + '</option>').appendTo(optGroup).val(data[groupName][key][valuefield]);
-        }/*
-        var value = data[key][itemName].length > 1 || data[key][itemName][0].type_names ?
-          JSON.stringify(data[groupName][itemName].map(function (item) {var result = {}; result[item.item_code] = item.type_names; return result;})) :
-          data[groupName][itemName][0].item_code;
-        $('<option>' + itemName + '</option>').appendTo(optGroup).val(value);
-        */
-      }
+        }
       optGroup.appendTo(this.jq);
     }
     this.setDefault();
