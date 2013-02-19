@@ -299,23 +299,29 @@ bls.DataDrivenSelect.prototype = {
       var optGroup = $('<optgroup label="' + groupName + '"/>')
       for (var key in data[groupName]) {
         var option;
-        if ($.isArray(data[groupName][key])) {
+        if ($.isArray(data[groupName][key]) && data[groupName][key].length > 0) {
           var value = {};
           $.each(data[groupName][key], function () {
+            if (this[textfield]) {
               value[this[valuefield]] = this[textfield];
+            } else {
+              value = this[valuefield];
+              return false;
+            }
           });
-          $('<option>' + key + '</option>').appendTo(optGroup).val(JSON.stringify(value));
+          $('<option>' + key + '</option>').appendTo(optGroup).val($(value).getString());
         } else {
           $('<option>' + data[groupName][key][textfield] + '</option>').appendTo(optGroup).val(data[groupName][key][valuefield]);
         }
-      optGroup.appendTo(this.jq);
+        optGroup.appendTo(this.jq);
+      }
     }
     this.setDefault();
     this.jq.chosen();
   },
   setDefault : function () {
     var value = $.cookie(this.jq.data('cookie')) || this.jq.data('default');
-    value = typeof(value) === "string" ? value : JSON.stringify(value);
+    value = $(value).getString();
     this.jq.val(value);
   }
 };
@@ -326,5 +332,8 @@ bls.DataDrivenSelect.prototype = {
         var dds = new bls.DataDrivenSelect(this);
         dds.loadData(callback);
       });
+    };
+    $.fn.getString = function () {
+      return typeof(this.selector) === "string" ? this.selector : JSON.stringify(this.get(0));
     };
 })(jQuery);
