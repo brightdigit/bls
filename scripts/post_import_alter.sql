@@ -54,7 +54,7 @@ create table measurements (
     label varchar(63) NOT NULL
 );
 
-INSERT INTO `bls`.`measurements`
+INSERT INTO `bls`.`measurements_search`
 VALUES
 -- terms
 (1, 'gallon', 'gallon'),
@@ -637,11 +637,11 @@ measurements.priority
  FROM ap_item
 left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code
 inner join (SELECT ap_item.item_code, min(priority) as priority FROM ap_item
-left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code, measurements
+left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code, measurements_search as measurements
 where
 LOCATE(CONCAT(' ', keyword), description) > 0 and ap_item_inactive.item_code is null
 group by ap_item.item_code) priorities
-on ap_item.item_code = priorities.item_code, measurements
+on ap_item.item_code = priorities.item_code, measurements_search as measurements
 
 where ap_item_inactive.item_code is null
 and measurements.priority = priorities.priority) unparsed_qty;
