@@ -12,6 +12,18 @@ var bls = {
   getString : function (value) {
       return (typeof(value) === "string" && value.length > 0) ? value : JSON.stringify(value);
   },
+  getOnlyValue : function (value) {
+    var child; 
+    if (typeof(value) === 'object') {
+      for (var key in value) {
+        if (child) {
+          return value;
+        }
+        child = value[key];
+      }
+      return child;
+    }
+  },
   onresize: function() {
     var height = $(window).height() - this.container.position().top - $('.bottom').height();
     if(height < 200) {
@@ -312,7 +324,8 @@ bls.DataDrivenSelect.prototype = {
       console.log(ex);
     }
     var list = this.subdd.find('ul').empty();
-    value = value || this.jq.val();
+    value = bls.getOnlyValue(value) || this.jq.val();
+    value = ($.isArray(value) && value.join(',')) || value;
     if (typeof(value) === 'object') {
       for (var code in value) {
         //this.subdd              
