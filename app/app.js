@@ -68,11 +68,12 @@ var bls = function() {
 };
 
 
-bls.controller = function(queryFormat, defaultParameters, groupNames, jsonFields) {
+bls.controller = function(queryFormat, defaultParameters, groupNames, jsonFields, callback) {
     this.queryFormat = this.initializeFormat(queryFormat);
     this.defaultParameters = defaultParameters ? defaultParameters : this.defaultParameter;
     this.groupNames = groupNames || this.groupNames;
     this.jsonFields = jsonFields || this.jsonFields;
+    this.callback = callback;
   };
 
 bls.controller.prototype = {
@@ -86,6 +87,7 @@ bls.controller.prototype = {
         res.end();
       } else {
         var data = bls.controller.prototype.groupBy(bls.controller.prototype.jsonConvert(results, that.jsonFields), that.groupNames);
+        data = that.callback ? data.map(that.callback) : data;
         res.writeHead(200, {
           'Content-Type': 'application/json'
         });
@@ -206,7 +208,32 @@ bls.controllers = {
     'item': null
   }, ['area_group_name']),
   'data': new bls.controller(
-  ['select start_date as startDate, DATE_ADD(start_date, interval :months month) as endDate, value from (', 'select str_to_date(concat(floor((time*:months)/12),\'-\',cast( ((time*:months)/12 - floor((time*:months)/12))*12 as unsigned) + 1,\'-01\'), \'%Y-%m-%d\') as start_date, avg(value) as value from (', 'select value, floor((year*12 + (period-1))/:months) as time from ap_current ', 'inner join ap_series on ap_current.series_id = ap_series.series_id', 'where (ap_series.item_code = :item and ap_series.area_code = :area', 'and str_to_date(concat(year, \'-\', period, \'-01\'), \'%Y-%m-%d\') between :startDate and :endDate)', 'order by year, period', ') data group by time) as valuez limit 100 offset :offset'])
+  ['select start_date as startDate, DATE_ADD(start_date, interval :months month) as endDate, value from (', 'select str_to_date(concat(floor((time*:months)/12),\'-\',cast( ((time*:months)/12 - floor((time*:months)/12))*12 as unsigned) + 1,\'-01\'), \'%Y-%m-%d\') as start_date, avg(value) as value from (', 'select value, floor((year*12 + (period-1))/:months) as time from ap_current ', 'inner join ap_series on ap_current.series_id = ap_series.series_id', 'where (ap_series.item_code = :item and ap_series.area_code = :area', 'and str_to_date(concat(year, \'-\', period, \'-01\'), \'%Y-%m-%d\') between :startDate and :endDate)', 'order by year, period', ') data group by time) as valuez limit 100 offset :offset']),
+  'units': new bls.controller(
+  ['select measurements.measurements_id as id, measurements.label, ratios from measurements',
+'left join (',
+'SELECT from_measurements_id, ',
+'IFNULL(GROUP_CONCAT(concat(measurements_ratios.to_measurements_id,\':\',measurements_ratios.ratio)),measurements_ratios.ratio) as ratios',
+'FROM bls.measurements_ratios',
+'group by measurements_ratios.from_measurements_id',
+') ratio_table on',
+'measurements.measurements_id = ratio_table.from_measurements_id;'], null, null, null, function (value) {
+    var ratios = value.ratios;
+    if (ratios) {
+      if (ratios.indexOf(':') < 0) {
+        value.ratios = parseFloat(ratios);
+      } else {
+        value.ratios = [];
+        ratios.split(',').forEach(function (item) {
+          var set = item.split(':');
+          value.ratios[set[0]] = parseFloat(set[1]);
+        });
+      }
+      return value;
+    } else {
+      return value;
+    }
+  })
 };
 
 bls.prototype = {
