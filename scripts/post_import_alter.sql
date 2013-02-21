@@ -49,31 +49,54 @@ ALTER TABLE `ap_item`
 drop table  if exists measurements;
 
 create table measurements (
-    priority tinyint NOT NULL PRIMARY KEY,
-    keyword varchar(63) NOT NULL,
-    label varchar(63) NOT NULL
+	measurements_id tinyint primary key not null,
+	label varchar(63) not null unique
 );
 
-INSERT INTO `bls`.`measurements_search`
+insert into measurements values 
+(1, 'KWH'),
+(2, 'dozen'),
+(3, 'gallon'),
+(4, 'liter'),
+(5, 'ounces'),
+(6, 'pounds'),
+(7, 'therm'),
+(8, 'teaspoon'),
+(9, 'tablespoon'),
+(10, 'fluid ounce'),
+(11, 'cup'),
+(12, 'pint'),
+(13, 'quart'),
+(15, 'milliliter');
+
+drop table  if exists measurements_search;
+
+create table measurements_search (
+    priority tinyint NOT NULL PRIMARY KEY,
+    keyword varchar(63) NOT NULL,
+    measurements_id tinyint NOT NULL
+);
+
+INSERT INTO measurements_search
 VALUES
 -- terms
-(1, 'gallon', 'gallon'),
-(2, 'ounces', 'ounces'),
-(3, 'pound', 'pounds'),
-(4, 'KWH', 'KWH'),
-(5, 'therm', 'therm'),
+(1, 'gallon', 3),
+(2, 'ounces', 5),
+(3, 'pound', 6),
+(4, 'KWH', 1),
+(5, 'therm', 7),
 -- abbreviations
-(6, 'gal.', 'gallon'),
-(7, 'lb.', 'pounds'),
-(8, 'oz', 'ounces'),
-(9, 'doz.', 'dozen'),
-(10, 'liter', 'liter');
+(6, 'gal.', 3),
+(7, 'lb.', 6),
+(8, 'oz', 5),
+(9, 'doz.', 2),
+(10, 'liter', 14);
 
 drop table if exists ap_item_measurement;
 
 create table ap_item_measurement (
     item_code char(6) PRIMARY KEY,
-    priority tinyint NOT NULL,
+    measurements_id tinyint NOT NULL,
     value float NOT NULL
 );
 
@@ -628,11 +651,11 @@ INSERT INTO `ap_area_groups` VALUES
 
 GRANT SELECT ON bls.* TO 'bls_user'@'localhost' identified by 'HhI*+5oP:(X~}@-';
 
-select item_code, qty_str, priority
+select item_code, qty_str, measurements_id
 from (
 SELECT ap_item.item_code,
 RIGHT(LEFT(description, LOCATE(CONCAT(' ', keyword), description)-1), LOCATE(' ', REVERSE(LEFT(description, LOCATE(CONCAT(' ', keyword), description)-1)))-1) as qty_str,
-measurements.label,
+measurements.measurements_id,
 measurements.priority
  FROM ap_item
 left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code
