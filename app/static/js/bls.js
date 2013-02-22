@@ -135,8 +135,12 @@ var bls = {
     var script = document.getElementsByTagName('script')[(document.getElementsByTagName('script').length - 1)];
     return $(script.parentNode);
   },
+  cached : {
+    unitMap : {} 
+  },
   onDocumentReady : function () {
     var that = this;
+    this.loadUnits();
     that.busy = $('#fadingBarsG').appendTo(that.container);
     $('.link').click(bls.updateView);
     bls.updateView();
@@ -151,8 +155,25 @@ var bls = {
     this.container.append(canvas);
     var dataDrivens = $('.data-driven');
     var semaphore = $.map(new Array(dataDrivens.length), function () { return false; });
-    dataDrivens.loadData( function () {
+    dataDrivens.loadData( function (select, data) {
       var lastone = -1;
+
+      if (select.jq.data('src') === 'items') {
+        for (var key in data) {
+          group = data[key];
+          for (var key in group) {
+            item = group[key];
+            for (var key in item) {
+              type = item[key];
+              bls.cached.unitMap[type.item_code] = type.measure_type;              
+            }          
+          }
+        }
+        select.jq.change(function () {
+
+        });
+      }
+
       if (semaphore.every(function (value, index) {lastone = index; return value;})) {
         that.onDataDrivenComplete();
       } else {
@@ -162,10 +183,20 @@ var bls = {
         }
       }
     });
+
   },
   onDataDrivenComplete : function () {
 
   },
+  loadUnits : function () {
+    $.get('units', function (data) {
+      bls.units = [];
+      data.forEach( function (value) {
+        bls.units[parseInt(value.id)] = value;
+      });
+    });
+  },
+  units : [],
   initialize: function() {
     /*
     bls.defaults.item = $.cookie('item') || bls.defaults.item;
@@ -173,6 +204,7 @@ var bls = {
     */
     bls.defaults.startDate = (new Date($.cookie('startDate'))) || bls.defaults.startDate;
     bls.defaults.endDate = (new Date($.cookie('endDate'))) || bls.defaults.endDate;
+
     var that = this;
     this.container = bls.findContainer();
      $(document).ready(function() {
@@ -305,8 +337,8 @@ bls.DataDrivenSelect = function(element) {
   this.jq = $(element);
   this.name = this.jq.attr('name');
   this.jq.removeAttr('name');
-  this.subdd = $('#subselector').clone().removeAttr('id').appendTo(
-    this.jq.parent());
+  this.subdd = $('#subselector').clone().removeAttr('id').insertAfter(
+    this.jq);
   this.subdd.find('.dropdown-toggle').dropdown();
   this.jq.change( function (evt) {
     that.onChange(evt);
@@ -359,7 +391,7 @@ bls.DataDrivenSelect.prototype = {
     var that = this;
     $.get(this.jq.data('src'), function (data) {
       that.update(data);
-      callback(this.jq);
+      callback(that, data);
     });
   },
   update : function (data) {
@@ -387,7 +419,7 @@ bls.DataDrivenSelect.prototype = {
       }
     }
     this.setDefault();
-    this.jq.chosen();
+    this.chosen = this.jq.chosen();
   },
   setDefault : function () {
     var value = $.cookie(this.jq.data('cookie')) || this.jq.data('default');

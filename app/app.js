@@ -97,7 +97,9 @@ bls.controller.prototype = {
   },
   stringify : function (object) {
     var comps = [];
-    if (Object.prototype.toString.call( object ) === '[object Array]' && object.length) {
+    if (object === undefined || object === null) {
+      return 'null';
+    } else if (Object.prototype.toString.call( object ) === '[object Array]' && object.length) {
       comps.push('[');
       for (var index = 0; index < object.length; index++) {
         comps.push(bls.controller.prototype.stringify(object[index]));
@@ -116,9 +118,9 @@ bls.controller.prototype = {
         }
       }
       comps[comps.length - 1] = '}';
-    } else {
+    } else  {
       return JSON.stringify(object);
-    }
+    } 
     return comps.join('');
   },
   jsonConvert : function(results, jsonFields) {
@@ -181,7 +183,7 @@ bls.controllers = {
   //'test' : new controller(),
   'items': new bls.controller(
   ['select ap_item_matches_mapping.root_code as item_code, ap_item_names.name, group_name, concat(\'["\',group_concat(distinct ap_item_types.type_name separator \'","\'), \'"]\') as type_names, count(*) as count,',
-  'ap_item_measurement.priority as measure_type, ap_item_measurement.value',
+  'ap_item_measurement.measurements_id as measure_type, ap_item_measurement.value',
 'from ap_current inner join ap_series on ap_current.series_id = ap_series.series_id',
 'inner join ap_item on ap_series.item_code = ap_item.item_code',
 'inner join ap_item_matches_mapping on ap_item.item_code = ap_item_matches_mapping.item_code',

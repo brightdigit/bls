@@ -71,38 +71,39 @@ window.jQuery || document.write('<script src="js/jquery-1.8.3.min.js"><\/script>
     </div>
     <div class="container">
       <div id="home">
-        <form>
-          <fieldset>
-            <div class="control-group">
-              <div class="controls controls-row">
-                <!--<button type="reset" class="btn span2">Reset</button>-->
-                <div class="span3">
+        <div class="row">
+          <div class="span3">
+            <form>
+              <fieldset>
+                <div>
                   <select name="area" class="areas chosen-control data-driven" data-src="areas" data-valuefield="area_code" data-textfield="area_name" data-default="0000" data-cookie="area" disabled>
                     <option value="">
                       Select Area...
                     </option>
                   </select>
                 </div>
-                <div class="span5">
+                <div>
                   <select name="item" class="items chosen-control data-driven" data-src="items" data-valuefield="item_code" data-textfield="type_names" data-default="{&quot;74714&quot;:[&quot;unleaded regular&quot;],&quot;74715&quot;:[&quot;unleaded midgrade&quot;],&quot;74716&quot;:[&quot;unleaded premium&quot;],&quot;7471A&quot;:[&quot;all types&quot;]}" data-cookie="item" disabled>
                     <option value="">
                       Select Item...
                     </option>
                   </select>
+                  <div class="input-append">
+                    <input class="input-mini" type="text" name="value" value="1.0">
+                    <span class="dropdown">
+                      <a class="dropdown-toggle add-on" data-toggle="dropdown" href="#">gallon</a>
+                      <div class="dropdown-menu units" role="menu" aria-labelledby="dLabel">
+                        
+                      </div>
+                    </span>
+                  </div>
                 </div>
-                <div class="input-prepend span3">
+                <div class="input-prepend">
                   <input class="daterangepicker-control" type="text" name="dateRange" id="dateRange" data-startCookie="startDate" data-endCookie="endDate" disabled>
                 </div>
-              </div>
-            </div>
-          </fieldset>
-        </form>
-        <div class="row alerts">
-          <div class="span3 areas-alert"></div>
-          <div class="span3 items-alert"></div>
-          <div class="daterangepicker-control-alert span3"></div>
-        </div>
-        <div class="row">
+              </fieldset>
+            </form>
+          </div>
           <div id="container" class="span12">
             <script data-src="data">
 bls.initialize();

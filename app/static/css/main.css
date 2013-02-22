@@ -37,11 +37,24 @@
 
 .subselector {
 	margin-left: 5px;
+	display: block;
+	margin-bottom: 5px;
 }
 
 #cache {
 	display: none;
 }
+
+#home fieldset > div {
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+	border-bottom: dotted 1px #CCC;
+}
+
+#home fieldset > div:last-child {
+	border-bottom: none;
+}
+
 #fadingBarsG{
 position:absolute;
 width:480px;
