@@ -24,6 +24,18 @@ var bls = {
       return child;
     }
   },
+  getOnlyKey : function (value) {
+    var child; 
+    if (typeof(value) === 'object') {
+      for (var key in value) {
+        if (child) {
+          return value;
+        }
+        child = key;
+      }
+      return child;
+    }
+  },
   onresize: function() {
     var height = $(window).height() - this.container.position().top - $('.bottom').height();
     if(height < 200) {
@@ -138,6 +150,27 @@ var bls = {
   cached : {
     unitMap : {} 
   },
+  createRadio : function (value, text, name, selected) {
+    var label = $('<label>');
+    label.text(text);
+    var input = $('<input>');
+    input.attr('type', 'radio');
+    input.attr('name', name);
+    input.val(value);
+    if (selected) {
+      input.attr('selected', 'selected');
+    }
+    label.append(input);
+    return $('<li>').append(label);
+  },
+  updateUnits : function (item_code) {
+    $('input[name=value]').val(bls.cached.unitMap[item_code].value);
+    var unitDetails = bls.units[parseInt(bls.cached.unitMap[item_code].unit_id)];
+    var list = $('<ul>');
+    list.append(bls.createRadio(unitDetails.id, unitDetails.label,  'unit', true));
+    $('.dropdown-menu.units').empty();
+    $('.dropdown-menu.units').append(list);   
+  },
   onDocumentReady : function () {
     var that = this;
     this.loadUnits();
@@ -165,12 +198,15 @@ var bls = {
             item = group[key];
             for (var key in item) {
               type = item[key];
-              bls.cached.unitMap[type.item_code] = type.measure_type;              
+              bls.cached.unitMap[type.item_code] = { unit_id : type.unit_id, value : type.value };              
             }          
           }
         }
-        select.jq.change(function () {
-
+        select.onsubselectchange(function (element, evt) {
+          var value = $(element).val();
+          value = bls.getOnlyKey(JSON.parse(value)) || value;
+          bls.updateUnits(value);
+          //console.log();
         });
       }
 
@@ -370,8 +406,9 @@ bls.DataDrivenSelect.prototype = {
       this.subdd.find('.dropdown-menu input, .dropdown-menu label').click(function(e) {
           e.stopPropagation();
       });
-      this.subdd.find('.dropdown-menu input').change(function () {
+      this.subdd.find('.dropdown-menu input').change(function (evt) {
         that.subdd.find('.selected-value').text(that.subdd.find('input:checked').parent().text());
+        that.onsubselectchangetrigger(this, evt, that);
       });
         that.subdd.find('.selected-value').text(that.subdd.find('input:checked').parent().text());
       this.subdd.find('.dropdown-toggle').dropdown();
@@ -382,9 +419,18 @@ bls.DataDrivenSelect.prototype = {
           e.stopPropagation();
           return false;
         }
-      });//.attr('disabled', ? 'disabled': '');
+      });
     } else {
       this.subdd.hide();
+      this.onsubselectchangetrigger(evt.target, evt, this);
+    }
+  },
+  onsubselectchange : function (func) {
+    this.onsubselectchangecallback = func;
+  },
+  onsubselectchangetrigger : function (input, evt) {
+    if (this.onsubselectchangecallback) {
+      this.onsubselectchangecallback(input, evt, this);
     }
   },
   loadData : function (callback) {
