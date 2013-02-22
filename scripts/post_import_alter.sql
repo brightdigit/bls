@@ -1,18 +1,13 @@
 update ap_current set period = SUBSTRING(period, 2);
 update ap_series set begin_period = substring(begin_period, 2), end_period=substring(begin_period, 2);
 
-create table current_temp SELECT
-`ap_current`.`series_id`,
-`ap_current`.`year`,
-`ap_current`.`period`,
-`ap_current`.`value`,
-`ap_current`.`footnote_codes`
-FROM `bls`.`ap_current`
-group by `ap_current`.`series_id`,
-`ap_current`.`year`,
-`ap_current`.`period`,
-`ap_current`.`value`,
-`ap_current`.`footnote_codes`;
+create table current_temp SELECT ap_current.series_id,
+    ap_current.year,
+    ap_current.period,
+    ap_current.value,
+    ap_current.footnote_codes FROM
+    bls.ap_current
+group by ap_current.series_id , ap_current.year , ap_current.period , ap_current.value , ap_current.footnote_codes;
 
 delete from ap_current;
 
@@ -46,14 +41,14 @@ ALTER TABLE `ap_area`
 ALTER TABLE `ap_item`
 	ADD PRIMARY KEY (`item_code`);
 
-drop table  if exists measurements;
+drop table  if exists units;
 
-create table measurements (
-	measurements_id tinyint primary key not null,
-	label varchar(63) not null unique
+create table units (
+    unit_id tinyint primary key not null,
+    label varchar(63) not null unique
 );
 
-insert into measurements values 
+insert into units values 
 (1, 'KWH'),
 (2, 'dozen'),
 (3, 'gallon'),
@@ -69,15 +64,15 @@ insert into measurements values
 (13, 'quart'),
 (15, 'milliliter');
 
-drop table  if exists measurements_search;
+drop table  if exists units_search;
 
-create table measurements_search (
+create table units_search (
     priority tinyint NOT NULL PRIMARY KEY,
     keyword varchar(63) NOT NULL,
-    measurements_id tinyint NOT NULL
+    unit_id tinyint NOT NULL
 );
 
-INSERT INTO measurements_search
+INSERT INTO units_search
 VALUES
 -- terms
 (1, 'gallon', 3),
@@ -92,16 +87,16 @@ VALUES
 (9, 'doz.', 2),
 (10, 'liter', 14);
 
-drop table if exists measurements_ratios;
+drop table if exists units_ratios;
 
-create table measurements_ratios (
-	ratio_id smallint primary key auto_increment,
-	from_measurements_id tinyint not null,
-	to_measurements_id tinyint,
-	ratio float not null
+create table units_ratios (
+    ratio_id smallint primary key auto_increment,
+    from_unit_id tinyint not null,
+    to_unit_id tinyint,
+    ratio float not null
 );
 
-insert into measurements_ratios (to_measurements_id, from_measurements_id, ratio) values
+insert into units_ratios (to_unit_id, from_unit_id, ratio) values
 (11,3,16),
 (10,3,128),
 (4,3,3.78541),
@@ -178,29 +173,29 @@ insert into measurements_ratios (to_measurements_id, from_measurements_id, ratio
 (8,15,0.202884231826936),
 (null, 2, 12);
 
-drop table if exists ap_item_measurement;
+drop table if exists ap_item_unit;
 
-create table ap_item_measurement (
+create table ap_item_unit (
     item_code char(6) PRIMARY KEY,
-    measurements_id tinyint NOT NULL,
+    unit_id tinyint NOT NULL,
     value float NOT NULL
 );
 
 drop table if exists ap_item_matches;
-create table ap_item_matches as (select item_code from ap_item);
+create table ap_item_matches as (select item_code from
+    ap_item);
 
-delete from ap_item_matches where item_code = '709112';
-delete from ap_item_matches where item_code = '709213';
+delete from ap_item_matches where item_code = '712112';
 
 drop table if exists ap_item_matches_mapping;
-create table ap_item_matches_mapping as (select item_code as root_code, item_code from ap_item_matches);
+create table ap_item_matches_mapping as (select item_code as root_code, item_code from
+    ap_item_matches);
 
-insert into ap_item_matches_mapping values ('709111','709112'),('709212','709213');
-
+insert into ap_item_matches_mapping values ('712111','712112');
 
 drop table if exists ap_item_inactive;
 create table ap_item_inactive (
-	item_code char(6) NOT NULL PRIMARY KEY
+    item_code char(6) NOT NULL PRIMARY KEY
 );
 
 insert into ap_item_inactive values
@@ -253,7 +248,8 @@ insert into ap_item_inactive values
 drop table if exists ap_item_groups;
 
 create table ap_item_groups (
-group_name varchar(127) primary key);
+    group_name varchar(127) primary key
+);
 
 insert into ap_item_groups values
 ('grains'),
@@ -268,8 +264,8 @@ insert into ap_item_groups values
 drop table if exists ap_item_grouping;
 
 create table ap_item_grouping (
-	item_code char(6) PRIMARY KEY,
-	group_name varchar(127) NOT null
+    item_code char(6) PRIMARY KEY,
+    group_name varchar(127) NOT null
 );
 
 INSERT into ap_item_grouping values ('701111', 'grains');
@@ -387,8 +383,8 @@ INSERT into ap_item_grouping values ('FL2101', 'fruits and vegatables');
 drop table if exists ap_item_names;
 
 create table ap_item_names (
-	item_code char(6) PRIMARY KEY,
-	name varchar(127) NOT NULL
+    item_code char(6) PRIMARY KEY,
+    name varchar(127) NOT NULL
 );
 
 INSERT into ap_item_names values ('701111', 'flour');
@@ -506,9 +502,9 @@ INSERT into ap_item_names values ('FL2101', 'lettuce');
 drop table if exists ap_item_types;
 
 create table ap_item_types (
-	item_code char(6),
-	type_name varchar(127) NOT NULL,
-	PRIMARY KEY(item_code, type_name)
+    item_code char(6),
+    type_name varchar(127) NOT NULL,
+    PRIMARY KEY (item_code , type_name)
 );
 
 INSERT into ap_item_types values ('701111', 'white');
@@ -612,9 +608,13 @@ INSERT into ap_item_types values ('704411', 'bone-in');
 INSERT into ap_item_types values ('708111', 'large');
 INSERT into ap_item_types values ('708112', 'large');
 INSERT into ap_item_types values ('709111', 'whole');
+INSERT into ap_item_types values ('709111', 'per half-gallon');
 INSERT into ap_item_types values ('709112', 'whole');
+INSERT into ap_item_types values ('709112', 'per gallon');
 INSERT into ap_item_types values ('709212', 'low fat');
+INSERT into ap_item_types values ('709212', 'per half-gallon');
 INSERT into ap_item_types values ('709213', 'low fat');
+INSERT into ap_item_types values ('709213', 'per gallon');
 INSERT into ap_item_types values ('710111', 'grade aa');
 INSERT into ap_item_types values ('714221', 'any style');
 INSERT into ap_item_types values ('714232', 'any type');
@@ -658,10 +658,10 @@ insert into ap_item_types values ('72611', '100 therms');
 insert into ap_item_types values ('72620', '1 therm');
 insert into ap_item_types values ('72621', 'per 500 KWH');
 
-create table ap_area_groupings  (
-	area_group_id tinyint auto_increment primary key,
-	area_group_name varchar(255) not null,
-	ordering tinyint unsigned not null default 255
+create table ap_area_groupings (
+    area_group_id tinyint auto_increment primary key,
+    area_group_name varchar(255) not null,
+    ordering tinyint unsigned not null default 255
 );
 
 insert into ap_area_groupings values (1, 'Urban Areas', 1), 
@@ -670,8 +670,8 @@ insert into ap_area_groupings values (1, 'Urban Areas', 1),
 (4, 'Class Grouping', 255);
 
 create table ap_area_groups (
-	area_code char(4) primary key,
-	area_group_id tinyint not null
+    area_code char(4) primary key,
+    area_group_id tinyint not null
 );
 
 INSERT INTO `ap_area_groups` VALUES 
@@ -737,20 +737,24 @@ INSERT INTO `ap_area_groups` VALUES
 
 GRANT SELECT ON bls.* TO 'bls_user'@'localhost' identified by 'HhI*+5oP:(X~}@-';
 
-select item_code, qty_str, measurements_id
-from (
-SELECT ap_item.item_code,
-RIGHT(LEFT(description, LOCATE(CONCAT(' ', keyword), description)-1), LOCATE(' ', REVERSE(LEFT(description, LOCATE(CONCAT(' ', keyword), description)-1)))-1) as qty_str,
-measurements.measurements_id,
-measurements.priority
- FROM ap_item
-left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code
-inner join (SELECT ap_item.item_code, min(priority) as priority FROM ap_item
-left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code, measurements_search as measurements
-where
-LOCATE(CONCAT(' ', keyword), description) > 0 and ap_item_inactive.item_code is null
-group by ap_item.item_code) priorities
-on ap_item.item_code = priorities.item_code, measurements_search as measurements
-
-where ap_item_inactive.item_code is null
-and measurements.priority = priorities.priority) unparsed_qty;
+select 
+    item_code, qty_str, unit_id
+from
+    (SELECT 
+        ap_item.item_code,
+            RIGHT(LEFT(description, LOCATE(CONCAT(' ', keyword), description) - 1), LOCATE(' ', REVERSE(LEFT(description, LOCATE(CONCAT(' ', keyword), description) - 1))) - 1) as qty_str,
+            units.unit_id,
+            units.priority
+    FROM
+        ap_item
+    left join ap_item_inactive ON ap_item.item_code = ap_item_inactive.item_code
+    inner join (SELECT 
+        ap_item.item_code, min(priority) as priority
+    FROM
+        ap_item
+    left join ap_item_inactive ON ap_item.item_code = ap_item_inactive.item_code, units_search as units
+    where
+        LOCATE(CONCAT(' ', keyword), description) > 0 and ap_item_inactive.item_code is null
+    group by ap_item.item_code) priorities ON ap_item.item_code = priorities.item_code, units_search as units
+    where
+        ap_item_inactive.item_code is null and units.priority = priorities.priority) unparsed_qty;
