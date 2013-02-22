@@ -212,14 +212,14 @@ bls.controllers = {
   'data': new bls.controller(
   ['select start_date as startDate, DATE_ADD(start_date, interval :months month) as endDate, value from (', 'select str_to_date(concat(floor((time*:months)/12),\'-\',cast( ((time*:months)/12 - floor((time*:months)/12))*12 as unsigned) + 1,\'-01\'), \'%Y-%m-%d\') as start_date, avg(value) as value from (', 'select value, floor((year*12 + (period-1))/:months) as time from ap_current ', 'inner join ap_series on ap_current.series_id = ap_series.series_id', 'where (ap_series.item_code = :item and ap_series.area_code = :area', 'and str_to_date(concat(year, \'-\', period, \'-01\'), \'%Y-%m-%d\') between :startDate and :endDate)', 'order by year, period', ') data group by time) as valuez limit 100 offset :offset']),
   'units': new bls.controller(
-  ['select units.units_id as id, units.label, ratios from units',
+  ['select units.unit_id as id, units.label, ratios from units',
 'left join (',
-'SELECT from_units_id, ',
-'IFNULL(GROUP_CONCAT(concat(units_ratios.to_units_id,\':\',units_ratios.ratio)),units_ratios.ratio) as ratios',
+'SELECT from_unit_id, ',
+'IFNULL(GROUP_CONCAT(concat(units_ratios.to_unit_id,\':\',units_ratios.ratio)),units_ratios.ratio) as ratios',
 'FROM bls.units_ratios',
-'group by units_ratios.from_units_id',
+'group by units_ratios.from_unit_id',
 ') ratio_table on',
-'units.units_id = ratio_table.from_units_id;'], null, null, null, function (value) {
+'units.unit_id = ratio_table.from_unit_id;'], null, null, null, function (value) {
     var ratios = value.ratios;
     if (ratios) {
       if (ratios.indexOf(':') < 0) {
