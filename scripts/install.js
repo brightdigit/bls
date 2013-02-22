@@ -105,12 +105,12 @@ function beginDownload() {
                                   function (value) {
                                     return '(' + [
                                       "'" + value.item_code + "'",
-                                      value.measurements_id,
+                                      value.unit_id,
                                       parseValue(value.qty_str)
                                     ].join(',') + ')';
                                   }
                                 );
-                                connection.query('INSERT INTO ap_item_measurement (`item_code`, `measurements_id`,`value`) VALUES ' + quantities.join(', '), function (error) {
+                                connection.query('INSERT INTO ap_item_unit (`item_code`, `unit_id`,`value`) VALUES ' + quantities.join(', '), function (error) {
                                   if (error) {
                                     throw error;
                                   } else {

@@ -118,9 +118,9 @@ bls.controller.prototype = {
         }
       }
       comps[comps.length - 1] = '}';
-    } else  {
+    } else {
       return JSON.stringify(object);
-    } 
+    }
     return comps.join('');
   },
   jsonConvert : function(results, jsonFields) {
@@ -183,12 +183,12 @@ bls.controllers = {
   //'test' : new controller(),
   'items': new bls.controller(
   ['select ap_item_matches_mapping.root_code as item_code, ap_item_names.name, group_name, concat(\'["\',group_concat(distinct ap_item_types.type_name separator \'","\'), \'"]\') as type_names, count(*) as count,',
-  'ap_item_measurement.measurements_id as measure_type, ap_item_measurement.value',
+  'ap_item_unit.unit_id as unit_id, ap_item_unit.value',
 'from ap_current inner join ap_series on ap_current.series_id = ap_series.series_id',
 'inner join ap_item on ap_series.item_code = ap_item.item_code',
 'inner join ap_item_matches_mapping on ap_item.item_code = ap_item_matches_mapping.item_code',
 'inner join ap_item_names on ap_item_matches_mapping.root_code = ap_item_names.item_code',
-'left join ap_item_measurement on ap_item.item_code = ap_item_measurement.item_code',
+'left join ap_item_unit on ap_item.item_code = ap_item_unit.item_code',
 'left join ap_item_inactive on ap_item.item_code = ap_item_inactive.item_code',
 'left join ap_item_grouping on ap_item.item_code = ap_item_grouping.item_code',
 'left join ap_item_types on ap_item.item_code = ap_item_types.item_code',
@@ -212,14 +212,14 @@ bls.controllers = {
   'data': new bls.controller(
   ['select start_date as startDate, DATE_ADD(start_date, interval :months month) as endDate, value from (', 'select str_to_date(concat(floor((time*:months)/12),\'-\',cast( ((time*:months)/12 - floor((time*:months)/12))*12 as unsigned) + 1,\'-01\'), \'%Y-%m-%d\') as start_date, avg(value) as value from (', 'select value, floor((year*12 + (period-1))/:months) as time from ap_current ', 'inner join ap_series on ap_current.series_id = ap_series.series_id', 'where (ap_series.item_code = :item and ap_series.area_code = :area', 'and str_to_date(concat(year, \'-\', period, \'-01\'), \'%Y-%m-%d\') between :startDate and :endDate)', 'order by year, period', ') data group by time) as valuez limit 100 offset :offset']),
   'units': new bls.controller(
-  ['select measurements.measurements_id as id, measurements.label, ratios from measurements',
+  ['select units.units_id as id, units.label, ratios from units',
 'left join (',
-'SELECT from_measurements_id, ',
-'IFNULL(GROUP_CONCAT(concat(measurements_ratios.to_measurements_id,\':\',measurements_ratios.ratio)),measurements_ratios.ratio) as ratios',
-'FROM bls.measurements_ratios',
-'group by measurements_ratios.from_measurements_id',
+'SELECT from_units_id, ',
+'IFNULL(GROUP_CONCAT(concat(units_ratios.to_units_id,\':\',units_ratios.ratio)),units_ratios.ratio) as ratios',
+'FROM bls.units_ratios',
+'group by units_ratios.from_units_id',
 ') ratio_table on',
-'measurements.measurements_id = ratio_table.from_measurements_id;'], null, null, null, function (value) {
+'units.units_id = ratio_table.from_units_id;'], null, null, null, function (value) {
     var ratios = value.ratios;
     if (ratios) {
       if (ratios.indexOf(':') < 0) {
