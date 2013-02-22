@@ -164,12 +164,26 @@ var bls = {
     return $('<li>').append(label);
   },
   updateUnits : function (item_code) {
+    var def_unit = parseInt(bls.cached.unitMap[item_code].unit_id);
     $('input[name=value]').val(bls.cached.unitMap[item_code].value);
-    var unitDetails = bls.units[parseInt(bls.cached.unitMap[item_code].unit_id)];
+    var unitDetails = bls.units[def_unit];
     var list = $('<ul>');
     list.append(bls.createRadio(unitDetails.id, unitDetails.label,  'unit', true));
+    for (var index = 0; index < unitDetails.ratios.length; index++) {
+      if (unitDetails.ratios[index]) {
+        list.append(bls.createRadio(index, bls.units[index].label, 'unit'));
+      }
+    }
     $('.dropdown-menu.units').empty();
-    $('.dropdown-menu.units').append(list);   
+    $('.dropdown-menu.units').append(list); 
+    $('.dropdown-menu.units input').change(function () {
+      console.log($('.dropdown-menu.units input:checked').parent().text());
+      $('.unitName').text($('.dropdown-menu.units input:checked').parent().text());
+      var newValue = Math.round(
+        $('input[name=value]').val() * bls.units[def_unit].ratios[$('.dropdown-menu.units input:checked').val()] * 1000)/1000.0;
+      $('input[name=value]').val(newValue);
+      def_unit = $('.dropdown-menu.units input:checked').val();
+    });  
   },
   onDocumentReady : function () {
     var that = this;
@@ -422,7 +436,7 @@ bls.DataDrivenSelect.prototype = {
       });
     } else {
       this.subdd.hide();
-      this.onsubselectchangetrigger(evt.target, evt, this);
+      this.onsubselectchangetrigger(evt?evt.target:undefined, evt, this);
     }
   },
   onsubselectchange : function (func) {
