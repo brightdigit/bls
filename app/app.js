@@ -99,6 +99,9 @@ bls.controller.prototype = {
     var comps = [];
     if (object === undefined || object === null) {
       return 'null';
+    } else if (object.getDate) {
+      //return ['new Date(\'',object.toJSON(),'\')'].join('');
+      return ['"',object.toJSON(),'"'].join('');
     } else if (Object.prototype.toString.call( object ) === '[object Array]' && object.length) {
       comps.push('[');
       for (var index = 0; index < object.length; index++) {
