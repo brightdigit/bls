@@ -240,13 +240,19 @@ var bls = {
             }          
           }
         }
+        select.jq.change(function () {
+          bls.updateUnits(select.val());
+        });
         select.onsubselectchange(function (element, evt) {
           var value = $(element).val();
-          value = bls.getOnlyKey(JSON.parse(value)) || value;
+          try {
+            value = bls.getOnlyKey(JSON.parse(value)) || value;
+          } catch (ex) {
+            
+          }
           bls.updateUnits(value, true);
-          //console.log();
         });
-        //bls.updateUnits(select.jq.val());
+        bls.updateUnits(select.val());
       }
 
       if (semaphore.every(function (value, index) {lastone = index; return value;})) {
@@ -398,7 +404,7 @@ bls.PacketRequest.prototype = {
   start: function() {
     var that = this;
 
-      that.callback(that, []);
+    that.callback(that, []);
       /*
     $.get('data', this.formatParameters(this.parameters), function(data) {
       that.callback(that, data);
@@ -472,10 +478,10 @@ bls.DataDrivenSelect.prototype = {
     this.onsubselectchangecallback = func;
   },
   onsubselectchangetrigger : function (input, evt) {
+    if ($(input).attr('type') === 'radio') {
+      this.__input.val($(input).val());
+    }
     if (this.onsubselectchangecallback) {
-      if ($(input).attr('type') === 'radio') {
-        this.__input.val($(input).val());
-      }
       this.onsubselectchangecallback(input, evt, this);
     }
   },
@@ -485,6 +491,9 @@ bls.DataDrivenSelect.prototype = {
       that.update(data);
       callback(that, data);
     });
+  },
+  val : function () {
+    return this.__input.val();
   },
   update : function (data) {
     var valuefield = this.jq.data('valuefield');
@@ -517,6 +526,7 @@ bls.DataDrivenSelect.prototype = {
     var value = $.cookie(this.jq.data('cookie')) || this.jq.data('default');
     value = bls.getString(value);
     this.jq.val(value);
-    this.onChange();
+    //this.onChange();
+    this.jq.trigger($.Event("change"));
   }
 };

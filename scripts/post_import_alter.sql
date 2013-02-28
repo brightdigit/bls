@@ -181,6 +181,8 @@ create table ap_item_unit (
     value float NOT NULL
 );
 
+insert into ap_item_unit values ('713111', 10, 16);
+
 drop table if exists ap_item_matches;
 create table ap_item_matches as (select item_code from
     ap_item);
@@ -748,13 +750,15 @@ from
     FROM
         ap_item
     left join ap_item_inactive ON ap_item.item_code = ap_item_inactive.item_code
+    left join ap_item_unit ON ap_item.item_code = ap_item_unit.item_code
     inner join (SELECT 
         ap_item.item_code, min(priority) as priority
     FROM
         ap_item
-    left join ap_item_inactive ON ap_item.item_code = ap_item_inactive.item_code, units_search as units
+    left join ap_item_inactive ON ap_item.item_code = ap_item_inactive.item_code
+    left join ap_item_unit ON ap_item.item_code = ap_item_unit.item_code, units_search as units
     where
-        LOCATE(CONCAT(' ', keyword), description) > 0 and ap_item_inactive.item_code is null
+        LOCATE(CONCAT(' ', keyword), description) > 0 and ap_item_inactive.item_code is null and ap_item_unit.item_code is null
     group by ap_item.item_code) priorities ON ap_item.item_code = priorities.item_code, units_search as units
     where
-        ap_item_inactive.item_code is null and units.priority = priorities.priority) unparsed_qty;
+        ap_item_inactive.item_code is null and ap_item_unit.item_code is null and units.priority = priorities.priority) unparsed_qty;
