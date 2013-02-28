@@ -102,13 +102,14 @@ bls.controller.prototype = {
     } else if (object.getDate) {
       //return ['new Date(\'',object.toJSON(),'\')'].join('');
       return ['"',object.toJSON(),'"'].join('');
-    } else if (Object.prototype.toString.call( object ) === '[object Array]' && object.length) {
+    } else if (Object.prototype.toString.call( object ) === '[object Array]') {
       comps.push('[');
       for (var index = 0; index < object.length; index++) {
         comps.push(bls.controller.prototype.stringify(object[index]));
         comps.push(", ");
       }
-      comps[comps.length - 1] = ']';
+      comps[Math.max(comps.length - 1, 1)] = ']';
+      return comps.join('');
     } else if (typeof(object) === 'object') {
       comps.push('{');
       for (var key in object) {
@@ -120,11 +121,11 @@ bls.controller.prototype = {
           comps.push(", ");
         }
       }
-      comps[comps.length - 1] = '}';
+      comps[Math.max(comps.length - 1, 1)] = '}';
+      return comps.join('');
     } else {
       return JSON.stringify(object);
     }
-    return comps.join('');
   },
   jsonConvert : function(results, jsonFields) {
     if (jsonFields) {

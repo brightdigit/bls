@@ -1,5 +1,5 @@
 (function($){
-    $.fn.loadData = function(callback){
+    $.fn.loadData = function(callback, options){
       this.each(function () {
         var dds = new bls.DataDrivenSelect(this);
         dds.loadData(callback);
@@ -188,7 +188,6 @@ var bls = {
     $('.dropdown-menu.units').empty();
     $('.dropdown-menu.units').append(list); 
     $('.dropdown-menu.units input').change(function () {
-      console.log($('.dropdown-menu.units input:checked').parent().text());
       $('.unitName').text($('.dropdown-menu.units input:checked').parent().text());
       var newValue = Math.round(
         $('input[name=value]').val() * bls.units[def_unit].ratios[$('.dropdown-menu.units input:checked').val()] * 1000)/1000.0;
@@ -198,11 +197,12 @@ var bls = {
     });  
     $('.unitName').text(bls.units[def_unit].label);
   },
-  updateFactor : function () {
+  updateFactor : function (evt) {
     var ratio = (($('.dropdown-menu.units input:checked').val() !== $('input[name=baseUnit]').val())
      && (bls.units[$('.dropdown-menu.units input:checked').val()].ratios[$('input[name=baseUnit]').val()])) || 1;
     $('input[name=ratio]').val(ratio);
     $('input[name=factor]').val(ratio * ($('input[name=value]').val())/ ($('input[name=baseValue]').val()));
+    bls.update(evt, $('input[name=factor]'));
   },
   onDocumentReady : function () {
     var that = this;
@@ -253,8 +253,13 @@ var bls = {
               
             }
             bls.updateUnits(value, true);
+            bls.update(evt, $(element));
           });
           bls.updateUnits(select.val());
+        } else {
+          select.onsubselectchange(function (element, evt) {
+            bls.update(evt, $(element));
+          });
         }
 
         if (semaphore.every(function (value, index) {lastone = index; return value;})) {
@@ -416,13 +421,17 @@ bls.PacketRequest.prototype = {
   }
 };
 
-bls.DataDrivenSelect = function(element) {
+bls.DataDrivenSelect = function(element, onChange) {
   var that = this;
   this.jq = $(element);
   this.name = this.jq.attr('name');
   this.jq.removeAttr('name');
   this.__input = $('<input type="text"/>').appendTo(this.jq.parent());
   this.__input.attr('name', this.name);
+  this.__input.change( function () {
+    console.log(that.name);
+  });
+  console.log('adding hidden input ' + this.name);
   this.subdd = $('#subselector').clone().removeAttr('id').insertAfter(
     this.jq);
   this.subdd.find('.dropdown-toggle').dropdown();
@@ -484,6 +493,9 @@ bls.DataDrivenSelect.prototype = {
     if ($(input).attr('type') === 'radio') {
       this.__input.val($(input).val());
     }
+    if (this.changecallback) {
+      this.changecallback(input, evt, this);
+    }
     if (this.onsubselectchangecallback) {
       this.onsubselectchangecallback(input, evt, this);
     }
@@ -496,7 +508,12 @@ bls.DataDrivenSelect.prototype = {
     });
   },
   val : function () {
-    return this.__input.val();
+    var val =  this.__input.val();
+    if (val === '') {
+      this.__input.val(val = this.value);
+    }
+    console.log(val);
+    return val;
   },
   update : function (data) {
     var valuefield = this.jq.data('valuefield');
@@ -528,8 +545,12 @@ bls.DataDrivenSelect.prototype = {
   setDefault : function () {
     var value = $.cookie(this.jq.data('cookie')) || this.jq.data('default');
     value = bls.getString(value);
+    console.log('set value to ' + value);
+    this.value = value;
     this.jq.val(value);
     //this.onChange();
+    this.__input.val(value);
+    console.log(this.__input.val());
     this.jq.trigger($.Event("change"));
   }
 };
