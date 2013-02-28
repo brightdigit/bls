@@ -66,8 +66,9 @@ var bls = {
       that.pjs.update();
     });
     var parameters = {
-      item: $('.items').val(),
-      area: $('.areas').val(),
+      item: $('[name=item]').val(),
+      area: $('[name=area]').val(),
+      factor: $('[name=factor]').val(),
       startDate: bls.current.startDate ? bls.current.startDate : bls.defaults.daterangepicker.startDate,
       endDate: bls.current.endDate ? bls.current.endDate : bls.defaults.daterangepicker.endDate
     };
@@ -404,12 +405,9 @@ bls.PacketRequest.prototype = {
   start: function() {
     var that = this;
 
-    that.callback(that, []);
-      /*
     $.get('data', this.formatParameters(this.parameters), function(data) {
       that.callback(that, data);
     });
-*/
   }
 };
 

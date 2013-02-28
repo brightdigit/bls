@@ -210,7 +210,13 @@ bls.controllers = {
     'item': null
   }, ['area_group_name']),
   'data': new bls.controller(
-  ['select start_date as startDate, DATE_ADD(start_date, interval :months month) as endDate, value from (', 'select str_to_date(concat(floor((time*:months)/12),\'-\',cast( ((time*:months)/12 - floor((time*:months)/12))*12 as unsigned) + 1,\'-01\'), \'%Y-%m-%d\') as start_date, avg(value) as value from (', 'select value, floor((year*12 + (period-1))/:months) as time from ap_current ', 'inner join ap_series on ap_current.series_id = ap_series.series_id', 'where (ap_series.item_code = :item and ap_series.area_code = :area', 'and str_to_date(concat(year, \'-\', period, \'-01\'), \'%Y-%m-%d\') between :startDate and :endDate)', 'order by year, period', ') data group by time) as valuez limit 100 offset :offset']),
+  ['select start_date as startDate, DATE_ADD(start_date, interval :months month) as endDate, value from (',
+   'select str_to_date(concat(floor((time*:months)/12),\'-\',cast( ((time*:months)/12 - floor((time*:months)/12))*12 as unsigned) + 1,\'-01\'), \'%Y-%m-%d\') as start_date, :factor * avg(value) as value from (',
+    'select value, floor((year*12 + (period-1))/:months) as time from ap_current ', 
+    'inner join ap_series on ap_current.series_id = ap_series.series_id',
+    'inner join ap_item_matches_mapping on ap_series.item_code = ap_item_matches_mapping.item_code',
+    'where (ap_item_matches_mapping.root_code = :item and ap_series.area_code = :area', 'and str_to_date(concat(year, \'-\', period, \'-01\'), \'%Y-%m-%d\') between :startDate and :endDate)',
+    'order by year, period', ') data group by time) as valuez limit 100 offset :offset'], {factor : 1}),
   'units': new bls.controller(
   ['select units.unit_id as id, units.label, ratios from units',
 'left join (',
