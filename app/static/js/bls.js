@@ -150,32 +150,39 @@ var bls = {
   cached : {
     unitMap : {} 
   },
-  createRadio : function (value, text, name, selected) {
+  createRadio : function (value, text, name, checked) {
     var label = $('<label>');
     label.text(text);
     var input = $('<input>');
     input.attr('type', 'radio');
     input.attr('name', name);
     input.val(value);
-    if (selected) {
-      input.attr('selected', 'selected');
+    if (checked) {
+      input.attr('checked', 'checked');
     }
     label.append(input);
     return $('<li>').append(label);
   },
-  updateUnits : function (item_code) {
+  updateUnits : function (item_code, dontChangeValue) {
     var def_unit = parseInt(bls.cached.unitMap[item_code].unit_id);
-    $('input[name=value]').val(bls.cached.unitMap[item_code].value);
+    if (!dontChangeValue) {
+      $('input[name=value]').val(bls.cached.unitMap[item_code].value);
+    }
     $('input[name=baseValue]').val(bls.cached.unitMap[item_code].value);
     $('input[name=baseUnit]').val(def_unit);
     $('input[name=factor]').val(1);
     var unitDetails = bls.units[def_unit];
     var list = $('<ul>');
     list.append(bls.createRadio(unitDetails.id, unitDetails.label,  'unit', true));
-    for (var index = 0; index < unitDetails.ratios.length; index++) {
-      if (unitDetails.ratios[index]) {
-        list.append(bls.createRadio(index, bls.units[index].label, 'unit'));
+    if (unitDetails.ratios) {
+      for (var index = 0; index < unitDetails.ratios.length; index++) {
+        if (unitDetails.ratios[index]) {
+          list.append(bls.createRadio(index, bls.units[index].label, 'unit'));
+        }
       }
+      $('.unitName').removeAttr('disabled');
+    } else {
+      $('.unitName').attr('disabled','disabled');
     }
     $('.dropdown-menu.units').empty();
     $('.dropdown-menu.units').append(list); 
@@ -191,10 +198,18 @@ var bls = {
     $('.unitName').text(bls.units[def_unit].label);
   },
   updateFactor : function () {
-    bls
+    var ratio = (($('.dropdown-menu.units input:checked').val() !== $('input[name=baseUnit]').val())
+     && (bls.units[$('.dropdown-menu.units input:checked').val()].ratios[$('input[name=baseUnit]').val()])) || 1;
+    $('input[name=ratio]').val(ratio);
+    $('input[name=factor]').val(ratio * ($('input[name=value]').val())/ ($('input[name=baseValue]').val()));
   },
   onDocumentReady : function () {
     var that = this;
+    $('.unitName').click( function (e) {
+      if ($(this).attr('disabled') !== undefined) {
+        e.stopPropagation();
+      }
+    });
     $('input[name=value]').change(bls.updateFactor);
     this.loadUnits();
     that.busy = $('#fadingBarsG').appendTo(that.container);
@@ -228,7 +243,7 @@ var bls = {
         select.onsubselectchange(function (element, evt) {
           var value = $(element).val();
           value = bls.getOnlyKey(JSON.parse(value)) || value;
-          bls.updateUnits(value);
+          bls.updateUnits(value, true);
           //console.log();
         });
         //bls.updateUnits(select.jq.val());
