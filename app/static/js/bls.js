@@ -166,6 +166,9 @@ var bls = {
   updateUnits : function (item_code) {
     var def_unit = parseInt(bls.cached.unitMap[item_code].unit_id);
     $('input[name=value]').val(bls.cached.unitMap[item_code].value);
+    $('input[name=baseValue]').val(bls.cached.unitMap[item_code].value);
+    $('input[name=baseUnit]').val(def_unit);
+    $('input[name=factor]').val(1);
     var unitDetails = bls.units[def_unit];
     var list = $('<ul>');
     list.append(bls.createRadio(unitDetails.id, unitDetails.label,  'unit', true));
@@ -183,10 +186,16 @@ var bls = {
         $('input[name=value]').val() * bls.units[def_unit].ratios[$('.dropdown-menu.units input:checked').val()] * 1000)/1000.0;
       $('input[name=value]').val(newValue);
       def_unit = $('.dropdown-menu.units input:checked').val();
+      bls.updateFactor();
     });  
+    $('.unitName').text(bls.units[def_unit].label);
+  },
+  updateFactor : function () {
+    bls
   },
   onDocumentReady : function () {
     var that = this;
+    $('input[name=value]').change(bls.updateFactor);
     this.loadUnits();
     that.busy = $('#fadingBarsG').appendTo(that.container);
     $('.link').click(bls.updateView);
@@ -222,6 +231,7 @@ var bls = {
           bls.updateUnits(value);
           //console.log();
         });
+        //bls.updateUnits(select.jq.val());
       }
 
       if (semaphore.every(function (value, index) {lastone = index; return value;})) {
@@ -387,6 +397,8 @@ bls.DataDrivenSelect = function(element) {
   this.jq = $(element);
   this.name = this.jq.attr('name');
   this.jq.removeAttr('name');
+  this.__input = $('<input type="text"/>').appendTo(this.jq.parent());
+  this.__input.attr('name', this.name);
   this.subdd = $('#subselector').clone().removeAttr('id').insertAfter(
     this.jq);
   this.subdd.find('.dropdown-toggle').dropdown();
@@ -406,7 +418,7 @@ bls.DataDrivenSelect.prototype = {
       console.log(ex);
     }
     var list = this.subdd.find('ul').empty();
-    value = bls.getOnlyValue(value) || this.jq.val();
+    value = bls.getOnlyKey(value) || this.jq.val();
     value = ($.isArray(value) && value.join(',')) || value;
     if (typeof(value) === 'object') {
       for (var code in value) {
@@ -434,7 +446,9 @@ bls.DataDrivenSelect.prototype = {
           return false;
         }
       });
+      this.onsubselectchangetrigger(list.find('input:checked').get(0), evt, this);
     } else {
+      this.__input.val(value);
       this.subdd.hide();
       this.onsubselectchangetrigger(evt?evt.target:undefined, evt, this);
     }
@@ -444,6 +458,9 @@ bls.DataDrivenSelect.prototype = {
   },
   onsubselectchangetrigger : function (input, evt) {
     if (this.onsubselectchangecallback) {
+      if ($(input).attr('type') === 'radio') {
+        this.__input.val($(input).val());
+      }
       this.onsubselectchangecallback(input, evt, this);
     }
   },
