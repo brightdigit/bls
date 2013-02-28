@@ -212,7 +212,7 @@ var bls = {
       }
     });
     $('input[name=value]').change(bls.updateFactor);
-    this.loadUnits();
+
     that.busy = $('#fadingBarsG').appendTo(that.container);
     $('.link').click(bls.updateView);
     bls.updateView();
@@ -227,55 +227,60 @@ var bls = {
     this.container.append(canvas);
     var dataDrivens = $('.data-driven');
     var semaphore = $.map(new Array(dataDrivens.length), function () { return false; });
-    dataDrivens.loadData( function (select, data) {
-      var lastone = -1;
+    this.loadUnits(function () {
+      dataDrivens.loadData( function (select, data) {
+        var lastone = -1;
 
-      if (select.jq.data('src') === 'items') {
-        for (var key in data) {
-          group = data[key];
-          for (var key in group) {
-            item = group[key];
-            for (var key in item) {
-              type = item[key];
-              bls.cached.unitMap[type.item_code] = { unit_id : type.unit_id, value : type.value };              
-            }          
+        if (select.jq.data('src') === 'items') {
+          for (var key in data) {
+            group = data[key];
+            for (var key in group) {
+              item = group[key];
+              for (var key in item) {
+                type = item[key];
+                bls.cached.unitMap[type.item_code] = { unit_id : type.unit_id, value : type.value };              
+              }          
+            }
           }
-        }
-        select.jq.change(function () {
+          select.jq.change(function () {
+            bls.updateUnits(select.val());
+          });
+          select.onsubselectchange(function (element, evt) {
+            var value = $(element).val();
+            try {
+              value = bls.getOnlyKey(JSON.parse(value)) || value;
+            } catch (ex) {
+              
+            }
+            bls.updateUnits(value, true);
+          });
           bls.updateUnits(select.val());
-        });
-        select.onsubselectchange(function (element, evt) {
-          var value = $(element).val();
-          try {
-            value = bls.getOnlyKey(JSON.parse(value)) || value;
-          } catch (ex) {
-            
-          }
-          bls.updateUnits(value, true);
-        });
-        bls.updateUnits(select.val());
-      }
-
-      if (semaphore.every(function (value, index) {lastone = index; return value;})) {
-        that.onDataDrivenComplete();
-      } else {
-        semaphore[lastone] = true;
-        if (lastone === semaphore.length-1) {
-          that.onDataDrivenComplete();
         }
-      }
+
+        if (semaphore.every(function (value, index) {lastone = index; return value;})) {
+          that.onDataDrivenComplete();
+        } else {
+          semaphore[lastone] = true;
+          if (lastone === semaphore.length-1) {
+            that.onDataDrivenComplete();
+          }
+        }
+      });
     });
 
   },
   onDataDrivenComplete : function () {
 
   },
-  loadUnits : function () {
+  loadUnits : function (callback) {
     $.get('units', function (data) {
       bls.units = [];
       data.forEach( function (value) {
         bls.units[parseInt(value.id)] = value;
       });
+      if (callback) {
+        callback();
+      }
     });
   },
   units : [],
