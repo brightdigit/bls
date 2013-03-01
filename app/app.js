@@ -102,7 +102,7 @@ bls.controller.prototype = {
     } else if (object.getDate) {
       //return ['new Date(\'',object.toJSON(),'\')'].join('');
       return ['"',object.toJSON(),'"'].join('');
-    } else if (Object.prototype.toString.call( object ) === '[object Array]') {
+    } else if (Object.prototype.toString.call( object ) === '[object Array]' && object.length) {
       comps.push('[');
       for (var index = 0; index < object.length; index++) {
         comps.push(bls.controller.prototype.stringify(object[index]));

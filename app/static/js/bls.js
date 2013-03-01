@@ -253,7 +253,7 @@ var bls = {
               
             }
             bls.updateUnits(value, true);
-            bls.update(evt, $(element));
+            bls.update(evt, select.jq);
           });
           bls.updateUnits(select.val());
         } else {
@@ -457,7 +457,7 @@ bls.DataDrivenSelect.prototype = {
       for (var code in value) {
         //this.subdd              
         var label = $('<label>').addClass('radio');
-        $('<input type="radio">').attr('name', this.name).attr('id', this.name + '_' + code).val(code).prop('checked', first).appendTo(label);
+        $('<input type="radio">').attr('name', this.name + '-sub').attr('id', this.name + '_' + code).val(code).prop('checked', first).appendTo(label);
         label.append(value[code].join(','));
         first = false;
         label.appendTo('<li>').appendTo(list);
