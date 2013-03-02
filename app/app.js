@@ -95,6 +95,15 @@ bls.controller.prototype = {
       }
     });
   },
+  isEmpty : function (obj) {
+    for(var prop in obj) {
+      console.log(prop);
+      if(obj.hasOwnProperty(prop) && (parseInt(prop).toString() !== prop))
+        return false;
+      console.log('prop:' + prop);
+    }
+    return true;
+  },
   stringify : function (object) {
     var comps = [];
     if (object === undefined || object === null) {
@@ -102,9 +111,9 @@ bls.controller.prototype = {
     } else if (object.getDate) {
       //return ['new Date(\'',object.toJSON(),'\')'].join('');
       return ['"',object.toJSON(),'"'].join('');
-    } else if (Object.prototype.toString.call( object ) === '[object Array]' && object.length) {
+    } else if (Object.prototype.toString.call( object ) === '[object Array]' && (object.length || bls.controller.prototype.isEmpty(object))) {
       comps.push('[');
-      for (var index = 0; index < object.length; index++) {
+      for (var index = 0; index < (object.length || 0); index++) {
         comps.push(bls.controller.prototype.stringify(object[index]));
         comps.push(", ");
       }

@@ -46,13 +46,18 @@ var bls = {
     }
     this.pjs.size(this.container.width(), height);
   },
+  verifyParameters : function (params) {
+    return params.item.length > 4 && params.area.length > 3;
+  },
   update : function (e, src) {
     var classNames = ['areas', 'items', 'daterangepicker-control'];
     var cls = src.attr('class').split(/\s+/).filter( function (value) { return classNames.some( function (other) {
       return other===value;
     }); } )[0];
     bls.lastChanged = cls;
-    bls.load();
+    if (!bls.load()) {
+      alert('invalid parameters')
+    }
   },
   load: function() {
     var that = this;
@@ -72,11 +77,14 @@ var bls = {
       startDate: bls.current.startDate ? bls.current.startDate : bls.defaults.daterangepicker.startDate,
       endDate: bls.current.endDate ? bls.current.endDate : bls.defaults.daterangepicker.endDate
     };
+    if (!bls.verifyParameters(parameters)) {
+      return false;
+    }
     for (var name in parameters) {
       $.cookie(name, parameters[name]);
     }
     bls.request(parameters, function(request) {
-      if (request.data) {
+      if (request.data && !$.isEmptyObject(request.data)) {
         that.pjs.loadData(request.data);
         if (request.data.length > 0) {
           var result = {startDate : undefined, endDate : undefined};
@@ -100,6 +108,7 @@ var bls = {
         $('.' + bls.lastChanged + '-alert')).alert();
       }
     });
+    return true;
   },
   toUTC : function (d) {
     utc = d.getTime() + (d.getTimezoneOffset() * 60000);
@@ -206,6 +215,10 @@ var bls = {
   },
   onDocumentReady : function () {
     var that = this;
+    $('input.debug').each( function () {
+      $(this).attr('title', $(this).attr('name'));
+    });
+    $('[data-toggle=tooltip]').tooltip();
     $('.unitName').click( function (e) {
       if ($(this).attr('disabled') !== undefined) {
         e.stopPropagation();
@@ -296,7 +309,6 @@ var bls = {
     */
     bls.defaults.startDate = (new Date($.cookie('startDate'))) || bls.defaults.startDate;
     bls.defaults.endDate = (new Date($.cookie('endDate'))) || bls.defaults.endDate;
-
     var that = this;
     this.container = bls.findContainer();
      $(document).ready(function() {
@@ -426,11 +438,15 @@ bls.DataDrivenSelect = function(element, onChange) {
   this.jq = $(element);
   this.name = this.jq.attr('name');
   this.jq.removeAttr('name');
-  this.__input = $('<input type="text"/>').appendTo(this.jq.parent());
+  this.__input = $('<input type="text" readonly/>').appendTo(this.jq.parent());
   this.__input.attr('name', this.name);
   this.__input.change( function () {
     console.log(that.name);
   });
+  this.__input.addClass('debug input-mini');
+  this.__input.attr('title', this.name);
+  this.__input.attr('data-toggle', 'tooltip');
+  this.__input.tooltip();
   console.log('adding hidden input ' + this.name);
   this.subdd = $('#subselector').clone().removeAttr('id').insertAfter(
     this.jq);
