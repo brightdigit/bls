@@ -84,7 +84,7 @@ var bls = {
       $.cookie(name, parameters[name]);
     }
     bls.request(parameters, function(request) {
-      if (request.data && !$.isEmptyObject(request.data)) {
+      if (request.data) {
         that.pjs.loadData(request.data);
         if (request.data.length > 0) {
           var result = {startDate : undefined, endDate : undefined};
@@ -97,6 +97,8 @@ var bls = {
           result.startDate = bls.toUTC(result.startDate);
           result.endDate = bls.toUTC(result.endDate);
           $('#dateRange').val([result.startDate.toString(bls.defaults.daterangepicker.format),result.endDate.toString(bls.defaults.daterangepicker.format)].join(' - '));
+        } else {
+          $('.modal').modal();
         }
       }
       that.busy.fadeOut();

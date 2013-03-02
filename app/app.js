@@ -41,6 +41,20 @@ connection.config.queryFormat = function(query, values) {
   }.bind(this));
 };
 
+/*
+select min(str_to_date(concat(begin_year,'-', begin_period,'-01'), '%Y-%m-%d')) as begin_date,
+max(str_to_date(concat(end_year,'-', end_period,'-01'), '%Y-%m-%d')) as end_date,
+group_name, area_group_name, area_name, name, type_names  from ap_series 
+inner join ap_area on ap_series.area_code = ap_area.area_code
+inner join ap_area_groups on ap_series.area_code = ap_area_groups.area_code
+inner join ap_area_groupings on ap_area_groups.area_group_id = ap_area_groupings.area_group_id
+inner join ap_item_matches_mapping on ap_series.item_code = ap_item_matches_mapping.item_code
+inner join ap_item_names on ap_item_matches_mapping.root_code = ap_item_names.item_code
+inner join ap_item_grouping on ap_item_matches_mapping.root_code = ap_item_grouping.item_code
+left join (select *, concat('["',group_concat(distinct ap_item_types.type_name separator '","'), '"]') as type_names from ap_item_types group by item_code) types on ap_item_matches_mapping.root_code = types.item_code
+group by ap_item_matches_mapping.root_code, ap_series.area_code
+order by area_group_name, area_name, group_name, name, type_names;
+*/
 
 var bls = function() {
   this.connection = mysql.createConnection({
