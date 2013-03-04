@@ -59,6 +59,37 @@ var bls = {
       alert('invalid parameters')
     }
   },
+  availability : {
+    item_groups : {},
+    area_groups : {},
+    ranges : [],
+    get_ranges : function (item_group, area_group) {
+      function intersect_safe(a, b)
+      {
+        var ai=0, bi=0;
+        var result = new Array();
+
+        while( ai < a.length && bi < b.length )
+        {
+           if      (a[ai] < b[bi] ){ ai++; }
+           else if (a[ai] > b[bi] ){ bi++; }
+           else /* they're equal */
+           {
+             result.push(a[ai]);
+             ai++;
+             bi++;
+           }
+        }
+
+        return result;
+      }
+
+      var indicies = intersect_safe(bls.availability.item_groups[item_group], bls.availability.area_groups[area_group]);
+      return indicies.map( function (index) {
+        return bls.availability.ranges[index];
+      });
+    }
+  },
   load: function() {
     var that = this;
     this.pjs = Processing.getInstanceById(that.container.find('canvas').attr('id'));
@@ -228,6 +259,19 @@ var bls = {
     });
     $('input[name=value]').change(bls.updateFactor);
 
+    $.get('available', function (data) {
+      for (var index = 0; index < data.length; index++) {
+        if (!bls.availability.item_groups[data[index].group_name]) {
+          bls.availability.item_groups[data[index].group_name] = [];
+        }
+        bls.availability.item_groups[data[index].group_name].push(index);
+        if (!bls.availability.area_groups[data[index].area_group_name]) {
+          bls.availability.area_groups[data[index].area_group_name] = [];
+        }
+        bls.availability.area_groups[data[index].area_group_name].push(index);
+        bls.availability.ranges.push(data[index]);
+      }
+    });
     that.busy = $('#fadingBarsG').appendTo(that.container);
     $('.link').click(bls.updateView);
     bls.updateView();

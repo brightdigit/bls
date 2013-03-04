@@ -1,5 +1,5 @@
 update ap_current set period = SUBSTRING(period, 2);
-update ap_series set begin_period = substring(begin_period, 2), end_period=substring(begin_period, 2);
+update ap_series set begin_period = substring(begin_period, 2), end_period=substring(end_period, 2);
 
 create table current_temp SELECT ap_current.series_id,
     ap_current.year,
