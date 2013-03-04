@@ -63,6 +63,7 @@ var bls = {
     item_groups : {},
     area_groups : {},
     ranges : [],
+    map : {},
     get_ranges : function (item_group, area_group) {
       function intersect_safe(a, b)
       {
@@ -269,6 +270,16 @@ var bls = {
           bls.availability.area_groups[data[index].area_group_name] = [];
         }
         bls.availability.area_groups[data[index].area_group_name].push(index);
+        
+        if (!bls.availability.map[data[index].group_name]) {
+          bls.availability.map[data[index].group_name] = {};
+        }
+        if (!bls.availability.map[data[index].group_name][data[index].area_group_name]) {
+          bls.availability.map[data[index].group_name][data[index].area_group_name] = 1;
+        } else {
+          bls.availability.map[data[index].group_name][data[index].area_group_name]++;
+        }
+
         bls.availability.ranges.push(data[index]);
       }
     });
