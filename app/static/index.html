@@ -76,6 +76,20 @@ window.jQuery || document.write('<script src="js/jquery-1.8.3.min.js"><\/script>
             <form>
               <fieldset>
                 <div>
+                  <select name="item_type" class="item_type">
+                    <option value="">
+                      Select Item Type...
+                    </option>
+                  </select>
+                </div>
+                <div>
+                  <select name="area_group" class="area_groups" disabled>
+                    <option value="">
+                      Select Area Group...
+                    </option>
+                  </select>
+                </div>
+                <div>
                   <select name="area" class="areas chosen-control data-driven" data-src="areas" data-valuefield="area_code" data-textfield="area_name" data-default="0000" data-cookie="area" disabled>
                     <option value="">
                       Select Area...
