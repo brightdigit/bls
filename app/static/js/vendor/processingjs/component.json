@@ -1,0 +1,8 @@
+{
+  "name": "processingjs",
+  "version": "1.4.0",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jeresig/processing-js"
+  }
+}
