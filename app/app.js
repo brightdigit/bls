@@ -2,7 +2,24 @@ var http = require('http'),
   url = require('url'),
   fs = require('fs'),
   path = require('path'),
-  mysql = require('mysql');
+  mysql = require('mysql'),
+  less = require('less');
+
+fs.readFile('app/static/less/app.less',function(error,data){
+    data = data.toString();
+    try{
+      less.render(data, function (e, css) {
+        console.log('test');
+        console.log(css);
+        console.log(e);
+        process.exit();
+      });
+
+    } catch (e) {
+      console.log(e);
+        process.exit();
+    }
+});
 
 var mimeTypes = {
   "html": "text/html",
