@@ -348,18 +348,19 @@ bls.prototype = {
             'Content-Type': 'text/html'
           });
         }
-
         res.end(data);
       });
     } else if(pathSplit[1] === 'css' && (lessBase = lessConfig.files[pathSplit[0].substr(1)]) ) {
       fs.readFile(path.join(lessConfig.baseDirectory, lessBase + '.less'),function(error,data){
         data = data.toString();
+        var cd = process.cwd();
         process.chdir(lessConfig.baseDirectory);
         less.render(data, function (e, css) {
           res.writeHead(200, {
             'Content-Type': mimeTypes['css']
           });
           res.end(css);
+          process.chdir(cd);
         });
       });
     } else if(mimeType = mimeTypes[pathSplit[pathSplit.length - 1]]) {

@@ -13,8 +13,53 @@
     <meta name="descriptin" content="">
     <meta name="viewport" content="width=device-width">
     <script data-main="js/main.js" src="js/vendor/requirejs/require.js"></script>
+    <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <div class="bls-viewport" data-src="data"></div>
+    <div class="navbar navbar-inverse navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"></a> <a class="brand" href="#home">bls/dv</a>
+          <div class="nav-collapse collapse">
+            <ul class="nav">
+              <li class="active">
+                <a class="link" href="#home">Home</a>
+              </li>
+              <li>
+                <a class="link" href="#about">About</a>
+              </li>
+              <li>
+                <a class="link" href="#contact">Contact</a>
+              </li>
+            </ul>
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="page" id="home">
+        <div class="row">
+          <div class="span9">
+            Home;
+            <div class="bls-viewport" data-src="data"></div>
+          </div>
+        </div>
+      </div>
+      <div class="page" id="about">
+        <div class="row">
+          <div class="span9">
+            About
+            <div class="bls-viewport" data-src="data"></div>
+          </div>
+        </div>
+      </div>
+      <div class="page" id="contact">
+        <div class="row">
+          <div class="span9">
+            Contact
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
