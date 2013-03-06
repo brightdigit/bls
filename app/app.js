@@ -5,6 +5,13 @@ var http = require('http'),
   mysql = require('mysql'),
   less = require('less');
 
+var lessConfig = {
+  baseDirectory : 'app/static/less',
+  files : {
+    style : 'app'
+  }
+};
+/*
 fs.readFile('app/static/less/app.less',function(error,data){
     data = data.toString();
     try{
@@ -20,7 +27,7 @@ fs.readFile('app/static/less/app.less',function(error,data){
         process.exit();
     }
 });
-
+*/
 var mimeTypes = {
   "html": "text/html",
   "jpeg": "image/jpeg",
@@ -327,6 +334,7 @@ bls.prototype = {
   },
   handle: function(req, res) {
     var mimeType;
+    var lessBase;
     var components = url.parse(req.url, true);
     var pathSplit = components.path.split('.');
     console.log(req.url);
@@ -342,6 +350,17 @@ bls.prototype = {
         }
 
         res.end(data);
+      });
+    } else if(pathSplit[1] === 'css' && (lessBase = lessConfig.files[pathSplit[0].substr(1)]) ) {
+      fs.readFile(path.join(lessConfig.baseDirectory, lessBase + '.less'),function(error,data){
+        data = data.toString();
+        process.chdir(lessConfig.baseDirectory);
+        less.render(data, function (e, css) {
+          res.writeHead(200, {
+            'Content-Type': mimeTypes['css']
+          });
+          res.end(css);
+        });
       });
     } else if(mimeType = mimeTypes[pathSplit[pathSplit.length - 1]]) {
       fs.readFile(path.join(__dirname, 'static', components.path), function(err, data) {
