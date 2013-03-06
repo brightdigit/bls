@@ -37,13 +37,4 @@ Icon?
 ehthumbs.db
 Thumbs.db
 
-app/static/js/vendor/**/docs
-app/static/js/vendor/**/tests
-app/static/js/vendor/**/test
-app/static/js/vendor/**/examples
-app/static/js/vendor/**/src
-app/static/js/vendor/**/js/docs
-app/static/js/vendor/**/js/tests
-app/static/js/vendor/**/js/test
-app/static/js/vendor/**/js/examples
-app/static/js/vendor/**/js/src
+app/static/js/vendor
