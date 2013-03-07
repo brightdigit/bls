@@ -26,6 +26,9 @@ define('bls',[
   ], function($, Processing){
     var bls = (function () {
       var my = {
+        data : {
+
+        },
         defaults : {
           daterangepicker : {startDate : (new Date(1978, 0, 1)), endDate : (new Date()), format : 'yyyy-MM-dd',
             ranges : {
@@ -63,21 +66,60 @@ define('bls',[
           $(hash).show();
         },
         setupForm: function () {
-          /*
-          $('<link>')
-            .attr('href','/js/vendor/bootstrap-daterangepicker/daterangepicker.css')
-            .attr('rel','stylesheet')
-            .appendTo($('head'));
-            */
           $('input.daterangepicker-control').daterangepicker(my.defaults.daterangepicker);
+          my.pullData();
+        },
+        pullData: function () {
+          $('.data-driven').each ( function () {
+            var jq = $(this);
+            my.data[jq.data('src')] = new my.selectrequest(jq);
+          });
+        },
+        selectrequest : function (jq) {
+          this._constuctor(jq);
         },
         initialize: function() {
           my.pjs = my.getProcessingJS();
           my.setupPages();
           my.setupForm();
-          $('[data-toggle=tooltip]').tooltip();
         }
       };
+
+      my.selectrequest._init = function () {
+            $.fn.selectrequest = function (cb) {
+            this.each(function() {
+              var el = $(this);
+              var name = el.attr('name');
+              if (my.selectrequest._elements[name]) {
+                return my.selectrequest._elements[name];
+              } else {
+                return new my.selectrequest(el, cb);
+              }
+            });
+            return this;
+          };
+      };
+
+      my.selectrequest._elements = {};
+
+      my.selectrequest.prototype = {
+        jq : undefined,
+
+        _constuctor : function (jq, cb, src) {
+          this.jq = jq;
+          this.src = src || jq.data('src');
+          this.cb = cb;
+          this.load();
+          my.selectrequest._elements[jq.attr('name')] = this;
+        },
+
+        load : function () {
+          $.get(this.src, function (data) {
+              console.log(data);
+          });
+        }
+      };
+
       my.initialize();
       return my;
     })();
