@@ -47,14 +47,22 @@ define('bls',[
           item_group : {
             change : function (evt) {
               var item_group = $('[name=item_group]'),
-                area_group = $('[name=area_group]');
+                area_group = $('[name=area_group]'),
+                area_select =  $('[name=area]'),
+                item_select =  $('[name=item]');
+              var value = area_group.val();
               area_group.empty();
               for (var key in my.data.available.item[item_group.val()]) {
                 $('<option>').appendTo(area_group).text(key).val(key);
               }
+              area_group.val(value);
+
 
               if (area_group.find('option').length > 1) {
                 area_group.removeAttr('disabled');
+                if (area_group.val() !== value) {
+                  area_group.trigger('change');
+                }
               } else {
                 area_group.attr('disabled', 'disabled');
                 area_group.trigger('change');
