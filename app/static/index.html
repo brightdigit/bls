@@ -18,7 +18,7 @@
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
-        <div class="container">
+        <div class="container-fluid">
           <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"></a> <a class="brand" href="#home">bls/dv</a>
           <div class="nav-collapse collapse">
             <ul class="nav">
@@ -36,46 +36,48 @@
         </div>
       </div>
     </div>
-    <div class="container">
+    <div class="container-fluid">
       <div class="page" id="home">
-        <div class="row">
-          <div class="span3">
+        <div class="row-fluid">
+          <div class="span4">
             <form>
               <fieldset>
-                <select name="item_group" disabled>
+                <select name="item_group" class="input-large" disabled>
                   <option value="">
                     Select Item Type...
                   </option>
                 </select>
-                <select name="area_group" disabled>
+                <select name="area_group" class="input-large" disabled>
                   <option value="">
                     Select Area Group...
                   </option>
                 </select>
-                <select class="data-driven" name="area" data-src="areas" disabled>
+                <select class="data-driven input-large" name="area" disabled>
                 </select>
-                <select class="data-driven" name="item" data-src="items" disabled>
-                </select>
+                <div class="control-group">
+                <select class="data-driven input-large" name="item" disabled>
+                </select><a href="#" id="adv-item"><i class="icon-wrench"></i></a>
+              </div>
                 <div class="input-prepend">
-                  <input class="daterangepicker-control" type="text" name="dateRange" id="dateRange" data-startCookie="startDate" data-endCookie="endDate">
+                  <input class="daterangepicker-control input-large" type="text" name="dateRange" id="dateRange" data-startCookie="startDate" data-endCookie="endDate">
                 </div>
               </fieldset>
             </form>
           </div>
-          <div class="span9">
+          <div class="span8">
             <div class="bls-viewport" data-src="data"></div>
           </div>
         </div>
       </div>
       <div class="page" id="about">
-        <div class="row">
+        <div class="row-fluid">
           <div class="span9">
             <span data-toggle="tooltip" title="test">About</span>
           </div>
         </div>
       </div>
       <div class="page" id="contact">
-        <div class="row">
+        <div class="row-fluid">
           <div class="span9">
             Contact
           </div>

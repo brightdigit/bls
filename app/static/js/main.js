@@ -46,7 +46,75 @@ define('bls',[
         events : {
           item_group : {
             change : function (evt) {
-              console.log(this);
+              var item_group = $('[name=item_group]'),
+                area_group = $('[name=area_group]');
+              area_group.empty();
+              for (var key in my.data.available.item[item_group.val()]) {
+                $('<option>').appendTo(area_group).text(key).val(key);
+              }
+
+              if (area_group.find('option').length > 1) {
+                area_group.removeAttr('disabled');
+              } else {
+                area_group.attr('disabled', 'disabled');
+                area_group.trigger('change');
+              }
+            }
+          },
+          area_group : {
+            change : function (evt) {
+              var item_group = $('[name=item_group]'),
+                area_group = $('[name=area_group]'),
+                area_select =  $('[name=area]'),
+                item_select =  $('[name=item]');
+
+              var indicies = my.data.available.item[item_group.val()][area_group.val()];
+
+              area_select.empty();
+              item_select.empty();
+
+              // add items
+              for (var index = 0; index < indicies.length; index++) {
+                var item, range = my.data.available.data[indicies[index]];
+                if (item = my.data.items[item_group.val()][range.name]) {
+                  $('<option>').appendTo(item_select).val(item[0].item_code).text(range.name).data('group', item_group.val()).data('advanced', item.length > 1);
+                }
+              }
+
+              // add areas
+              for (var index = 0; index < my.data.areas[area_group.val()].length; index++) {
+                var area = my.data.areas[area_group.val()][index];
+                $('<option>').appendTo(area_select).val(area.area_code).text(area.area_name);
+              }
+
+              if (area_select.find('option').length > 1) {
+                area_select.removeAttr('disabled');
+              } else {
+                area_select.attr('disabled', 'disabled');
+                area_select.trigger('change');
+              }
+
+
+              if (item_select.find('option').length > 1) {
+                item_select.removeAttr('disabled');
+              } else {
+                item_select.attr('disabled', 'disabled');
+              }
+                item_select.trigger('change');
+            }
+          },
+          item : {
+            change : function (evt) {
+              var item_group = $('[name=item_group]'),
+                area_group = $('[name=area_group]'),
+                area_select =  $('[name=area]'),
+                item_select =  $('[name=item]');
+
+              if (my.data.items[item_group.val()][item_select.find('option:selected').text()].length > 1) {
+                $('#adv-item').fadeIn();
+              } else {
+                $('#adv-item').fadeOut();
+              }
             }
           }
         },
@@ -78,7 +146,7 @@ define('bls',[
 
           $('[name]').change(function (evt) {
             var fn;
-            if (fn = my.events[$(this).attr('name')]['change']) {
+            if (my.events[$(this).attr('name')] && (fn = my.events[$(this).attr('name')]['change'])) {
               fn.call(this, evt);
             }
           });
@@ -86,8 +154,18 @@ define('bls',[
         pullData: function () {
           $.get('/available', function (data) {
             my.data.available = new my.availablity(data);
-            var item_group = $('[name=item_group]');
-            console.log(my.data.available);
+            var item_group = $('[name=item_group]'),
+              area_group = $('[name=area_group]');
+            for (var key in my.data.available.item) {
+              $('<option>').appendTo(item_group).text(key).val(key);
+            }
+            item_group.removeAttr('disabled');
+          });
+          $.get('/items', function (data) {
+            my.data.items = data;
+          });
+          $.get('/areas', function (data) {
+            my.data.areas = data;
           });
         },
         selectrequest : function (jq) {
@@ -97,12 +175,29 @@ define('bls',[
           my.pjs = my.getProcessingJS();
           my.setupPages();
           my.setupForm();
+        },
+        addObject: function(parent, key, value) {
+          value = value || {};
+          if (!parent[key]) {
+            parent[key] = value;
+          }
+          return parent[key];
         }
       };
 
       my.availablity = function (data) {
         for (var index = 0; index < data.length; index++) {
+          var range = data[index];
+          if (!this.item[range.group_name]) {
+            this.item[range.group_name] = {};
+          }
 
+          if (!this.item[range.group_name][range.area_group_name]) {
+            this.item[range.group_name][range.area_group_name] = [];
+          }
+
+          this.item[range.group_name][range.area_group_name].push(index);
+          
         }
         this.data = data;
       };
