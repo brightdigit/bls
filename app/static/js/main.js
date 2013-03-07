@@ -111,9 +111,9 @@ define('bls',[
                 item_select =  $('[name=item]');
 
               if (my.data.items[item_group.val()][item_select.find('option:selected').text()].length > 1) {
-                $('#adv-item').fadeIn();
+                $('#adv-item').removeAttr('disabled');
               } else {
-                $('#adv-item').fadeOut();
+                $('#adv-item').attr('disabled', 'disabled');
               }
             }
           }
@@ -134,8 +134,22 @@ define('bls',[
         },
         setupPages: function () {
           $('a.link').click(function () {
+            $(this).parents('ul').find('li.active').removeClass('active');
+            $(this).parent('li').addClass('active');
             $('.page').fadeOut();
             $($(this).attr('href')).fadeIn();
+          });
+          $(window).resize(function () {
+            var controls = $('#controls'),
+              vpParent = $('#viewport-parent');
+
+            if ($(window).width() >= 1650) {
+              controls.removeClass('span3 span4').addClass('span2');
+              vpParent.removeClass('span9 span8').addClass('span10');
+            } else if ($(window).width() >=  1024) {
+              controls.removeClass('span4 span2').addClass('span3');
+              vpParent.removeClass('span8 span10').addClass('span9');              
+            }
           });
           var hash = (window.location.hash ? window.location.hash : '#home');
           $(hash).show();

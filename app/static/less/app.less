@@ -1,14 +1,7 @@
 @import "../js/vendor/bootstrap/less/bootstrap.less";
+@import "../js/vendor/bootstrap/less/responsive.less";
+@import "../js/vendor/bootstrap-daterangepicker/daterangepicker.css";
 
-body > .container-fluid {
-	margin-top: 40px;
-	padding-top: 20px;
-}
-
-.page {
-	display: none;
-	position: absolute;
-}
 
 select {
 	text-transform: capitalize; 
@@ -17,7 +10,63 @@ select {
 form #adv-item {
 	margin-top: -3px;
 	margin-left: 3px;
-	display: none;
 }
 
-@import "../js/vendor/bootstrap-daterangepicker/daterangepicker.css";
+
+form #adv-item[disabled] {
+	.opacity(50);
+	cursor: not-allowed;
+}
+
+
+.page {
+	display: none;
+	position: absolute;
+	width: 100%;
+}
+
+body {
+	padding-top: 60px;
+	padding-bottom: 40px;
+}
+
+.sidebar-nav {
+	padding: 9px 0;
+}
+
+@media (max-width: 980px) {
+	/* Enable use of floated navbar text */
+	.navbar-text.pull-right {
+	  float: none;
+	  padding-left: 5px;
+	  padding-right: 5px;
+	}
+}
+
+@media (max-width: 979px) {
+	body {
+		padding-top: 0;
+	}
+}
+
+@media (max-width: 1023px) {
+	#controls {
+		display: none;
+	}
+}
+
+@media (max-height: 320px) and (min-width: 1024px) {
+	footer {
+		position: static;
+	}
+}
+
+footer {
+	position: absolute;
+	bottom: 0px;
+	width: 100%;
+}
+
+.viewport-parent {
+	background-color: #000;
+}
