@@ -1,6 +1,7 @@
 var bower = require('bower'),
   npm = require('npm'),
   path = require('path'),
+  fs = require('fs'),
   spawn = require('child_process').spawn;
 
 var vendorDirectory = 'app/static/js/vendor';
@@ -45,31 +46,3 @@ bower.commands
       });
     }
   });
-  /*
-    data && console.log(data);
-    process.chdir('app/static/js/vendor/bootstrap');
-    npm.load({}, function (er) {
-      if (er) return handlError(er)
-      npm.commands.install([], function (er, data) {
-        if (er) return commandFailed(er)
-
-        var ps = spawn('make', ['bootstrap']);
-        ps.stdout.on('data', function (data) {
-          console.log(data);
-        });
-
-        ps.stderr.on('data', function (data) {
-          console.log('ps stderr: ' + data);
-        });
-
-        ps.on('exit', function (code) {
-          if (code !== 0) {
-            console.log('ps process exited with code ' + code);
-          }
-        });
-      });
-        // command succeeded, and data might have some info
-      //})
-    });
-  });
-  */

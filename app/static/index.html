@@ -39,8 +39,30 @@
     <div class="container">
       <div class="page" id="home">
         <div class="row">
+          <div class="span3">
+            <form>
+              <fieldset>
+                <select name="item_group" disabled>
+                  <option value="">
+                    Select Item Type...
+                  </option>
+                </select>
+                <select name="area_group" disabled>
+                  <option value="">
+                    Select Area Group...
+                  </option>
+                </select>
+                <select name="area" disabled>
+                </select>
+                <select name="item" disabled>
+                </select>
+                <div class="input-prepend">
+                  <input class="daterangepicker-control" type="text" name="dateRange" id="dateRange" data-startCookie="startDate" data-endCookie="endDate">
+                </div>
+              </fieldset>
+            </form>
+          </div>
           <div class="span9">
-            Home;
             <div class="bls-viewport" data-src="data"></div>
           </div>
         </div>
@@ -48,8 +70,7 @@
       <div class="page" id="about">
         <div class="row">
           <div class="span9">
-            About
-            <div class="bls-viewport" data-src="data"></div>
+            <span data-toggle="tooltip" title="test">About</span>
           </div>
         </div>
       </div>
