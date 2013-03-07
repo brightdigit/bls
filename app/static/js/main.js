@@ -43,6 +43,13 @@ define('bls',[
           area : '0000',
           item : '[{"74714":["unleaded regular"]},{"74715":["unleaded midgrade"]},{"74716":["unleaded premium"]},{"7471A":["all types"]}]'
         },
+        events : {
+          item_group : {
+            change : function (evt) {
+              console.log(this);
+            }
+          }
+        },
         getRandomId: function() {
           var id = "";
           var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -68,11 +75,19 @@ define('bls',[
         setupForm: function () {
           $('input.daterangepicker-control').daterangepicker(my.defaults.daterangepicker);
           my.pullData();
+
+          $('[name]').change(function (evt) {
+            var fn;
+            if (fn = my.events[$(this).attr('name')]['change']) {
+              fn.call(this, evt);
+            }
+          });
         },
         pullData: function () {
-          $('.data-driven').each ( function () {
-            var jq = $(this);
-            my.data[jq.data('src')] = new my.selectrequest(jq);
+          $.get('/available', function (data) {
+            my.data.available = new my.availablity(data);
+            var item_group = $('[name=item_group]');
+            console.log(my.data.available);
           });
         },
         selectrequest : function (jq) {
@@ -85,6 +100,20 @@ define('bls',[
         }
       };
 
+      my.availablity = function (data) {
+        for (var index = 0; index < data.length; index++) {
+
+        }
+        this.data = data;
+      };
+
+      my.availablity.prototype = {
+        item : {
+
+        },
+        data : undefined
+      };
+      /*
       my.selectrequest._init = function () {
             $.fn.selectrequest = function (cb) {
             this.each(function() {
@@ -119,6 +148,7 @@ define('bls',[
           });
         }
       };
+      */
 
       my.initialize();
       return my;
