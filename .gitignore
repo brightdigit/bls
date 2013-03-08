@@ -38,3 +38,4 @@ ehthumbs.db
 Thumbs.db
 
 app/static/js/vendor
+test/client/js/vendor

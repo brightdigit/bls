@@ -1,0 +1,9 @@
+{ 
+  "name": "bls-tests",
+  "version": "1.0.0",
+  "main": ["./bls-tests.js"],
+  "dependencies": {
+    "qunit": null,
+    "requirejs": null
+  }
+}

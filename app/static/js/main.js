@@ -1,5 +1,7 @@
+var QUnit = QUnit || false;
+
 requirejs.config({
-  baseUrl: '/js/vendor',
+  baseUrl: (QUnit?'../../app/static/js/vendor':'js/vendor'),
   paths: {
     bootstrap: 'bootstrap/bootstrap/js/bootstrap.min',
     jquery: 'jquery/jquery.min',
@@ -282,12 +284,15 @@ define('bls',[
         }
       };
       */
-
-      my.initialize();
+      if (!QUnit) {
+        my.initialize();
+      }
       return my;
     })();
     // this is where all the site code should begin
     return bls;
 });
 
-require(['bls']);
+if (!QUnit) {
+  require(['bls']);
+}

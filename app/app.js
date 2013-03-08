@@ -11,23 +11,7 @@ var lessConfig = {
     style : 'app'
   }
 };
-/*
-fs.readFile('app/static/less/app.less',function(error,data){
-    data = data.toString();
-    try{
-      less.render(data, function (e, css) {
-        console.log('test');
-        console.log(css);
-        console.log(e);
-        process.exit();
-      });
 
-    } catch (e) {
-      console.log(e);
-        process.exit();
-    }
-});
-*/
 var mimeTypes = {
   "html": "text/html",
   "jpeg": "image/jpeg",
