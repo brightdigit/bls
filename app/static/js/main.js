@@ -139,10 +139,11 @@ define('bls',[
           } while ($('#' + id).length > 0);
           return id;
         },
-        getProcessingJS: function() {
+        getCanvas: function() {
           var canvas = $('<canvas id="' + my.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
           $('.bls-viewport').append(canvas);
-          my.pjs = Processing.getInstanceById(canvas.attr('id'));
+           Processing.reload();
+          return canvas;
         },
         setupPages: function () {
           $('a.link').click(function () {
@@ -167,7 +168,22 @@ define('bls',[
           $(hash).show();
         },
         load: function () {
+          var parameters = {
+            item: $('[name=item]').val(),
+            area: $('[name=area]').val(),
+            factor: $('[name=factor]').val(),
+            startDate: new Date($('[name=startDate]').val()),
+            endDate: new Date($('[name=endDate]').val())
+          };
 
+          var request = new my.DataRequest(parameters);
+          request.on('end', my.onload);
+          request.start();
+        },
+        onload: function (request) {
+          if (request.data) {
+            my.getProcessingJS().loadData(request.data);
+          }
         },
         setupForm: function () {
           var val = [my.defaults.daterangepicker.startDate.toString(my.defaults.daterangepicker.format),
@@ -212,9 +228,17 @@ define('bls',[
           this._constuctor(jq);
         },
         initialize: function() {
-          my.pjs = my.getProcessingJS();
+          my.canvas = my.getCanvas();
           my.setupPages();
           my.setupForm();
+        },
+        getProcessingJS: function () {
+          if (!my.pjs) {
+            my.pjs = Processing.getInstanceById(my.canvas.attr('id'));
+            my.pjs.setBLS(my);
+          }
+
+          return my.pjs;
         },
         addObject: function(parent, key, value) {
           value = value || {};
@@ -222,6 +246,21 @@ define('bls',[
             parent[key] = value;
           }
           return parent[key];
+        },
+        getDateTime: function(unixTimestamp) {
+          var date = new Date(unixTimestamp * 1000);
+          return date;
+        },
+        getUnixTime: function(arg) {
+          var date;
+          if(typeof(arg) === 'object' && arg.length >= 3) {
+            date = new Date(arg[0], arg[1] - 1, arg[2]);
+          } else if(typeof(arg) === 'string') {
+            date = new Date(arg);
+          } else {
+            throw 'date argument is of invalid type: ' + typeof(arg);
+          }
+          return date.valueOf() / 1000.00;
         }
       };
 
@@ -247,6 +286,95 @@ define('bls',[
 
         },
         data : undefined
+      };
+
+
+      my.DataRequest = function(parameters, totalPoints) {
+        this.totalPoints = totalPoints ? totalPoints : this.totalPoints;
+        this.parameters = this.calculateParameters(parameters);
+      };
+
+      my.DataRequest.prototype = {
+        parameters: undefined,
+        totalPoints: 1000,
+        calculateParameters: function(parameters) {
+          parameters.months = Math.max(Math.ceil(this.calculateTotalMonths(parameters.startDate, parameters.endDate) / this.totalPoints), 1);
+          return parameters;
+        },
+        calculateTotalMonths: function(startDate, endDate) {
+          var months;
+          months = (endDate.getFullYear() - startDate.getFullYear()) * 12;
+          months -= startDate.getMonth() + 1;
+          months += endDate.getMonth();
+          return months;
+        },
+        events: {},
+        on: function(eventName, callback) {
+          if(!this.events[eventName]) {
+            this.events[eventName] = [];
+          }
+
+          this.events[eventName].push(callback);
+        },
+        start: function() {
+          var that = this;
+          var request = new my.PacketRequest(this.parameters, function(request, data) {
+            that.next(request, data)
+          });
+          request.start();
+        },
+        data: undefined,
+        next: function(request, data) {
+          var that = this;
+          if(!this.data) {
+            this.data = [];
+          }
+          this.data = this.data.concat(data);
+          if(data.length >= 100) {
+            var parameters = request.parameters;
+            parameters.offset = request.parameters.offset + data.length;
+            var request = new my.PacketRequest(parameters, function(request, data) {
+              that.next(request, data);
+            });
+            request.start();
+          } else if(this.events.end) {
+            for(var index = 0; index < this.events.end.length; index++) {
+              this.events.end[index](this);
+            };
+          }
+        }
+      };
+
+      my.PacketRequest = function(parameters, callback) {
+        this.parameters = this.applyDefaults(parameters);
+        this.callback = callback;
+      };
+
+      my.PacketRequest.prototype = {
+        parameters: undefined,
+        defaultParameters: {
+          offset: 0
+        },
+        formatParameters: function(parameters) {
+          parameters.startDate = parameters.startDate.getFullYear ? [
+          parameters.startDate.getFullYear(), parameters.startDate.getMonth() + 1, parameters.startDate.getDate()].join('-') : parameters.startDate;
+          parameters.endDate = parameters.endDate.getFullYear ? [
+          parameters.endDate.getFullYear(), parameters.endDate.getMonth() + 1, parameters.endDate.getDate()].join('-') : parameters.endDate;
+          return parameters;
+        },
+        applyDefaults: function(parameters) {
+          for(var key in this.defaultParameters) {
+            parameters[key] = parameters[key] ? parameters[key] : this.defaultParameters[key];
+          }
+          return parameters;
+        },
+        start: function() {
+          var that = this;
+
+          $.get('data', this.formatParameters(this.parameters), function(data) {
+            that.callback(that, data);
+          });
+        }
       };
       /*
       my.selectrequest._init = function () {

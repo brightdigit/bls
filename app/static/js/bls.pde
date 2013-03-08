@@ -14,7 +14,7 @@ class Coordinate {
 int xPos, yPos;
 
 PFont font;
-
+var bls;
 Coordinate [] coordinates;
 float x_scale, y_scale;
 float x_offset, y_offset;
@@ -25,7 +25,11 @@ void setup() {
   background(255);
   font = createFont("fonts/fixed_01.ttf");
   textFont(font, 12);
-  bls.load();
+  //bls.load();
+}
+
+void setBLS(module) {
+	bls = module;
 }
 
 void loadData (data) {
