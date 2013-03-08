@@ -123,6 +123,8 @@ define('bls',[
               } else {
                 $('#adv-item').attr('disabled', 'disabled');
               }
+              
+              my.load();
             }
           }
         },
@@ -162,8 +164,22 @@ define('bls',[
           var hash = (window.location.hash ? window.location.hash : '#home');
           $(hash).show();
         },
+        load: function () {
+
+        },
         setupForm: function () {
-          $('input.daterangepicker-control').daterangepicker(my.defaults.daterangepicker);
+          var val = [my.defaults.daterangepicker.startDate.toString(my.defaults.daterangepicker.format),
+          my.defaults.daterangepicker.endDate.toString(my.defaults.daterangepicker.format)].join(' - ');
+
+          var startDateInput = $('<input>').attr('name', 'startDate').attr('type', 'hidden').val(my.defaults.daterangepicker.startDate)
+          var endDateInput = $('<input>').attr('name', 'endDate').attr('type', 'hidden').val(my.defaults.daterangepicker.endDate);
+
+          $('input.daterangepicker-control').val(val).after(endDateInput).after(startDateInput).daterangepicker(my.defaults.daterangepicker, function (start, end) {
+            startDateInput.val(start);
+            endDateInput.val(end);
+            my.load();
+          });
+
           my.pullData();
 
           $('[name]').change(function (evt) {
