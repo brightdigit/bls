@@ -267,22 +267,30 @@ define('bls',[
       my.availablity = function (data) {
         for (var index = 0; index < data.length; index++) {
           var range = data[index];
-          if (!this.item[range.group_name]) {
-            this.item[range.group_name] = {};
+          if (!this.item_groups[range.item_group_name]) {
+            this.item_groups[range.item_group_name] = {};
           }
 
-          if (!this.item[range.group_name][range.area_group_name]) {
-            this.item[range.group_name][range.area_group_name] = [];
+          if (!this.item_groups[range.item_group_name][range.area_group_id]) {
+            this.item_groups[range.item_group_name][range.area_group_id] = {};
           }
 
-          this.item[range.group_name][range.area_group_name].push(index);
-          
+          if (!this.item_groups[range.item_group_name][range.area_group_id][range.area_code]) {
+            this.item_groups[range.item_group_name][range.area_group_id][range.area_code] = {};
+          }
+
+          if (!this.item_groups[range.item_group_name][range.area_group_id][range.area_code][range.item_code]) {
+            this.item_groups[range.item_group_name][range.area_group_id][range.area_code][range.item_code] = {
+              begin_date : range.begin_date,
+              end_date : range.end_date
+            };
+          }
+         
         }
-        this.data = data;
       };
 
       my.availablity.prototype = {
-        item : {
+        item_groups : {
 
         },
         data : undefined

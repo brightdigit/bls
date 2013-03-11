@@ -272,23 +272,15 @@ bls.controllers = {
     }
   }),
   'available' : new bls.controller(
-  ['select begin_date, end_date, group_name, area_group_name, name from (',
-  'select min(str_to_date(concat(begin_year,\'-\', begin_period,\'-01\'), \'%Y-%m-%d\')) as begin_date,',
+  ['select ap_item_grouping.group_name as item_group_name, ap_area_groups.area_group_id, root_code as item_code, ap_series.area_code,',
+'min(str_to_date(concat(begin_year,\'-\', begin_period,\'-01\'), \'%Y-%m-%d\')) as begin_date,',
 'max(str_to_date(concat(end_year,\'-\', end_period,\'-01\'), \'%Y-%m-%d\')) as end_date,',
-'group_name, area_group_name, area_name, name from ap_series ',
-'inner join ap_area on ap_series.area_code = ap_area.area_code',
+'count(*) from ap_current',
+'inner join ap_series on ap_current.series_id = ap_series.series_id',
 'inner join ap_area_groups on ap_series.area_code = ap_area_groups.area_code',
-'inner join ap_area_groupings on ap_area_groups.area_group_id = ap_area_groupings.area_group_id',
 'inner join ap_item_matches_mapping on ap_series.item_code = ap_item_matches_mapping.item_code',
-'inner join ap_item_names on ap_item_matches_mapping.root_code = ap_item_names.item_code',
 'inner join ap_item_grouping on ap_item_matches_mapping.root_code = ap_item_grouping.item_code',
-'group by ap_item_names.name, ap_series.area_code',
-'order by area_group_name, area_name, group_name, name',
-')available group by group_name, area_group_name, name',
-'order by area_group_name, group_name;'],
- null, null, [
-      'type_names'
-    ]
+'group by ap_item_matches_mapping.root_code, area_code;']
     )
 };
 
