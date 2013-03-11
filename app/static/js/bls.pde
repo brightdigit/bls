@@ -14,7 +14,7 @@ class Coordinate {
 int xPos, yPos;
 
 PFont font;
-var bls;
+Object bls;
 Coordinate [] coordinates;
 float x_scale, y_scale;
 float x_offset, y_offset;
@@ -28,7 +28,7 @@ void setup() {
   //bls.load();
 }
 
-void setBLS(module) {
+void initialize(module) {
 	bls = module;
 }
 

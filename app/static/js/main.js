@@ -54,7 +54,7 @@ define('bls',[
                 item_select =  $('[name=item]');
               var value = area_group.val();
               area_group.empty();
-              for (var key in my.data.available.item[item_group.val()]) {
+              for (var key in my.data.available.item_groups[item_group.val()]) {
                 $('<option>').appendTo(area_group).text(key).val(key);
               }
               area_group.val(value);
@@ -78,18 +78,10 @@ define('bls',[
                 area_select =  $('[name=area]'),
                 item_select =  $('[name=item]');
 
-              var indicies = my.data.available.item[item_group.val()][area_group.val()];
+              var value = area_select.val();
+              var areas = my.data.available.item_groups[item_group.val()][area_group.val()];
 
               area_select.empty();
-              item_select.empty();
-
-              // add items
-              for (var index = 0; index < indicies.length; index++) {
-                var item, range = my.data.available.data[indicies[index]];
-                if (item = my.data.items[item_group.val()][range.name]) {
-                  $('<option>').appendTo(item_select).val(item[0].item_code).text(range.name).data('group', item_group.val()).data('advanced', item.length > 1);
-                }
-              }
 
               // add areas
               for (var index = 0; index < my.data.areas[area_group.val()].length; index++) {
@@ -97,20 +89,45 @@ define('bls',[
                 $('<option>').appendTo(area_select).val(area.area_code).text(area.area_name);
               }
 
+              area_select.val(value);
+
               if (area_select.find('option').length > 1) {
                 area_select.removeAttr('disabled');
+                if (area_select.val() !== value) {
+                  area_select.trigger('change');
+                }
               } else {
                 area_select.attr('disabled', 'disabled');
                 area_select.trigger('change');
               }
+            }
+          },
+          area : {
+            change : function (evt) {
+              var item_group = $('[name=item_group]'),
+                area_group = $('[name=area_group]'),
+                area_select =  $('[name=area]'),
+                item_select =  $('[name=item]');
 
+              var value = item_select.val();
+              var items = my.data.available.item_groups[item_group.val()][area_group.val()][area_select.val()];
+              item_select.empty();
+              for (var code in items) {
+                var name = my.data.item_map[code];
+                $('<option>').appendTo(item_select).val(code).text(name);
+              }
+
+              item_select.val(value);
 
               if (item_select.find('option').length > 1) {
                 item_select.removeAttr('disabled');
+                if (item_select.val() !== value) {
+                  item_select.trigger('change');
+                }
               } else {
                 item_select.attr('disabled', 'disabled');
-              }
                 item_select.trigger('change');
+              }
             }
           },
           item : {
@@ -119,12 +136,13 @@ define('bls',[
                 area_group = $('[name=area_group]'),
                 area_select =  $('[name=area]'),
                 item_select =  $('[name=item]');
-
+/*
               if (my.data.items[item_group.val()][item_select.find('option:selected').text()].length > 1) {
                 $('#adv-item').removeAttr('disabled');
               } else {
                 $('#adv-item').attr('disabled', 'disabled');
               }
+              */
               
               my.load();
             }
@@ -163,7 +181,10 @@ define('bls',[
               controls.removeClass('span4 span2').addClass('span3');
               vpParent.removeClass('span8 span10').addClass('span9');              
             }
+
+            my.canvas.height($('footer').offset().top);
           });
+            my.canvas.height($('footer').offset().top);
           var hash = (window.location.hash ? window.location.hash : '#home');
           $(hash).show();
         },
@@ -212,13 +233,21 @@ define('bls',[
             my.data.available = new my.availablity(data);
             var item_group = $('[name=item_group]'),
               area_group = $('[name=area_group]');
-            for (var key in my.data.available.item) {
+            for (var key in my.data.available.item_groups) {
               $('<option>').appendTo(item_group).text(key).val(key);
             }
             item_group.removeAttr('disabled');
           });
           $.get('/items', function (data) {
             my.data.items = data;
+            my.data.item_map = {};
+
+            for (var name in my.data.items) {
+              var item_set =my.data.items[name];
+              for (var index = 0; index < item_set.length; index++) {
+                my.data.item_map[item_set[index].item_code] = name;
+              }
+            }
           });
           $.get('/areas', function (data) {
             my.data.areas = data;
@@ -235,7 +264,7 @@ define('bls',[
         getProcessingJS: function () {
           if (!my.pjs) {
             my.pjs = Processing.getInstanceById(my.canvas.attr('id'));
-            my.pjs.setBLS(my);
+            my.pjs.initialize(my);
           }
 
           return my.pjs;
@@ -271,16 +300,16 @@ define('bls',[
             this.item_groups[range.item_group_name] = {};
           }
 
-          if (!this.item_groups[range.item_group_name][range.area_group_id]) {
-            this.item_groups[range.item_group_name][range.area_group_id] = {};
+          if (!this.item_groups[range.item_group_name][range.area_group_name]) {
+            this.item_groups[range.item_group_name][range.area_group_name] = {};
           }
 
-          if (!this.item_groups[range.item_group_name][range.area_group_id][range.area_code]) {
-            this.item_groups[range.item_group_name][range.area_group_id][range.area_code] = {};
+          if (!this.item_groups[range.item_group_name][range.area_group_name][range.area_code]) {
+            this.item_groups[range.item_group_name][range.area_group_name][range.area_code] = {};
           }
 
-          if (!this.item_groups[range.item_group_name][range.area_group_id][range.area_code][range.item_code]) {
-            this.item_groups[range.item_group_name][range.area_group_id][range.area_code][range.item_code] = {
+          if (!this.item_groups[range.item_group_name][range.area_group_name][range.area_code][range.item_code]) {
+            this.item_groups[range.item_group_name][range.area_group_name][range.area_code][range.item_code] = {
               begin_date : range.begin_date,
               end_date : range.end_date
             };
