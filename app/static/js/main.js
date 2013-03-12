@@ -160,8 +160,21 @@ define('bls',[
         getCanvas: function() {
           var canvas = $('<canvas id="' + my.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
           $('.bls-viewport').append(canvas);
-           Processing.reload();
+          Processing.reload();
+          var interval = setInterval(function () {
+            if (my.getProcessingJS()) {
+              console.log('ready');
+              clearInterval(interval);
+              my.pjsReady();
+            }
+          });
           return canvas;
+        },
+        pjsReady : function () {
+            my.canvas.height($('footer').offset().top - 100);
+          console.log(my.canvas.height());
+            my.pjs.size(my.canvas.width(), my.canvas.height());
+
         },
         setupPages: function () {
           $('a.link').click(function () {
@@ -182,10 +195,16 @@ define('bls',[
               vpParent.removeClass('span8 span10').addClass('span9');              
             }
 
-            my.canvas.height($('footer').offset().top - 80);
+            console.log($('footer').offset().top - 100);
+            my.canvas.width(my.canvas.parent().width());
+            my.canvas.height($('footer').offset().top - 100);
+            //console.log(my.canvas)
+            my.getProcessingJS().size(my.canvas.width(), my.canvas.height());
           });
-            my.canvas.height($('footer').offset().top - 80);
+            //my.canvas.height($('footer').offset().top - 80);            //my.getProcessingJS().size(my.canvas.width(), my.canvas.height());
+
           var hash = (window.location.hash ? window.location.hash : '#home');
+            //my.getProcessingJS().size(my.canvas.width(), my.canvas.height());
           $(hash).show();
         },
         load: function () {
@@ -262,12 +281,14 @@ define('bls',[
           my.setupForm();
         },
         getProcessingJS: function () {
-          if (!my.pjs) {
+          if (!my.pjs || !my.pjs.initialize) {
             my.pjs = Processing.getInstanceById(my.canvas.attr('id'));
-            my.pjs.initialize(my);
+
+            //my.pjs.initialize(my);
+           // my.pjs.size(my.canvas.width(), my.canvas.height());
           }
 
-          return my.pjs;
+          return my.pjs.initialize ? my.pjs : undefined;
         },
         addObject: function(parent, key, value) {
           value = value || {};
@@ -450,7 +471,9 @@ define('bls',[
       };
       */
       if (!QUnit) {
-        my.initialize();
+        $(window).ready(function () {
+          my.initialize();
+        });        
       }
       return my;
     })();
