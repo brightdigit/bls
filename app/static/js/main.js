@@ -182,9 +182,9 @@ define('bls',[
               vpParent.removeClass('span8 span10').addClass('span9');              
             }
 
-            my.canvas.height($('footer').offset().top);
+            my.canvas.height($('footer').offset().top - 80);
           });
-            my.canvas.height($('footer').offset().top);
+            my.canvas.height($('footer').offset().top - 80);
           var hash = (window.location.hash ? window.location.hash : '#home');
           $(hash).show();
         },
