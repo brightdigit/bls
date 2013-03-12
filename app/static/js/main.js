@@ -31,6 +31,9 @@ define('bls',[
         data : {
 
         },
+        previous : {
+
+        },
         defaults : {
           daterangepicker : {startDate : (new Date(1978, 0, 1)), endDate : (new Date()), format : 'yyyy-MM-dd',
             ranges : {
@@ -134,6 +137,7 @@ define('bls',[
 
               var range = my.data.available.item_groups[item_group.val()][area_group.val()][area_select.val()][item_select.val()];
               $('[name=dateRange]').val([range.begin_date.toString(my.defaults.daterangepicker.format),range.end_date.toString(my.defaults.daterangepicker.format)].join(' - '));
+              my.previous = range;
 /*
               if (my.data.items[item_group.val()][item_select.find('option:selected').text()].length > 1) {
                 $('#adv-item').removeAttr('disabled');
@@ -170,7 +174,6 @@ define('bls',[
         },
         pjsReady : function () {
             my.canvas.height($('footer').offset().top - 100);
-          console.log(my.canvas.height());
             my.pjs.size(my.canvas.width(), my.canvas.height());
 
         },
@@ -193,7 +196,6 @@ define('bls',[
               vpParent.removeClass('span8 span10').addClass('span9');              
             }
 
-            console.log($('footer').offset().top - 100);
             my.canvas.width(my.canvas.parent().width());
             my.canvas.height($('footer').offset().top - 100);
             //console.log(my.canvas)
@@ -223,6 +225,24 @@ define('bls',[
             my.getProcessingJS().loadData(request.data);
           }
         },
+        calculateRange: function (available, previous, newStart, newEnd) {
+          var newRange = {
+            begin_date : newStart,
+            end_date : newEnd
+          };
+
+          if (newEnd < available.begin_date || newStart > available.end_date) {
+            newRange = previous;
+          } else if (newStart > available.begin_date && newStart < available.end_date && newEnd > available.end_date) {
+            newRange.end_date = available.end_date;
+          } else if (newStart < available.begin_date && newEnd > available.begin_date && newEnd < available.end_date) {
+            newRange.begin_date = available.begin_date;            
+          } else if (newStart < available.begin_date && newEnd > available.end_date) {
+            newRange = available;
+          }
+
+          return newRange;
+        },
         setupForm: function () {
           var val = [my.defaults.daterangepicker.startDate.toString(my.defaults.daterangepicker.format),
           my.defaults.daterangepicker.endDate.toString(my.defaults.daterangepicker.format)].join(' - ');
@@ -230,9 +250,27 @@ define('bls',[
           var startDateInput = $('<input>').attr('name', 'startDate').attr('type', 'hidden').val(my.defaults.daterangepicker.startDate)
           var endDateInput = $('<input>').attr('name', 'endDate').attr('type', 'hidden').val(my.defaults.daterangepicker.endDate);
 
-          $('input.daterangepicker-control').val(val).after(endDateInput).after(startDateInput).daterangepicker(my.defaults.daterangepicker, function (start, end) {
-            startDateInput.val(start);
-            endDateInput.val(end);
+          $('input.daterangepicker-control').val(val).after(endDateInput).after(startDateInput).daterangepicker(my.defaults.daterangepicker, function (start, end) {  
+            var new_range;
+              var item_group = $('[name=item_group]'),
+                area_group = $('[name=area_group]'),
+                area_select =  $('[name=area]'),
+                item_select =  $('[name=item]');
+            if (item_group.val() !== '' && area_group.val() !== '' && area_select.val() !== '' && item_select !== '') {
+              var range = my.data.available.item_groups[item_group.val()][area_group.val()][area_select.val()][item_select.val()];          
+              new_range = my.calculateRange(range, my.previous, start, end);
+            } else {
+              new_range = {
+                begin_date : start,
+                end_date : end
+              };
+            }
+            startDateInput.val(new_range.begin_date);
+            endDateInput.val(new_range.end_date);
+            console.log(this);
+            my.previous.begin_date = new_range.begin_date;
+            my.previous.end_date = new_range.end_date;
+            $('[name=dateRange]').val([new_range.begin_date.toString(my.defaults.daterangepicker.format),new_range.end_date.toString(my.defaults.daterangepicker.format)].join(' - '));
             my.load();
           });
 
@@ -281,9 +319,6 @@ define('bls',[
         getProcessingJS: function () {
           if (!my.pjs || !my.pjs.initialize) {
             my.pjs = Processing.getInstanceById(my.canvas.attr('id'));
-
-            //my.pjs.initialize(my);
-           // my.pjs.size(my.canvas.width(), my.canvas.height());
           }
 
           return my.pjs.initialize ? my.pjs : undefined;
@@ -329,8 +364,8 @@ define('bls',[
 
           if (!this.item_groups[range.item_group_name][range.area_group_name][range.area_code][range.item_code]) {
             this.item_groups[range.item_group_name][range.area_group_name][range.area_code][range.item_code] = {
-              begin_date : new Date(range.begin_date),
-              end_date : new Date(range.end_date)
+              begin_date : (new Date(range.begin_date)).set({day : 1}),
+              end_date : (new Date(range.end_date)).set({day: 1})
             };
           }
          
