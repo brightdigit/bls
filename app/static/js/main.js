@@ -62,13 +62,10 @@ define('bls',[
 
               if (area_group.find('option').length > 1) {
                 area_group.removeAttr('disabled');
-                if (area_group.val() !== value) {
-                  area_group.trigger('change');
-                }
               } else {
                 area_group.attr('disabled', 'disabled');
-                area_group.trigger('change');
               }
+                area_group.trigger('change');
             }
           },
           area_group : {
@@ -93,13 +90,10 @@ define('bls',[
 
               if (area_select.find('option').length > 1) {
                 area_select.removeAttr('disabled');
-                if (area_select.val() !== value) {
-                  area_select.trigger('change');
-                }
               } else {
                 area_select.attr('disabled', 'disabled');
-                area_select.trigger('change');
               }
+                area_select.trigger('change');
             }
           },
           area : {
@@ -109,25 +103,26 @@ define('bls',[
                 area_select =  $('[name=area]'),
                 item_select =  $('[name=item]');
 
+              var names = [];
               var value = item_select.val();
               var items = my.data.available.item_groups[item_group.val()][area_group.val()][area_select.val()];
               item_select.empty();
               for (var code in items) {
                 var name = my.data.item_map[code];
-                $('<option>').appendTo(item_select).val(code).text(name);
+                if (names.indexOf(name) < 0) {
+                  names.push(name);   
+                  $('<option>').appendTo(item_select).val(code).text(name);               
+                }
               }
 
               item_select.val(value);
 
               if (item_select.find('option').length > 1) {
                 item_select.removeAttr('disabled');
-                if (item_select.val() !== value) {
-                  item_select.trigger('change');
-                }
               } else {
                 item_select.attr('disabled', 'disabled');
-                item_select.trigger('change');
               }
+                  item_select.trigger('change');
             }
           },
           item : {
@@ -136,6 +131,9 @@ define('bls',[
                 area_group = $('[name=area_group]'),
                 area_select =  $('[name=area]'),
                 item_select =  $('[name=item]');
+
+              var range = my.data.available.item_groups[item_group.val()][area_group.val()][area_select.val()][item_select.val()];
+              $('[name=dateRange]').val([range.begin_date.toString(my.defaults.daterangepicker.format),range.end_date.toString(my.defaults.daterangepicker.format)].join(' - '));
 /*
               if (my.data.items[item_group.val()][item_select.find('option:selected').text()].length > 1) {
                 $('#adv-item').removeAttr('disabled');
@@ -331,8 +329,8 @@ define('bls',[
 
           if (!this.item_groups[range.item_group_name][range.area_group_name][range.area_code][range.item_code]) {
             this.item_groups[range.item_group_name][range.area_group_name][range.area_code][range.item_code] = {
-              begin_date : range.begin_date,
-              end_date : range.end_date
+              begin_date : new Date(range.begin_date),
+              end_date : new Date(range.end_date)
             };
           }
          

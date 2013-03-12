@@ -25,7 +25,7 @@ void setup() {
   background(255);
   font = createFont("fonts/fixed_01.ttf");
   textFont(font, 12);
-  println(bls = require('bls'));
+  bls = require('bls');
   //bls.load();
 }
 
