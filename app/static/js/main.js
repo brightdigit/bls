@@ -138,7 +138,13 @@ define('bls',[
               var range = my.data.available.item_groups[item_group.val()][area_group.val()][area_select.val()][item_select.val()];
               $('[name=dateRange]').val([range.begin_date.toString(my.defaults.daterangepicker.format),range.end_date.toString(my.defaults.daterangepicker.format)].join(' - '));
               my.previous = range;
-/*
+              $('[name=startDate]').val(range.begin_date);
+              $('[name=endDate]').val(range.end_date);
+              my.daterangepicker.startDate = range.begin_date;
+              my.daterangepicker.endDate = range.end_date;
+              my.daterangepicker.notify();
+              my.daterangepicker.container.find('li').removeClass('active').last().addClass('active');
+/*            
               if (my.data.items[item_group.val()][item_select.find('option:selected').text()].length > 1) {
                 $('#adv-item').removeAttr('disabled');
               } else {
@@ -219,7 +225,11 @@ define('bls',[
 
           var request = new my.DataRequest(parameters);
           request.on('end', my.onload);
+          request.on('error', my.onerror);
           request.start();
+        },
+        onerror: function (request, packet, jq) {
+          debugger;
         },
         onload: function (request) {
           if (request.data) {
@@ -251,7 +261,7 @@ define('bls',[
           var startDateInput = $('<input>').attr('name', 'startDate').attr('type', 'hidden').val(my.defaults.daterangepicker.startDate)
           var endDateInput = $('<input>').attr('name', 'endDate').attr('type', 'hidden').val(my.defaults.daterangepicker.endDate);
 
-          $('input.daterangepicker-control').val(val).after(endDateInput).after(startDateInput).daterangepicker(my.defaults.daterangepicker, function (start, end) {  
+          my.daterangepicker = $('input.daterangepicker-control').val(val).after(endDateInput).after(startDateInput).daterangepicker(my.defaults.daterangepicker, function (start, end) {  
             var new_range;
               var item_group = $('[name=item_group]'),
                 area_group = $('[name=area_group]'),
@@ -273,7 +283,13 @@ define('bls',[
             my.previous.end_date = new_range.end_date;
             $('[name=dateRange]').val([new_range.begin_date.toString(my.defaults.daterangepicker.format),new_range.end_date.toString(my.defaults.daterangepicker.format)].join(' - '));
             my.load();
-          });
+            if (new_range.begin_date !== start || new_range.end_date !== end) {
+              my.daterangepicker.startDate = range.begin_date;
+              my.daterangepicker.endDate = range.end_date;
+              my.daterangepicker.notify();
+              my.daterangepicker.container.find('li').removeClass('active').last().addClass('active');
+            }
+          }).data('daterangepicker');
 
           my.pullData();
 
@@ -325,6 +341,7 @@ define('bls',[
 
           if (my._dataReady && my.pjs.initialize) {
             $('[name=item_group]').removeAttr('disabled');  
+            $('[name=dateRange]').removeAttr('disabled');  
           }
           return my.pjs.initialize ? my.pjs : undefined;
         },
@@ -353,8 +370,10 @@ define('bls',[
       };
 
       my.availablity = function (data) {
+        var min, max;
         for (var index = 0; index < data.length; index++) {
           var range = data[index];
+          
           if (!this.item_groups[range.item_group_name]) {
             this.item_groups[range.item_group_name] = {};
           }
@@ -369,12 +388,16 @@ define('bls',[
 
           if (!this.item_groups[range.item_group_name][range.area_group_name][range.area_code][range.item_code]) {
             this.item_groups[range.item_group_name][range.area_group_name][range.area_code][range.item_code] = {
-              begin_date : (new Date(range.begin_date)).set({day : 1}),
-              end_date : (new Date(range.end_date)).set({day: 1})
+              begin_date : (new Date(range.begin_date)),//.set({day : 1}),
+              end_date : (new Date(range.end_date))//.set({day: 1})
             };
           }
+
          
         }
+
+        my.defaults.daterangepicker.ranges['All'][0] = min;
+        my.defaults.daterangepicker.ranges['All'][1] = max;
       };
 
       my.availablity.prototype = {
@@ -419,6 +442,11 @@ define('bls',[
           });
           request.start();
         },
+        error: function (pRequest, request) {
+          for(var index = 0; index < this.events.error.length; index++) {
+            this.events.error[index](this, pRequest, request);
+          };
+        },
         data: undefined,
         next: function(request, data) {
           var that = this;
@@ -431,7 +459,9 @@ define('bls',[
             parameters.offset = request.parameters.offset + data.length;
             var request = new my.PacketRequest(parameters, function(request, data) {
               that.next(request, data);
-            });
+            }, (this.events.error && this.events.error.length > 0) && (function (pRequest) {
+              this.error(pRequest, request);
+            }));
             request.start();
           } else if(this.events.end) {
             for(var index = 0; index < this.events.end.length; index++) {
@@ -441,9 +471,10 @@ define('bls',[
         }
       };
 
-      my.PacketRequest = function(parameters, callback) {
+      my.PacketRequest = function(parameters, callback, errorCallback) {
         this.parameters = this.applyDefaults(parameters);
         this.callback = callback;
+        this.errorCallback = errorCallback;
       };
 
       my.PacketRequest.prototype = {
@@ -467,47 +498,19 @@ define('bls',[
         start: function() {
           var that = this;
 
-          $.get('data', this.formatParameters(this.parameters), function(data) {
+          var request = $.get('data', this.formatParameters(this.parameters), function(data) {
             that.callback(that, data);
           });
-        }
-      };
-      /*
-      my.selectrequest._init = function () {
-            $.fn.selectrequest = function (cb) {
-            this.each(function() {
-              var el = $(this);
-              var name = el.attr('name');
-              if (my.selectrequest._elements[name]) {
-                return my.selectrequest._elements[name];
-              } else {
-                return new my.selectrequest(el, cb);
+
+          if (this.errorCallback) {
+            request.fail(
+              function () {
+                that.errorCallback(request);
               }
-            });
-            return this;
-          };
-      };
-
-      my.selectrequest._elements = {};
-
-      my.selectrequest.prototype = {
-        jq : undefined,
-
-        _constuctor : function (jq, cb, src) {
-          this.jq = jq;
-          this.src = src || jq.data('src');
-          this.cb = cb;
-          this.load();
-          my.selectrequest._elements[jq.attr('name')] = this;
-        },
-
-        load : function () {
-          $.get(this.src, function (data) {
-              console.log(data);
-          });
+            );
+          }
         }
       };
-      */
       if (!QUnit) {
         $(window).ready(function () {
           my.initialize();
