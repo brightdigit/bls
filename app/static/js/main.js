@@ -198,8 +198,9 @@ define('bls',[
 
             my.canvas.width(my.canvas.parent().width());
             my.canvas.height($('footer').offset().top - 100);
-            //console.log(my.canvas)
+            
             my.getProcessingJS().size(my.canvas.width(), my.canvas.height());
+            my.getProcessingJS().update();
           });
             //my.canvas.height($('footer').offset().top - 80);            //my.getProcessingJS().size(my.canvas.width(), my.canvas.height());
 
