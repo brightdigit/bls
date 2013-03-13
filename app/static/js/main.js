@@ -291,7 +291,8 @@ define('bls',[
             for (var key in my.data.available.item_groups) {
               $('<option>').appendTo(item_group).text(key).val(key);
             }
-            item_group.removeAttr('disabled');
+            my._dataReady = true;
+            my.getProcessingJS();
           });
           $.get('/items', function (data) {
             my.data.items = data;
@@ -321,6 +322,9 @@ define('bls',[
             my.pjs = Processing.getInstanceById(my.canvas.attr('id'));
           }
 
+          if (my._dataReady && my.pjs.initialize) {
+            $('[name=item_group]').removeAttr('disabled');  
+          }
           return my.pjs.initialize ? my.pjs : undefined;
         },
         addObject: function(parent, key, value) {
