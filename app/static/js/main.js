@@ -8,7 +8,8 @@ requirejs.config({
     datejs : 'datejs/build/date',
     daterangepicker : 'bootstrap-daterangepicker/daterangepicker',
     'jquery.cookie' : 'jquery.cookie/jquery.cookie',
-    processingjs : 'processingjs/processing'
+    processingjs : 'processingjs/processing',
+    'wait' : '../wait'
   },
   shim: {
     'bootstrap':{deps: ['jquery'], exports : 'jquery'},
@@ -21,11 +22,12 @@ requirejs.config({
 define('bls',[
   'jquery', 
   'processingjs',
+  'wait',
   'bootstrap',
   'datejs',
   'daterangepicker',
-  'jquery.cookie',
-  ], function($, Processing){
+  'jquery.cookie'
+  ], function($, Processing, wait){
     var bls = (function () {
       var my = {
         data : {
@@ -169,6 +171,7 @@ define('bls',[
           var canvas = $('<canvas id="' + my.getRandomId() + '" data-processing-sources="js/bls.pde"/>');
           $('.bls-viewport').append(canvas);
           Processing.reload();
+          /*
           var interval = setInterval(function () {
             if (my.getProcessingJS()) {
               console.log('ready');
@@ -176,6 +179,7 @@ define('bls',[
               my.pjsReady();
             }
           });
+*/
           return canvas;
         },
         pjsReady : function () {
@@ -205,8 +209,8 @@ define('bls',[
             my.canvas.width(my.canvas.parent().width());
             my.canvas.height($('footer').offset().top - 100);
             
-            my.getProcessingJS().size(my.canvas.width(), my.canvas.height());
-            my.getProcessingJS().update();
+            //my.getProcessingJS().size(my.canvas.width(), my.canvas.height());
+            //my.getProcessingJS().update();
           });
             //my.canvas.height($('footer').offset().top - 80);            //my.getProcessingJS().size(my.canvas.width(), my.canvas.height());
 
@@ -233,7 +237,7 @@ define('bls',[
         },
         onload: function (request) {
           if (request.data) {
-            my.getProcessingJS().loadData(request.data);
+            my.pjs.loadData(request.data);
           }
         },
         calculateRange: function (available, previous, newStart, newEnd) {
@@ -278,7 +282,6 @@ define('bls',[
             }
             startDateInput.val(new_range.begin_date);
             endDateInput.val(new_range.end_date);
-            console.log(this);
             my.previous.begin_date = new_range.begin_date;
             my.previous.end_date = new_range.end_date;
             $('[name=dateRange]').val([new_range.begin_date.toString(my.defaults.daterangepicker.format),new_range.end_date.toString(my.defaults.daterangepicker.format)].join(' - '));
@@ -291,7 +294,7 @@ define('bls',[
             }
           }).data('daterangepicker');
 
-          my.pullData();
+          //my.pullData();
 
           $('[name]').change(function (evt) {
             var fn;
@@ -329,21 +332,84 @@ define('bls',[
         selectrequest : function (jq) {
           this._constuctor(jq);
         },
-        initialize: function() {
+        setup : function () {
+          $('[name]').change(function (evt) {
+            var fn;
+            if (my.events[$(this).attr('name')] && (fn = my.events[$(this).attr('name')]['change'])) {
+              fn.call(this, evt);
+            }
+          });
+
+
           my.canvas = my.getCanvas();
+
+          my.setupPages();
+        },
+        begin : function () {
+          wait.create([
+            function (success) {
+              var interval = setInterval(function () {
+                if (my.verifyPjs()) {
+                  console.log('ready');
+                  clearInterval(interval);
+                  success();
+                }
+              }, 250);},
+              function (success) {
+                $.get('/available', function (data) {
+                  my.data.available = new my.availablity(data);
+                  var item_group = $('[name=item_group]'),
+                  area_group = $('[name=area_group]');
+                  for (var key in my.data.available.item_groups) {
+                    $('<option>').appendTo(item_group).text(key).val(key);
+                  }
+                  success();
+                });
+              }, 
+              function (success) {
+                $.get('/items', function (data) {
+                  my.data.items = data;
+                  my.data.item_map = {};
+
+                  for (var name in my.data.items) {
+                    var item_set =my.data.items[name];
+                    for (var index = 0; index < item_set.length; index++) {
+                      my.data.item_map[item_set[index].item_code] = name;
+                    }
+                  }
+                  success();
+                });
+              }, 
+              function (success) {
+                $.get('/areas', function (data) {
+                  my.data.areas = data;
+                  success();
+                });
+              }
+            ]).begin(
+            function (result) {
+              my.setupForm();
+              my.canvas.height($('footer').offset().top - 80);
+              my.pjs.size(my.canvas.width(), my.canvas.height());
+              $('[name=item_group]').removeAttr('disabled');
+              $('[name=dateRange]').removeAttr('disabled');
+            }
+          );
+        },
+        initialize: function() {
+          my.setup();
+          my.begin();
+          /*
           my.setupPages();
           my.setupForm();
+          */
         },
-        getProcessingJS: function () {
-          if (!my.pjs || !my.pjs.initialize) {
-            my.pjs = Processing.getInstanceById(my.canvas.attr('id'));
-          }
-
-          if (my._dataReady && my.pjs.initialize) {
-            $('[name=item_group]').removeAttr('disabled');  
-            $('[name=dateRange]').removeAttr('disabled');  
-          }
-          return my.pjs.initialize ? my.pjs : undefined;
+        verifyPjs: function () {
+          var pjs = Processing.getInstanceById(my.canvas.attr('id'));
+          if (pjs && pjs.initialize) {
+            my.pjs = pjs;
+          } 
+          return my.pjs;
         },
         addObject: function(parent, key, value) {
           value = value || {};
