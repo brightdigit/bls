@@ -10,6 +10,68 @@ if (process.argv.length < 3) {
   process.exit(1); 
 }
 
+function Database () {
+
+}
+
+Database.prototype = {
+  state : undefinded,
+  setup : function (env) {
+    if (state) {
+      throw 'state already defined ' + state;
+    }
+    state = 'running';
+    this.initialize();
+  },
+  initialize : function () {
+    var that = this;
+    fs.mkdir(tmpDir, function (error) {
+    if (process.argv[2] == '-f') {
+      connection.query('DROP SCHEMA ' + dbName + '; CREATE SCHEMA ' + dbName + ';', function (error, results) {
+        if (error) {
+          console.log(error);
+          process.exit(1);
+        }
+        console.log('Schema dropped.');
+        that.download();
+      });
+    } else {
+      that.download();
+    }
+  });
+  }
+};
+
+Database.makeid = function () {
+  var text = "";
+  var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+  for( var i=0; i < 5; i++ )
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+  return text;
+};
+
+Database.parseValue = function(str) {
+  // if is a fraction
+  if (str.indexOf('/') >= 0) {
+    return str.split('/').reduce(function (prev, current, index) {
+      if (index === 0) {
+        return current;
+      } else {
+        return prev/current;
+      }
+    });
+  // if it contains per
+  } else if (str.indexOf('per') >= 0) {
+    return 1;
+  // if it can be parsed as an float
+  } else {
+    return parseFloat(str.match(/\d+(?:[.,]\d+)?/));
+  }
+  return 1;
+};
+
 function makeid()
 {
     var text = "";
@@ -87,7 +149,7 @@ function beginDownload() {
                         var filePath = path.sep === '\\' ? result.replace(/\\/g, '/') : result;
                         var sql = 'load data local infile \'' + filePath + '\' into table ' + tableName + ' ignore 1 lines;';
                         console.log('importing ' + value.file + ' to ' + value.table);
-                        var ps = spawn('mysql', ['-e', sql, '-u', 'root', '-p'+settings.password, dbName]);
+                        var ps = spawn('mysql', ['-e', sql, '-u', settings.user, '-p'+settings.password, dbName]);
                         ps.stdout.on('data', function (data) {
                           console.log('stdout: ' + data);
                         });
@@ -151,7 +213,13 @@ function beginDownload() {
   });
 }
 
-var settings = {user : 'root', password : process.argv[process.argv.length - 1], multipleStatements: true, debug : false};
+var settings = {
+  user : 'root', 
+  password : process.argv[process.argv.length - 1], 
+  multipleStatements: true, 
+  debug : false
+};
+
 var ftpBaseDir = '/pub/time.series/';
 var tmpDir = path.join(os.tmpDir(), makeid());
 var dbName = 'bls';
@@ -171,3 +239,7 @@ fs.mkdir(tmpDir, function (error) {
     beginDownload();
   }
 });
+
+Database.instance = new Database();
+
+module.exports = Database.instance;

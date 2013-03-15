@@ -3,7 +3,23 @@ var http = require('http'),
   fs = require('fs'),
   path = require('path'),
   mysql = require('mysql'),
-  less = require('less');
+  less = require('less'),
+  envious = require('envious');
+
+envious.development = 
+{
+  "db_host" : "localhost",
+  "static_host" : "http://bls-webstatic01.s3-website-us-east-1.amazonaws.com/"
+}
+
+envious.production = 
+{
+  "db_host" : "bls.cyppjw0vapjp.us-west-2.rds.amazonaws.com",
+  "static_host" : "http://bls-webstatic01.s3-website-us-east-1.amazonaws.com/",
+  "site_url": "http://labs.brightdigit.com/bls",
+}
+
+var env = envious.apply({strict: true});
 
 var lessConfig = {
   baseDirectory : 'app/static/less',
