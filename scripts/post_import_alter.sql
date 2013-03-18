@@ -738,6 +738,7 @@ INSERT INTO `ap_area_groups` VALUES
 ('X400',4);
 
 GRANT SELECT ON bls.* TO 'bls_user'@'localhost' identified by 'HhI*+5oP:(X~}@-';
+GRANT SELECT ON bls.* TO 'bls_maintence'@'localhost' identified by 'HhI*+5oP:(X~}@-';
 
 select 
     item_code, qty_str, unit_id

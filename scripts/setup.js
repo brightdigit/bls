@@ -2,14 +2,18 @@
 // deploy database
 // deploy static files
 var envious = require('envious'),
-	client = require('./client'),
-	//database = require('./database'),
-	statics = require('./statics'),
-	testing = require('./testing');
+  client = require('./client'),
+  //database = require('./database'),
+  statics = require('./statics'),
+  testing = require('./testing');
 
 envious.development = 
 {
-  "db_host" : "localhost"
+  database : {
+    "host" : "localhost",
+    "user_name" : "bls_maintence",
+    "password" : "HhI*+5oP:(X~}@-"
+  }
 }
 
 envious.production = 
