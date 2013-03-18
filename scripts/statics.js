@@ -2,6 +2,20 @@ var AWS = require('aws-sdk'),
   fs = require('fs'),
   path = require('path');
 AWS.config.loadFromPath('./aws.json');
+
+var mimeTypes = {
+  "html": "text/html",
+  "jpeg": "image/jpeg",
+  "jpg": "image/jpeg",
+  "png": "image/png",
+  "js": "text/javascript",
+  "css": "text/css",
+  "ico": "image/x-icon",
+  "pde": "text/plain",
+  "ttf": "font/opentype",
+  "less": "stylesheet/less",
+  "svg": "image/svg+xml"
+};
 /*
 AWS.config.update({ 
   "accessKeyId": "AKIAJDXH7S5YRZMJMINQ", 
@@ -47,10 +61,13 @@ Statics.prototype = {
         if (error) {
           cb({error : error, filename : filename});
         } else {
+          //console.log(that.getMimeType(filename));
           var obj = {
-            Bucket : 'bls-webstatic01',
+            Bucket : 'bls.labs.brightdigit.com',
             Key : filename,
-            Body: data
+            Body: data,
+            ACL:'public-read',
+            ContentType : that.getMimeType(filename)
           };
           //console.log('uploading ' + filename);
           client.putObject(obj, function(error, res) {
@@ -62,6 +79,15 @@ Statics.prototype = {
           });
         }
       });
+    }
+  },
+  getMimeType : function (filename) {
+    console.log(filename);
+    var comps = filename.split('.');
+    var ext = comps[comps.length - 1];
+    if (ext) {
+      ext = ext.toLowerCase();
+      return mimeTypes[ext];
     }
   },
     /*
@@ -99,7 +125,7 @@ Statics.prototype = {
               if (!--pending) done(null, results);
             }
           } else {
-            if (filename[0] !== '.') {
+            if (filename[0] !== '.' && that.getMimeType(filename)) {
               file = path.relative(root, file);
               results.push(file);
             }
