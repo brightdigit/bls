@@ -1,5 +1,6 @@
 var AWS = require('aws-sdk'),
   fs = require('fs'),
+  less = require('less'),
   path = require('path');
 AWS.config.loadFromPath('./aws.json');
 
@@ -16,6 +17,14 @@ var mimeTypes = {
   "less": "stylesheet/less",
   "svg": "image/svg+xml"
 };
+
+
+var lessConfig = {
+  baseDirectory : 'app/static/less',
+  files : {
+    style : 'app'
+  }
+};
 /*
 AWS.config.update({ 
   "accessKeyId": "AKIAJDXH7S5YRZMJMINQ", 
@@ -30,9 +39,29 @@ function Statics () {
 
 Statics.prototype = {
   setup : function (env) {
+    var that = this;
+    fs.readFile(path.join(lessConfig.baseDirectory, lessConfig.files.style + '.less'),function(error,data){
+      data = data.toString();
+      var cd = process.cwd();
+      process.chdir(lessConfig.baseDirectory);
+      less.render(data, function (e, css) {
+        fs.writeFile('../style.css', css, function (err) {
+          if (err) throw err;
+          that.beginFiles(env, function (error) {
+            if (error) {
+              console.log(error);
+            }
+          });
+        });
+      });
+    });
+  },
+
+  beginFiles : function (env, cb) {
     var s3 = new AWS.S3();
     var that = this;
-    this.walk('app/static', function (error, results) {
+    this.walk('..', function (error, results) {
+      console.log(error);
       if (!error) {
         var maxqueue = 10;
         var queue = 0;
@@ -40,10 +69,9 @@ Statics.prototype = {
         var done = 0;
         console.log('beginning upload of ' + results.length + ' files...');
         //results.forEach( function (filename, index, array) {
-          that.uploadFile(s3.client, results, 'app/static', 'bls-webstatic01', function (error) {
-            if (error) {
-              console.log(error);
-            }
+          that.uploadFile(s3.client, results, '..', 'bls-webstatic01', function (error) {
+            
+              cb(error);
           });
         //});
       }
@@ -61,10 +89,10 @@ Statics.prototype = {
         if (error) {
           cb({error : error, filename : filename});
         } else {
-          //console.log(that.getMimeType(filename));
+          console.log(filename.replace(/\\/g,'/'));
           var obj = {
             Bucket : 'bls.labs.brightdigit.com',
-            Key : filename,
+            Key : filename.replace(/\\/g,'/'),
             Body: data,
             ACL:'public-read',
             ContentType : that.getMimeType(filename)
@@ -82,7 +110,6 @@ Statics.prototype = {
     }
   },
   getMimeType : function (filename) {
-    console.log(filename);
     var comps = filename.split('.');
     var ext = comps[comps.length - 1];
     if (ext) {
@@ -115,8 +142,7 @@ Statics.prototype = {
               filename !== 'src' && 
               filename !== 'dist' && 
               filename !== 'tools' && 
-              filename !== 'feature-detects'&& 
-              filename !== 'build') {
+              filename !== 'feature-detects') {
               that.walk(file, function(err, res) {
                 results = results.concat(res);
                 if (!--pending) done(null, results);
