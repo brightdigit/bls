@@ -28,7 +28,10 @@ define('bls',[
   'daterangepicker',
   'jquery.cookie'
   ], function($, Processing, wait) {
-    var host = '//app.bls.labs.brightdigit.com';
+    var hosts = {
+      'bls.labs.brightdigit.com' : 'app.bls.labs.brightdigit.com'
+    };
+    var host = hosts[window.location.hostname] || '';
     var bls = (function () {
       var my = {
         data : {
