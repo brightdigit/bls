@@ -333,16 +333,21 @@ bls.prototype = {
     console.log(req.url);
 
     if(req.url == '/') {
-      fs.readFile(path.join(__dirname, 'static', 'index.html'), function(err, data) {
-        if(err) {
-          res.writeHead(404);
-        } else {
-          res.writeHead(200, {
-            'Content-Type': 'text/html'
-          });
-        }
-        res.end(data);
-      });
+      if (env.listen === '/tmp/bls.socket') {
+	res.writeHead(200); 
+	res.end();
+      } else {
+      	fs.readFile(path.join(__dirname, 'static', 'index.html'), function(err, data) {
+          if(err) {
+            res.writeHead(404);
+          } else {
+            res.writeHead(200, {
+              'Content-Type': 'text/html'
+            });
+          }
+          res.end(data);
+        });
+      }
     } else if(pathSplit[1] === 'css' && (lessBase = lessConfig.files[pathSplit[0].substr(1)]) ) {
       fs.readFile(path.join(lessConfig.baseDirectory, lessBase + '.less'),function(error,data){
         data = data.toString();
