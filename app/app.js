@@ -49,7 +49,7 @@ var connection = mysql.createConnection({
   password: 'HhI*+5oP:(X~}@-',
   database: 'bls',
   host : env.host,
-  debug: true
+  debug: false
 });
 
 var requireReferer = false;
@@ -83,7 +83,7 @@ var bls = function() {
     password: 'HhI*+5oP:(X~}@-',
     database: 'bls',
     host : env.host,
-    debug: true
+    debug: false
   });
 
   //var requireReferer = true;

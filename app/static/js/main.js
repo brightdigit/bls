@@ -32,6 +32,9 @@ define('bls',[
       'bls.labs.brightdigit.com' : 'app.bls.labs.brightdigit.com'
     };
     var host = hosts[window.location.hostname] || '';
+    if (host !== '') {
+      host = '//' + host;
+    }
     var bls = (function () {
       var my = {
         data : {
@@ -213,13 +216,11 @@ define('bls',[
             my.canvas.width(my.canvas.parent().width());
             my.canvas.height($('footer').offset().top - 100);
             
-            //my.getProcessingJS().size(my.canvas.width(), my.canvas.height());
-            //my.getProcessingJS().update();
+            if (my.pjs) {
+              my.pjs.size(my.canvas.width(), my.canvas.height());
+            }
           });
-            //my.canvas.height($('footer').offset().top - 80);            //my.getProcessingJS().size(my.canvas.width(), my.canvas.height());
-
           var hash = (window.location.hash ? window.location.hash : '#home');
-            //my.getProcessingJS().size(my.canvas.width(), my.canvas.height());
           $(hash).show();
         },
         load: function () {
