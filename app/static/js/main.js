@@ -565,7 +565,7 @@ define('bls',[
         start: function() {
           var that = this;
 
-          var request = $.get(host + 'data', this.formatParameters(this.parameters), function(data) {
+          var request = $.get(host + '/data', this.formatParameters(this.parameters), function(data) {
             that.callback(that, data);
           });
 
