@@ -27,7 +27,8 @@ define('bls',[
   'datejs',
   'daterangepicker',
   'jquery.cookie'
-  ], function($, Processing, wait){
+  ], function($, Processing, wait) {
+    var host = '//app.bls.labs.brightdigit.com';
     var bls = (function () {
       var my = {
         data : {
@@ -304,7 +305,7 @@ define('bls',[
           });
         },
         pullData: function () {
-          $.get('/available', function (data) {
+          $.get(host + '/available', function (data) {
             my.data.available = new my.availablity(data);
             var item_group = $('[name=item_group]'),
               area_group = $('[name=area_group]');
@@ -314,7 +315,7 @@ define('bls',[
             my._dataReady = true;
             my.getProcessingJS();
           });
-          $.get('/items', function (data) {
+          $.get(host + '/items', function (data) {
             my.data.items = data;
             my.data.item_map = {};
 
@@ -325,7 +326,7 @@ define('bls',[
               }
             }
           });
-          $.get('/areas', function (data) {
+          $.get(host + '/areas', function (data) {
             my.data.areas = data;
           });
         },
@@ -356,7 +357,7 @@ define('bls',[
                 }
               }, 250);},
               function (success) {
-                $.get('/available', function (data) {
+                $.get(host + '/available', function (data) {
                   my.data.available = new my.availablity(data);
                   var item_group = $('[name=item_group]'),
                   area_group = $('[name=area_group]');
@@ -367,7 +368,7 @@ define('bls',[
                 });
               }, 
               function (success) {
-                $.get('/items', function (data) {
+                $.get(host + '/items', function (data) {
                   my.data.items = data;
                   my.data.item_map = {};
 
@@ -381,7 +382,7 @@ define('bls',[
                 });
               }, 
               function (success) {
-                $.get('/areas', function (data) {
+                $.get(host + '/areas', function (data) {
                   my.data.areas = data;
                   success();
                 });
@@ -564,7 +565,7 @@ define('bls',[
         start: function() {
           var that = this;
 
-          var request = $.get('data', this.formatParameters(this.parameters), function(data) {
+          var request = $.get(host + 'data', this.formatParameters(this.parameters), function(data) {
             that.callback(that, data);
           });
 
