@@ -9,14 +9,16 @@ var http = require('http'),
 envious.development = 
 {
   "db_host" : "localhost",
-  "static_host" : "http://bls-webstatic01.s3-website-us-east-1.amazonaws.com/"
+  "static_host" : "http://bls-webstatic01.s3-website-us-east-1.amazonaws.com/",
+  "listen" : 3000
 }
 
 envious.production = 
 {
-  "db_host" : "bls.cyppjw0vapjp.us-west-2.rds.amazonaws.com",
+  "host" : "bls.cyppjw0vapjp.us-west-2.rds.amazonaws.com",
   "static_host" : "http://bls-webstatic01.s3-website-us-east-1.amazonaws.com/",
   "site_url": "http://labs.brightdigit.com/bls",
+  "listen": "/tmp/bls.socket"
 }
 
 var env = envious.apply({strict: true});
@@ -46,10 +48,11 @@ var connection = mysql.createConnection({
   user: 'bls_user',
   password: 'HhI*+5oP:(X~}@-',
   database: 'bls',
-  debug: false
+  host : env.host,
+  debug: true
 });
 
-var requireReferer = true;
+var requireReferer = false;
 
 connection.config.queryFormat = function(query, values) {
   if(!values) return query;
@@ -79,7 +82,8 @@ var bls = function() {
     user: 'bls_user',
     password: 'HhI*+5oP:(X~}@-',
     database: 'bls',
-    debug: false
+    host : env.host,
+    debug: true
   });
 
   //var requireReferer = true;
@@ -121,7 +125,8 @@ bls.controller.prototype = {
         var data = bls.controller.prototype.groupBy(bls.controller.prototype.jsonConvert(results, that.jsonFields), that.groupNames);
         data = that.callback ? data.map(that.callback) : data;
         res.writeHead(200, {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+	  'Access-Control-Allow-Origin' : 'http://bls.labs.brightdigit.com'
         });
         res.end(bls.controller.prototype.stringify(data));
       }
@@ -302,9 +307,10 @@ bls.controllers = {
 };
 
 bls.prototype = {
-  startServer: function(port) {
+  startServer: function() {
     var that = this;
-    http.createServer(this.handle.bind(this)).listen(3000);
+    console.log(env);
+    http.createServer(this.handle.bind(this)).listen(env.listen);
   },
   mimeTypes : {
     "html": "text/html",
