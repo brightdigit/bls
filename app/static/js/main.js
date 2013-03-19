@@ -231,7 +231,7 @@ define('bls',[
             startDate: new Date($('[name=startDate]').val()),
             endDate: new Date($('[name=endDate]').val())
           };
-
+          $('#controls input, #controls select').attr('disabled', true);
           var request = new my.DataRequest(parameters);
           request.on('end', my.onload);
           request.on('error', my.onerror);
@@ -243,6 +243,9 @@ define('bls',[
         onload: function (request) {
           if (request.data) {
             my.pjs.loadData(request.data);
+            $('#controls input, #controls select').filter(function () {
+              return this.nodeName !== 'SELECT' || $(this).children('option').length > 1;
+            }).removeAttr('disabled');
           }
         },
         calculateRange: function (available, previous, newStart, newEnd) {
