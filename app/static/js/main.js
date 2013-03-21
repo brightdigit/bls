@@ -605,6 +605,11 @@ define('bls',[
   define('bls', ['jquery', 'modernizr'] , function ($) {    
     $('body').addClass('incompatible');
     $('footer div.row-fluid').appendTo($('#support .container-fluid')).addClass('notfooter');
+    function resizeIElogo () {
+      $('#ie-logo').height($('#ie-logo').next().height());
+    }
+    $(window).resize(resizeIElogo);
+    $(window).load(resizeIElogo);
   });
 }
 

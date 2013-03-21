@@ -8,8 +8,9 @@
     "datejs": null,
     "jquery": null,
     "jquery.cookie": null,
-    "modernizr": null,
     "processingjs": null,
-    "requirejs": null
+    "requirejs": null,
+    "html5shiv": null,
+    "browser-logos":"git://github.com/paulirish/browser-logos.git"
   }
 }
