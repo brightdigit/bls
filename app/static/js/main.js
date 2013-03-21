@@ -207,13 +207,24 @@ define('bls',[
           $(window).resize(function () {
             var controls = $('#controls'),
               vpParent = $('#viewport-parent');
-
+/*
             if ($(window).width() >= 1650) {
               controls.removeClass('span3 span4').addClass('span2');
               vpParent.removeClass('span9 span8').addClass('span10');
+              $('#smallForm > .accordion-inner > form').appendTo($('#controls > .well')); 
             } else if ($(window).width() >=  1024) {
               controls.removeClass('span4 span2').addClass('span3');
-              vpParent.removeClass('span8 span10').addClass('span9');              
+              vpParent.removeClass('span8 span10').addClass('span9');   
+              $('#smallForm > .accordion-inner > form').appendTo($('#controls > .well'));            
+            } else {
+              vpParent.removeClass('span8 span9 span10').addClass('span12'); 
+              $('.well > form').appendTo($('#smallForm > .accordion-inner')); 
+            }*/
+
+            if ($(window).width() >=  979) {
+              $('#smallForm > .accordion-inner > form').appendTo($('#controls > .well'));            
+            } else {
+              $('.well > form').appendTo($('#smallForm > .accordion-inner')); 
             }
 
             my.canvas.width(my.canvas.parent().width());
@@ -223,6 +234,12 @@ define('bls',[
               my.pjs.size(my.canvas.width(), my.canvas.height());
             }
           });
+
+            if ($(window).width() >=  979) {
+              $('#smallForm > .accordion-inner > form').appendTo($('#controls > .well'));            
+            } else {
+              $('.well > form').appendTo($('#smallForm > .accordion-inner')); 
+            }
           var hash = (window.location.hash ? window.location.hash : '#home');
           $(hash).show();
         },
