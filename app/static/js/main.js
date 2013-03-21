@@ -232,6 +232,7 @@ define('bls',[
             endDate: new Date($('[name=endDate]').val())
           };
           $('#controls input, #controls select').attr('disabled', true);
+          my.pjs.beginLoadingState();
           var request = new my.DataRequest(parameters);
           request.on('end', my.onload);
           request.on('error', my.onerror);
@@ -358,6 +359,7 @@ define('bls',[
             function (success) {
               var interval = setInterval(function () {
                 if (my.verifyPjs()) {
+                  my.pjsReady();
                   console.log('ready');
                   clearInterval(interval);
                   success();
@@ -416,6 +418,7 @@ define('bls',[
           var pjs = Processing.getInstanceById(my.canvas.attr('id'));
           if (pjs && pjs.initialize) {
             my.pjs = pjs;
+            my.pjs.size();
           } 
           return my.pjs;
         },
