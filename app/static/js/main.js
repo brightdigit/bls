@@ -9,7 +9,8 @@ requirejs.config({
     daterangepicker : 'bootstrap-daterangepicker/daterangepicker',
     'jquery.cookie' : 'jquery.cookie/jquery.cookie',
     processingjs : 'processingjs/processing',
-    'wait' : '../wait'
+    'wait' : '../wait',
+    'modernizr' : 'modernizr/modernizr'
   },
   shim: {
     'bootstrap':{deps: ['jquery'], exports : 'jquery'},
@@ -18,7 +19,9 @@ requirejs.config({
     'processingjs' : {exports : 'Processing'}
   }
 });
- 
+
+if ([].forEach && document.createElement('canvas').getContext) {
+
 define('bls',[
   'jquery', 
   'processingjs',
@@ -598,6 +601,12 @@ define('bls',[
     // this is where all the site code should begin
     return bls;
 });
+} else {
+  define('bls', ['jquery', 'modernizr'] , function ($) {    
+    $('body').addClass('incompatible');
+    $('footer div.row-fluid').appendTo($('#support .container-fluid')).addClass('notfooter');
+  });
+}
 
 if (!QUnit) {
   require(['bls']);
