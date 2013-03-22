@@ -263,6 +263,7 @@ define('bls',[
             endDate: new Date($('[name=endDate]').val())
           };
           $('#controls input, #controls select').attr('disabled', true);
+          $('#progress-bar').slideDown();
           my.pjs.beginLoadingState();
           var request = new my.DataRequest(parameters);
           request.on('end', my.onload);
@@ -278,6 +279,7 @@ define('bls',[
             $('#controls input, #controls select').filter(function () {
               return this.nodeName !== 'SELECT' || $(this).children('option').length > 1;
             }).removeAttr('disabled');
+          $('#progress-bar').slideUp();
           }
         },
         calculateRange: function (available, previous, newStart, newEnd) {
@@ -434,6 +436,7 @@ define('bls',[
               my.pjs.size(my.canvas.width(), my.canvas.height());
               $('[name=item_group]').removeAttr('disabled');
               $('[name=dateRange]').removeAttr('disabled');
+              $('#progress-bar').slideUp();
             }
           );
         },
