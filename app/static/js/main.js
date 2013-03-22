@@ -198,16 +198,20 @@ define('bls',[
 
         },
         setupPages: function () {
-          $('a.link').click(function () {
-            $(this).parents('ul').find('li.active').removeClass('active');
-            $(this).parent('li').addClass('active');
-            $('.page').fadeOut();
-            $($(this).attr('href')).fadeIn();
-          });
-          $(window).resize(function () {
             var controls = $('#controls'),
-              vpParent = $('#viewport-parent');
-/*
+              vpParent = $('#viewport-parent')
+          $('a.link').click(function () {
+            var page = $(this).attr('href');
+
+            if (page.length > 0) {
+              $(this).parents('ul').find('li.active').removeClass('active');
+              $(this).parent('li').addClass('active');
+              $('.page').fadeOut();
+              $(page).fadeIn();
+            }
+          });
+          $(window).resize(function () {;
+/*        
             if ($(window).width() >= 1650) {
               controls.removeClass('span3 span4').addClass('span2');
               vpParent.removeClass('span9 span8').addClass('span10');
@@ -222,9 +226,11 @@ define('bls',[
             }*/
 
             if ($(window).width() >=  979) {
-              $('#smallForm > .accordion-inner > form').appendTo($('#controls > .well'));            
+              $('#smallForm > .accordion-inner > form').appendTo($('#controls > .well'));  
+              vpParent.removeClass('span12').addClass('span8'); 
             } else {
-              $('.well > form').appendTo($('#smallForm > .accordion-inner')); 
+              $('.well > form').prependTo($('#smallForm > .accordion-inner')); 
+              vpParent.removeClass('span8').addClass('span12'); 
             }
 
             my.canvas.width(my.canvas.parent().width());
@@ -232,13 +238,18 @@ define('bls',[
             
             if (my.pjs) {
               my.pjs.size(my.canvas.width(), my.canvas.height());
+              my.pjs.update();
             }
           });
 
+            
+            
             if ($(window).width() >=  979) {
-              $('#smallForm > .accordion-inner > form').appendTo($('#controls > .well'));            
+              $('#smallForm > .accordion-inner > form').appendTo($('#controls > .well'));  
+              vpParent.removeClass('span12').addClass('span8'); 
             } else {
-              $('.well > form').appendTo($('#smallForm > .accordion-inner')); 
+              $('.well > form').prependTo($('#smallForm > .accordion-inner')); 
+              vpParent.removeClass('span8').addClass('span12'); 
             }
           var hash = (window.location.hash ? window.location.hash : '#home');
           $(hash).show();

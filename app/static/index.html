@@ -42,15 +42,16 @@
       <div class="container-fluid">
         <div class="row-fluid">
           <div class="span12 hidden-desktop">
-            <div class="accordion">
+            <div id="settingsForm" class="accordion">
               <div class="accordion-group">
                 <div class="accordion-heading">
                   <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion2" href="#smallForm">
-                    Settings...
+                    Settings... 
                   </a>
                 </div>
                 <div id="smallForm" class="accordion-body collapse">
                   <div class="accordion-inner">
+                  <a id="viewport-button" href="#viewport-parent">View</a>
                   </div>
                 </div>
               </div>
@@ -94,6 +95,7 @@
             </div><!--/.well -->
           </div><!--/span-->
           <div id="viewport-parent" class="span8">
+            <div class="hidden-desktop"><a href="#settingsForm">Settings</a></div>
             <div class="bls-viewport" data-src="data"></div>
           </div><!--/span-->
         </div><!--/row-->
