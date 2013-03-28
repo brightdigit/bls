@@ -9,7 +9,7 @@ requirejs.config({
     daterangepicker : 'bootstrap-daterangepicker/daterangepicker',
     'jquery.cookie' : 'jquery.cookie/jquery.cookie',
     processingjs : 'processingjs/processing',
-    'wait' : '../wait',
+    'wait' : 'waitjs/wait',
     'modernizr' : 'modernizr/modernizr'
   },
   shim: {

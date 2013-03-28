@@ -11,6 +11,7 @@
     "processingjs": null,
     "requirejs": null,
     "html5shiv": null,
+    "waitjs":null,
     "browser-logos":"git://github.com/paulirish/browser-logos.git"
   }
 }
