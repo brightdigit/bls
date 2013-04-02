@@ -24,17 +24,20 @@ Client.prototype = {
         if (err) console.log(err);
       })
       .on('end', function (data) {
+        console.log('installed bower packages...');
         for (var key in makeDeps) {
           value = makeDeps[key] ? makeDeps[key] : [];
           process.chdir(path.join(vendorDirectory, key));
-          npm.load({}, function (er) {
+          npm.load({ 
+            production : false,
+            loglevel : 'warn'
+          }, function (er) {
             if (er) return handlError(er)
             npm.commands.install([], function (er, data) {
               if (er) return commandFailed(er)
 
               var ps = spawn('make', value);
               ps.stdout.on('data', function (data) {
-                //console.log(data);
               });
 
               ps.stderr.on('data', function (data) {

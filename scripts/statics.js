@@ -2,7 +2,6 @@ var AWS = require('aws-sdk'),
   fs = require('fs'),
   less = require('less'),
   path = require('path');
-AWS.config.loadFromPath('./aws.json');
 
 var mimeTypes = {
   "html": "text/html",
@@ -38,8 +37,16 @@ function Statics () {
 }
 
 Statics.prototype = {
+  _configloaded : false,
+  loadConfig : function (env) {
+    if (!Statics.prototype._configloaded) {
+      AWS.config.loadFromPath('./aws.json');
+      Statics.prototype._configloaded = true;
+    }
+  },
   setup : function (env) {
     var that = this;
+    this.loadConfig();
     fs.readFile(path.join(lessConfig.baseDirectory, lessConfig.files.style + '.less'),function(error,data){
       data = data.toString();
       var cd = process.cwd();
