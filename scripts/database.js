@@ -5,11 +5,130 @@ var ftp = require('ftp-get'),
   fs = require('fs'),
   spawn = require('child_process').spawn;
 
+/*
 if (process.argv.length < 3) {
   console.log(process.argv[0] + ' ' + __filename + ' (-f) dbpassword');
   process.exit(1); 
 }
+*/
 
+var Database = (function () {
+
+  var dbName = 'bls';
+
+  function merge_options(obj1,obj2){
+      var obj3 = {};
+      for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
+      for (var attrname in obj2) { obj3[attrname] = obj2[attrname]; }
+      return obj3;
+  }
+
+  function makeid()
+  {
+      var text = "";
+      var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+      for( var i=0; i < 5; i++ )
+          text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+      return text;
+  }
+
+  var setup = function (env, debug) {
+    this.env = env;
+    this.debug = debug;
+  };
+
+  setup.prototype = {
+    begin : function () {
+      this.connect();
+    },
+    executeScript : function (filename, cb) {
+      var connection = this.connection;
+
+      fs.readFile(path.resolve(__dirname, filename), 'UTF-8', 
+        function (error, data) {
+          if (error) {
+            cb(error);
+          } else {
+            connection.query(data, cb);  
+          }
+        }
+      );
+    },
+    connect : function () {
+      console.log('yep');
+      this.connection = mysql.createConnection(
+        merge_options(this.env.database, {
+          multipleStatements: true, 
+          debug : this.debug
+        }));
+      this.connection.connect(this.tmpDir.bind(this));
+    },
+    tmpDir : function (error) {
+      console.log(error);
+      console.log('yep');
+      this.tmpDirPath = path.join(os.tmpDir(), makeid());
+      console.log(this.dropDb);
+      fs.mkdir(this.tmpDirPath, this.dropDb.bind(this));
+    },
+    dropDb : function (error) {
+      console.log(error);
+      console.log('yep');
+      this.connection.query(
+        'DROP SCHEMA if exists ' + dbName + '; CREATE SCHEMA ' + dbName + '; GRANT ALL PRIVILEGES ON '+dbName+'.* To \'' + this.env.database.user + '\'@\'localhost\'',
+        this.changeUser.bind(this));
+    },
+    changeUser : function (error) {
+      console.log(error);
+      console.log('created');
+      this.connection.changeUser({database : dbName}, this.initializeDb.bind(this));
+    },
+    initializeDb : function (error) {
+      console.log(error);
+      this.executeScript('init_db.sql', this.tablesBuildQuery.bind(this));
+    },
+    tablesBuildQuery : function (error, results) {
+      console.log(error);
+      this.connection.query(
+        "select concat('create table ', table_name, '(', group_concat(concat_ws(' ',column_name, column_type, IF(nullable,'DEFAULT NULL','NOT NULL'))), ');') as value from meta group by table_name",
+        this.buildTables.bind(this));
+    },
+    buildTables : function (error, results) {
+      console.log(error);
+      this.connection.query(
+        results.map(function (current) {return current.value;}).join(''), 
+        this.beginImport.bind(this));
+    },
+    beginImport : function (error, results) {
+      this.connection.query('SELECT * from import', this.beginDownload.bind(this));
+    },
+    beginDownload : function (error, results) {
+      console.log('beginDownload'); 
+    }
+
+
+  };
+
+  var my = function () {
+
+  };
+
+  my.prototype = {
+    setup : function (env) {
+      (new setup(env)).begin();
+    }
+  };
+
+
+  my.instance = new my();
+
+  return my;
+})();
+
+module.exports = Database.instance;
+
+/*
 function Database () {
 
 }
@@ -56,11 +175,7 @@ Database.prototype = {
   },
   initDb : function (env) {
     var that = this;
-    fs.readFile(path.resolve(__dirname, 'init_db.sql'), 'UTF-8', function (error, data) {
-      connection.query(data, function (error, results) {
-        that.createTables(env);
-      });
-    });
+    this.executeScript(this.connection, 'init_db.sql', this.createTables);
   },
   executeScript : function (connection, filename, cb) {
     fs.readFile(path.resolve(__dirname, filename), 'UTF-8', function (error, data) {
@@ -211,6 +326,19 @@ Database.parseValue = function(str) {
   }
   return 1;
 };
+
+(function (Database) {
+  var env; 
+  Database.ActiveSetup = function (env) {
+
+  };
+
+  Database.ActiveSetup.prototype = {
+
+  };
+})(Database);
+
+
 
 function makeid()
 {
@@ -383,3 +511,4 @@ fs.mkdir(tmpDir, function (error) {
 Database.instance = new Database();
 
 module.exports = Database.instance;
+*/
