@@ -258,7 +258,7 @@ insert into ap_item_groups values
 ('snacks'),
 ('meat'),
 ('dairy'),
-('fruits and vegatables'),
+('fruits and vegetables'),
 ('condiments'),
 ('drinks'),
 ('energy');

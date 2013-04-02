@@ -62,6 +62,21 @@ Database.prototype = {
       });
     });
   },
+  executeScript : function (connection, filename, cb) {
+    fs.readFile(path.resolve(__dirname, filename), 'UTF-8', function (error, data) {
+      if (error) {
+        cb(error, data);
+      } else {
+        connection.query(data, function (error, results) {
+          cb(error, results);
+        });
+      }
+    });
+  },
+  createTables : function (env) {
+    connection.query("select concat('create table ', table_name, '(', group_concat(concat_ws(' ',column_name, column_type, IF(nullable,'DEFAULT NULL','NOT NULL'))), ');') as value from meta group by table_name", function (error, results) {
+
+  },
   download : function () {
     if (error) {
       console.log(error);
