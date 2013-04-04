@@ -53,7 +53,7 @@ var Client = (function () {
       if (error) {
         this.onError(error);
         return;
-}
+      }
       console.log('clearing cache...');
       bower.commands['cache-clean']()
         .on('data', setup.prototype.onData.bind(this))
