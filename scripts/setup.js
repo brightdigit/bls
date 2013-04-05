@@ -2,6 +2,7 @@
 // deploy database
 // deploy static files
 var envious = require('envious'),
+  async = require('async'),
   client = require('./client'),
   database = require('./database'),
   statics = require('./statics'),
@@ -18,14 +19,25 @@ envious.development =
 
 envious.production = 
 {
-  "db_host" : "bls.cyppjw0vapjp.us-west-2.rds.amazonaws.com",
-  "static_host" : "http://bls-webstatic01.s3-website-us-east-1.amazonaws.com/",
-  "site_url": "http://labs.brightdigit.com/bls",
+  database : {
+    "db_host" : "bls.cyppjw0vapjp.us-west-2.rds.amazonaws.com",
+    "user" : "bls_maintence",
+    "password" : "HhI*+5oP:(X~}@-"
+  },
+  statics : {
+    "bucket" : "bls.labs.brightdigit.com"
+  }
+  //"site_url": "http://labs.brightdigit.com/bls",
 }
 
 var env = envious.apply({strict: true});
 
+async.parallel([
+client.setup.bind(undefined, env, true),
+//database.setup.bind(undefined, env, false),  
+]);
+console.log('completed setup.')
 //client.setup(env, true);
-database.setup(env, false);
+//database.setup(env, false);
 //statics.setup(env);
 //testing.setup(env);
