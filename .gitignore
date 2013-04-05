@@ -41,3 +41,5 @@ app/static/js/vendor
 test/client/js/vendor
 
 /app/static/style.css
+
+!/scripts/*.*

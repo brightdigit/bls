@@ -26,6 +26,6 @@ envious.production =
 var env = envious.apply({strict: true});
 
 //client.setup(env, true);
-database.setup(env);
+database.setup(env, false);
 //statics.setup(env);
 //testing.setup(env);

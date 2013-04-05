@@ -1,4 +1,4 @@
-GRANT ALL ON bls.* TO 'bls_maintence'@'localhost' identified by 'HhI*+5oP:(X~}@-';
+-- GRANT ALL ON bls.* TO 'bls_maintence'@'localhost' identified by 'HhI*+5oP:(X~}@-';
 
 drop table if exists meta;
 drop table if exists import;

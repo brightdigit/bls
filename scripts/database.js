@@ -15,12 +15,32 @@ if (process.argv.length < 3) {
 var Database = (function () {
 
   var dbName = 'bls';
+  var node_env = process.env.NODE_ENV;
 
-  function merge_options(obj1,obj2){
-      var obj3 = {};
-      for (var attrname in obj1) { obj3[attrname] = obj1[attrname]; }
-      for (var attrname in obj2) { obj3[attrname] = obj2[attrname]; }
-      return obj3;
+  function merge_options(obj1, obj2) {
+    for (var p in obj2) {
+      try {
+        // Property in destination object set; update its value.
+        if ( obj2[p].constructor==Object ) {
+          obj1[p] = merge_options(obj1[p], obj2[p]);
+
+        } else {
+          obj1[p] = obj2[p];
+
+        }
+
+      } catch(e) {
+        // Property in destination object not set; create it and set its value.
+        obj1[p] = obj2[p];
+
+      }
+    }
+
+    return obj1;
+  }
+
+  function getFirstValue (obj) {
+    return obj[Object.keys(obj)[0]];
   }
 
   function makeid()
@@ -89,7 +109,8 @@ var Database = (function () {
       this.connection = mysql.createConnection(
         merge_options(this.env.database, {
           multipleStatements: true, 
-          debug : this.debug
+          debug : this.debug,
+          database : dbName 
         }));
       this.connection.connect(this.tmpDir.bind(this));
     },
@@ -102,8 +123,30 @@ var Database = (function () {
 
       console.log('making temporary directory...');
       this.tmpDirPath = path.join(os.tmpDir(), makeid());
-      console.log(this.dropDb);
-      fs.mkdir(this.tmpDirPath, this.dropDb.bind(this));
+      fs.mkdir(this.tmpDirPath, this.truncateDb.bind(this));
+    },
+    truncateDb : function (error) {
+
+      if (error) {
+        this.onError(error);
+        return;
+      }
+
+      this.connection.query('show tables', this.dropTables.bind(this));
+    },
+    dropTables : function (error, results) {
+      if (error) {
+        this.onError(error);
+        return;
+      }
+
+      if (results.length > 0) {
+        console.log('dropping all tables...');
+        this.connection.query('drop table ' + results.map(getFirstValue).join(','), this.initializeDb.bind(this));
+      } else {
+        console.log('no tables to drop.');
+        this.initializeDb(error, results);
+      }
     },
     dropDb : function (error) {
 
@@ -136,7 +179,11 @@ var Database = (function () {
       this.executeScript('init_db.sql', this.tablesBuildQuery.bind(this));
     },
     tablesBuildQuery : function (error, results) {
-      console.log(error);
+      if (error) {
+        this.onError(error);
+        return;
+      }
+
       this.connection.query(
         "select concat('create table ', table_name, '(', group_concat(concat_ws(' ',column_name, column_type, IF(nullable,'DEFAULT NULL','NOT NULL'))), ');') as value from meta group by table_name",
         this.buildTables.bind(this));
@@ -187,7 +234,8 @@ var Database = (function () {
       this.fileCounter--;
 
       if (this.fileCounter === 0) {
-        console.log('finished downloading files...');
+        process.env.NODE_ENV = node_env;
+        console.log('indexing and cleaning up data...');
         this.executeScript('post_import_alter.sql', this.beginPostImport.bind(this));
         //fs.readFile(path.resolve(__dirname, 'post_import_alter.sql'), 'UTF-8', this.beginPostImport.bind(this));
       } else {
@@ -195,6 +243,7 @@ var Database = (function () {
       }
     },
     beginPostImport : function (error, results) {
+      console.log(results);
       var quantities = results[results.length - 1].map(
         function (value) {
           return '(' + [
@@ -210,6 +259,7 @@ var Database = (function () {
       this.connection.query(units_sql, this.verifyIntegrity.bind(this));
     },
     verifyIntegrity : function (error) {
+      console.log(results);
       if (error) {
         this.onError(error);
         return;
@@ -233,6 +283,7 @@ var Database = (function () {
       //console.log(value.tmpFile);
       var fullFileName = path.join(directoryPath, value.file);
       var ftpPath = 'ftp://ftp.bls.gov/pub/time.series/' + dirName + '/' + value.file;
+      process.env.NODE_ENV =  'production';
       ftp.get(ftpPath, value.tmpFile, this.loadData.bind(this, value));
     },
     beginDirectoryDownload : function (directoryPath, dirName, directories, error) {
@@ -282,8 +333,8 @@ var Database = (function () {
   };
 
   my.prototype = {
-    setup : function (env) {
-      (new setup(env)).begin();
+    setup : function (env, debug) {
+      (new setup(env, debug)).begin();
     }
   };
 
