@@ -76,6 +76,7 @@ var Client = (function () {
 
       npm.load({ 
           production : false,
+          "dev": true,
           loglevel : 'warn'
         }, 
         this.onNpmLoad.bind(this) 
@@ -90,11 +91,12 @@ var Client = (function () {
       }
 
       console.log('building dependencies...');
-      async.each(Object.keys(this.dependencies), this.makeDependency.bind(this), this.onDepenciesCompleted.bind(this));
+      async.eachSeries(Object.keys(this.dependencies), this.makeDependency.bind(this), this.onDepenciesCompleted.bind(this));
     },
     makeDependency : function (key, cb) {   
       console.log('making ' + key + ' ...');     
       value = this.dependencies[key] ? this.dependencies[key] : [];
+      console.log(path.join(this.vendorDirectory, key));
       process.chdir(path.join(this.vendorDirectory, key));
       this.npmInstall.call(this, key, value, cb);
 
@@ -108,6 +110,7 @@ var Client = (function () {
         return;
       }
       console.log('installing npm dependencies for ' + key + '...');  
+      console.log(npm.config.list);
       npm.commands.install([], this.runMake.bind(this, key, value, cb));        
     },
     runMake : function (key, value, cb, error) {
