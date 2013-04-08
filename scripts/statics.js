@@ -1,6 +1,7 @@
 var AWS = require('aws-sdk'),
   fs = require('fs'),
   less = require('less'),
+  async = require('async'),
   path = require('path');
 
 var mimeTypes = {

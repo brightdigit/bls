@@ -74,9 +74,10 @@ var Database = (function () {
     return 1;
   }
 
-  var setup = function (env, debug) {
+  var setup = function (env, debug, callback) {
     this.env = env;
     this.debug = debug;
+    this.callback = callback;
   };
 
   setup.prototype = {
@@ -270,6 +271,7 @@ var Database = (function () {
         //process.exit(1);
       }
       console.log('database setup completed.');
+      this.callback(error);
     },
     beginDownloadFile : function (directoryPath, dirName, value) {
       //console.log(directoryPath);
@@ -326,8 +328,17 @@ var Database = (function () {
   };
 
   my.prototype = {
-    setup : function (env, debug) {
-      (new setup(env, debug)).begin();
+    setup : function (env, debugOrCallback, callback) {
+      /*
+      console.log('debug');
+      console.log(debug);
+      console.log('callback');
+      console.log(debugOrCallback);
+      */
+      var debug = (typeof(debugOrCallback)) === "function" ? 
+        debug : debugOrCallback;
+      callback = (typeof(debugOrCallback) === "function") ? debugOrCallback : callback;
+      (new setup(env, debug, callback)).begin();
     }
   };
 

@@ -3,6 +3,7 @@ var bower = require('bower'),
   path = require('path'),
   fs = require('fs'),
   rmdir = require('rmdir'),
+  async = require('async'),
   spawn = require('child_process').spawn;
 
 
@@ -15,9 +16,11 @@ var Client = (function () {
 
   my.vendorDirectory = 'app/static/js/vendor';
 
-  var setup = function (env, debug, dependencies, vendorDirectory) {
+  var setup = function (env, debug, callback, dependencies, vendorDirectory) {
+
     this.env = env;
     this.debug = debug;
+    this.callback = callback;
     this.dependencies = dependencies || my.dependencies;
     this.vendorDirectory = vendorDirectory || my.vendorDirectory;
   };
@@ -26,15 +29,23 @@ var Client = (function () {
     begin : function () {
       this.checkVendorDirectory();
     },
-    onData : function (data) {
-      if (this.debug) {console.log(data);}
+    onData : function (data) {      
+      if (this.debug) {console.log('info'); console.log(data);}
     },
     onError : function (error) {
       if (error) {console.log(error);}      
     },
-    onExit : function (code) {
+    onExit : function (cb, code) {
+      code = (typeof(cb) === 'number') ? cb : code;
+      cb = (typeof(cb) === 'number') ? undefined : cb;
       if (code !== 0) {
-        this.onError('ps process exited with code ' + code);
+        if (cb) {
+          cb(code);
+        } else {
+          this.onError('ps process exited with code ' + code);  
+        }
+      } else if (cb) {
+        cb();
       }      
     },
     checkVendorDirectory : function () {
@@ -55,77 +66,47 @@ var Client = (function () {
         return;
       }
       console.log('clearing cache...');
-      bower.commands['cache-clean']()
+      bower.commands['cache-clean'](undefined, {production : true})
         .on('data', setup.prototype.onData.bind(this))
         .on('error', setup.prototype.onError.bind(this))
         .on('end', this.install.bind(this));
     },
     install : function (data) {
       console.log('installing bower packages...');
-    bower.commands
-      .install()
+      bower.commands
+        .install()
         .on('data', setup.prototype.onData.bind(this))
         .on('error', setup.prototype.onError.bind(this))
         .on('end', this.makeDependencies.bind(this));
-        /*
-      .on('data', function (data) {
-      })
-      .on('error', function (err)  {
-        if (err) console.log(err);
-      })
-      .on('end', function (data) {
-        console.log('installed bower packages...');
-        for (var key in makeDeps) {
-          value = makeDeps[key] ? makeDeps[key] : [];
-          process.chdir(path.join(vendorDirectory, key));
-          npm.load({ 
-            production : false,
-            loglevel : 'warn'
-          }, function (er) {
-            if (er) return handlError(er)
-            npm.commands.install([], function (er, data) {
-              if (er) return commandFailed(er)
-
-              var ps = spawn('make', value);
-              ps.stdout.on('data', function (data) {
-              });
-
-              ps.stderr.on('data', function (data) {
-                console.log('ps stderr: ' + data);
-              });
-
-              ps.on('exit', function (code) {
-                if (code !== 0) {
-                  console.log('ps process exited with code ' + code);
-                }
-              });
-            });
-            npm.on("log", function (message) { if (debug) {console.log(message);} });
-          });
-        }
-      });
-      */
+    },
+    onDependenciesCompleted : function (err) {
+      if (err) {
+        console.log(err);
+      } 
+      console.log('completed building client files.');
+      this.callback(err);
+    },
+    beginNpm : function (key, cb) {
+      value = this.dependencies[key] ? this.dependencies[key] : [];
+      process.chdir(path.join(this.vendorDirectory, key));
+      npm.load({ 
+        production : false,
+        loglevel : 'warn'
+      }, this.npmInstall.bind(this, key, value, cb));
     },
     makeDependencies : function (data) {
-      console.log('building dependencies...' + data);
-      for (var key in this.dependencies) {
-        value = this.dependencies[key] ? this.dependencies[key] : [];
-        process.chdir(path.join(this.vendorDirectory, key));
-        npm.load({ 
-          production : false,
-          loglevel : 'warn'
-        }, this.npmInstall.bind(this, key, value));
-      }
+      console.log('building dependencies...');
+      async.each(Object.keys(this.dependencies), this.beginNpm.bind(this), this.onDependenciesCompleted.bind(this));
     },
-    npmInstall : function (key, value, error) {
+    npmInstall : function (key, value, cb, error) {
       if (error) {
         this.onError(error);
         return;
       }
       npm.on("log", this.onData.bind(this));
-      npm.commands.install([], this.makeDependency.bind(this, key, value));        
+      npm.commands.install([], this.makeDependency.bind(this, key, value, cb));        
     },
-    makeDependency : function (key, value, error, data) {
+    makeDependency : function (key, value, cb, error, data) {
       if (error) {
         this.onError(error);
         return;
@@ -133,15 +114,24 @@ var Client = (function () {
 
       var ps = spawn('make', value);
       ps.stdout.on('data', setup.prototype.onData.bind(this));
-      ps.stderr.on('data', setup.prototype.onError.bind(this));
-      ps.on('exit', setup.prototype.onExit.bind(this));
+      ps.stderr.on('data', setup.prototype.onError.bind(this, cb));
+      ps.on('exit', setup.prototype.onExit.bind(this, cb));
     }
   };
 
 
   my.prototype = {
-    setup : function (env, debug) {
-      (new setup(env, debug)).begin();
+    setup : function (env, debugOrCallback, debug) {
+/*
+      console.log('debug');
+      console.log(debug);
+      console.log('callback');
+      console.log(debugOrCallback);
+      */
+      var debug = (typeof(debugOrCallback)) === "function" ? 
+        debug : debugOrCallback;
+      callback = (typeof(debugOrCallback) === "function") ? debugOrCallback : callback;
+      (new setup(env, debug, callback)).begin();
   }
 };
 

@@ -33,10 +33,12 @@ envious.production =
 var env = envious.apply({strict: true});
 
 async.parallel([
-client.setup.bind(undefined, env, true),
-//database.setup.bind(undefined, env, false),  
-]);
-console.log('completed setup.')
+client.setup.bind(undefined, env),
+database.setup.bind(undefined, env, false),  
+], function (error, results) {
+  console.log('completed setup.');
+  process.exit(0);
+});
 //client.setup(env, true);
 //database.setup(env, false);
 //statics.setup(env);
