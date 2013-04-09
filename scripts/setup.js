@@ -32,7 +32,7 @@ envious.production =
 
 var env = envious.apply({strict: true});
 
-async.parallel([
+async.series([
 client.setup.bind(undefined, env),
 database.setup.bind(undefined, env, false),  
 ], function (error, results) {
