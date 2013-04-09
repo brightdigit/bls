@@ -737,8 +737,11 @@ INSERT INTO `ap_area_groups` VALUES
 ('X300',4),
 ('X400',4);
 
-GRANT SELECT ON bls.* TO 'bls_user'@'localhost' identified by 'HhI*+5oP:(X~}@-';
-GRANT ALL ON bls.* TO 'bls_maintence'@'localhost' identified by 'HhI*+5oP:(X~}@-';
+GRANT USAGE ON *.* TO 'bls_user'@'localhost';
+drop user 'bls_user'@'localhost';
+CREATE USER 'bls_user'@'localhost' identified by 'HhI*+5oP:(X~}@-';
+GRANT SELECT ON bls.* TO 'bls_user'@'localhost';
+-- GRANT ALL ON bls.* TO 'bls_maintence'@'localhost' identified by 'HhI*+5oP:(X~}@-';
 FLUSH PRIVILEGES;
 
 select 

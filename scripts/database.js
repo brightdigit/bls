@@ -243,6 +243,11 @@ var Database = (function () {
       }
     },
     beginPostImport : function (error, results) {
+      if (error) {
+        this.onError(error);
+        return;
+      }
+      
       var quantities = results[results.length - 1].map(
         function (value) {
           return '(' + [
