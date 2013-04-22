@@ -14,6 +14,9 @@ envious.development =
     "host" : "localhost",
     "user" : "bls_maintence",
     "password" : "HhI*+5oP:(X~}@-"
+  },
+  statics : {
+    "bucket" : "bls-test.labs.brightdigit.com"
   }
 }
 
@@ -27,15 +30,17 @@ envious.production =
   statics : {
     "bucket" : "bls.labs.brightdigit.com"
   }
-  //"site_url": "http://labs.brightdigit.com/bls",
 }
 
 var env = envious.apply({strict: true});
 
 async.series([
-client.setup.bind(undefined, env),
-database.setup.bind(undefined, env, false),  
+//client.setup.bind(undefined, env),
+//database.setup.bind(undefined, env, false),  
+statics.setup.bind(undefined, env)
 ], function (error, results) {
+  console.log(error);
+      
   console.log('completed setup.');
   process.exit(0);
 });
