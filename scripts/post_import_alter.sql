@@ -739,7 +739,7 @@ INSERT INTO `ap_area_groups` VALUES
 
 GRANT USAGE ON *.* TO 'bls_user'@'localhost';
 drop user 'bls_user'@'localhost';
-CREATE USER 'bls_user'@'localhost' identified by 'HhI*+5oP:(X~}@-';
+CREATE USER 'bls_user'@'localhost' identified by 'friacr=+kIez_az';
 GRANT SELECT ON bls.* TO 'bls_user'@'localhost';
 -- GRANT ALL ON bls.* TO 'bls_maintence'@'localhost' identified by 'HhI*+5oP:(X~}@-';
 FLUSH PRIVILEGES;

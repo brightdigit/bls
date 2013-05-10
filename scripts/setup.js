@@ -13,7 +13,7 @@ envious.development =
   database : {
     "host" : "localhost",
     "user" : "bls_maintence",
-    "password" : "HhI*+5oP:(X~}@-"
+    "password" : "Di=Driut=U89I!s"
   },
   statics : {
     "bucket" : "bls-test.labs.brightdigit.com"
@@ -25,7 +25,7 @@ envious.production =
   database : {
     "db_host" : "bls.cyppjw0vapjp.us-west-2.rds.amazonaws.com",
     "user" : "bls_maintence",
-    "password" : "HhI*+5oP:(X~}@-"
+    "password" : "Di=Driut=U89I!s"
   },
   statics : {
     "bucket" : "bls.labs.brightdigit.com"

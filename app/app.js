@@ -46,7 +46,7 @@ var mimeTypes = {
 
 var connection = mysql.createConnection({
   user: 'bls_user',
-  password: 'HhI*+5oP:(X~}@-',
+  password: 'friacr=+kIez_az',
   database: 'bls',
   host : env.host,
   debug: false
