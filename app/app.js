@@ -15,7 +15,7 @@ envious.development =
 
 envious.production = 
 {
-  "host" : "bls.cyppjw0vapjp.us-west-2.rds.amazonaws.com",
+  "host" : "apps01.cyppjw0vapjp.us-west-2.rds.amazonaws.com",
   "static_host" : "http://bls-webstatic01.s3-website-us-east-1.amazonaws.com/",
   "site_url": "http://labs.brightdigit.com/bls",
   "listen": "/tmp/bls.socket"
