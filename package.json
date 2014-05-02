@@ -1,0 +1,32 @@
+{
+  "name": "bls",
+  "version": "2.0.6",
+  "description": "\"BLS web project\"",
+  "main": "app/index.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://leogdion@bitbucket.org/leogdion/bls.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.6.2",
+    "gulp-bump": "^0.1.7",
+    "gulp-jshint": "^1.5.3",
+    "gulp-beautify": "^1.0.3",
+    "gulp-mocha": "^0.4.1",
+    "chai": "^1.9.1",
+    "gulp-istanbul": "^0.1.1",
+    "gulp-istanbul-enforcer": "^1.0.2",
+    "gulp-coveralls": "^0.1.2",
+    "chai-things": "^0.2.0"
+  },
+  "dependencies": {
+    "async": "^0.8.0",
+    "express": "^4.1.1",
+    "moment": "^2.6.0"
+  }
+}

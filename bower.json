@@ -1,0 +1,17 @@
+{
+  "name": "bls",
+  "version": "2.0.0",
+  "authors": [
+    "Leo Dion <leogdion@brightdigit.com>"
+  ],
+  "license": "MIT",
+  "homepage": "bls.labs.brightdigit.com",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
