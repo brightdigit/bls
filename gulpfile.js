@@ -10,9 +10,17 @@ var gulp = require('gulp'),
     bowerRequireJS = require('bower-requirejs'),
     requirejs = require('requirejs'),
     es = require('event-stream'),
-    coverageEnforcer = require("gulp-istanbul-enforcer");
+    coverageEnforcer = require("gulp-istanbul-enforcer"),
+    jstConcat = require('gulp-jst-concat'),
+    jst = require('gulp-jst');
 
-gulp.task('default', ['requirejs', 'less', 'beautify', 'lint', 'copy', 'test', 'enforce-coverage', 'coveralls', 'bump']);
+gulp.task('default', ['JST', 'requirejs', 'less', 'beautify', 'lint', 'copy', 'test', 'enforce-coverage', 'coveralls', 'bump']);
+
+gulp.task('JST', function () {
+  gulp.src('static/templates/**/*html').pipe(jst()).pipe(jstConcat('jst.js', {
+    renameKeys: ['^.*templates/(.*).js$', '$1']
+  })).pipe(gulp.dest('.tmp'));
+});
 
 gulp.task('copy', function () {
   //    gulp.src('src/**/*.html').pipe(gulp.dest('dist'));
