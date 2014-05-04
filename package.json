@@ -1,6 +1,6 @@
 {
   "name": "bls",
-  "version": "2.0.22",
+  "version": "2.0.25",
   "description": "\"BLS web project\"",
   "main": "app/index.js",
   "scripts": {
@@ -26,7 +26,7 @@
     "gulp-istanbul-enforcer": "^1.0.2",
     "gulp-jshint": "^1.5.3",
     "gulp-jst": "^0.1.1",
-    "gulp-jst-concat": "0.0.1",
+    "gulp-jst-concat": "git+https://github.com/jfmoy/gulp-jst-concat.git",
     "gulp-less": "^1.2.3",
     "gulp-mocha": "^0.4.1",
     "requirejs": "^2.1.11"

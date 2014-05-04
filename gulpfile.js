@@ -18,7 +18,8 @@ gulp.task('default', ['JST', 'requirejs', 'less', 'beautify', 'lint', 'copy', 't
 
 gulp.task('JST', function () {
   gulp.src('static/templates/**/*html').pipe(jst()).pipe(jstConcat('jst.js', {
-    renameKeys: ['^.*templates/(.*).js$', '$1']
+    renameKeys: ['^.*templates/(.*).js$', '$1'],
+    amd: true
   })).pipe(gulp.dest('.tmp'));
 });
 
@@ -99,7 +100,7 @@ gulp.task('test', function (cb) {
 });
 
 gulp.task('bump', function () {
-  gulp.src('./package.json').pipe(bump({
+  gulp.src(['./package.json', './bower.json']).pipe(bump({
     type: 'patch'
   })).pipe(gulp.dest('./'));
 });
