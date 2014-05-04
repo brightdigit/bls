@@ -4,10 +4,65 @@ var gulp = require('gulp'),
     jshint = require('gulp-jshint'),
     beautify = require('gulp-beautify'),
     istanbul = require("gulp-istanbul"),
-    coveralls = require('gulp-coveralls');
-coverageEnforcer = require("gulp-istanbul-enforcer");
+    coveralls = require('gulp-coveralls'),
+    less = require('gulp-less'),
+    bower = require('bower'),
+    bowerRequireJS = require('bower-requirejs'),
+    requirejs = require('requirejs'),
+    es = require('event-stream'),
+    coverageEnforcer = require("gulp-istanbul-enforcer");
 
-gulp.task('default', ['beautify', 'lint', 'test', 'enforce-coverage', 'coveralls', 'bump']);
+gulp.task('default', ['requirejs', 'less', 'beautify', 'lint', 'copy', 'test', 'enforce-coverage', 'coveralls', 'bump']);
+
+gulp.task('copy', function () {
+  //    gulp.src('src/**/*.html').pipe(gulp.dest('dist'));
+  es.merge(
+  gulp.src('bower_components/requirejs/require.js').pipe(gulp.dest('public/js')), gulp.src('static/html/*.html').pipe(gulp.dest('public')));
+});
+
+gulp.task('less', ['bower'], function () {
+  gulp.src('static/less/**/*.less').pipe(less()).pipe(gulp.dest('public/css'));
+});
+
+gulp.task('bower', function (cb) {
+  var install = bower.commands.install();
+
+  install.on('log', function (message) {
+    console.log(message);
+  });
+  install.on('error', function (error) {
+    console.log(error);
+    cb(error);
+  });
+  install.on('end', cb.bind(undefined, undefined));
+  // place code for your default task here
+});
+
+gulp.task('bowerrjs', ['bower'], function (cb) {
+  gulp.src("static/js/config.js").pipe(gulp.dest(".tmp"));
+  var options = {
+    config: ".tmp/config.js",
+    baseUrl: 'js',
+    transitive: true
+  };
+
+  bowerRequireJS(options, function (result) {
+    console.log(result);
+    cb(undefined, result);
+  });
+});
+
+gulp.task('requirejs', ['bower', 'bowerrjs'], function (cb) {
+  var config = {
+    mainConfigFile: ".tmp/config.js",
+    baseUrl: 'static/js',
+    name: 'main',
+    out: 'public/js/script.js',
+    optimize: 'none'
+  };
+
+  requirejs.optimize(config, cb.bind(undefined, undefined), cb);
+});
 
 gulp.task('coveralls', ['enforce-coverage'], function () {
   gulp.src('coverage/**/lcov.info').pipe(coveralls());
