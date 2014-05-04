@@ -3,6 +3,7 @@ var app = express();
 var async = require('async');
 var moment = require('moment');
 
+app.use(express.static(__dirname + '/../public'));
 app.get('/api/v2/prices', function (req, res) {
   var result = [];
   var dates = req.query.dates.split(',').concat([new Date()]).map(function (v) {
