@@ -16,6 +16,7 @@ var gulp = require('gulp'),
 
 gulp.task('default', ['JST', 'requirejs', 'less', 'beautify', 'lint', 'copy', 'test', 'enforce-coverage', 'coveralls', 'bump']);
 
+gulp.task('heroku:production', ['default']);
 gulp.task('JST', function () {
   gulp.src('static/templates/**/*html').pipe(jst()).pipe(jstConcat('jst.js', {
     renameKeys: ['^.*templates/(.*).js$', '$1'],
