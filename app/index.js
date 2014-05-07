@@ -24,4 +24,6 @@ app.get('/api/v2/prices', function (req, res) {
   });
 });
 
-var server = app.listen(port);
+var server = app.listen(port, function () {
+  console.log("starting server...");
+});

@@ -18,8 +18,8 @@ gulp.task('default', ['JST', 'requirejs', 'less', 'beautify', 'lint', 'copy', 't
 
 gulp.task('heroku:development', ['default']);
 gulp.task('JST', function () {
-  gulp.src('static/templates/**/*html').pipe(jst()).pipe(jstConcat('jst.js', {
-    renameKeys: ['^.*templates/(.*).js$', '$1'],
+  gulp.src('static/templates/**/*html').pipe(jstConcat('jst.js', {
+    renameKeys: ['^.*templates/(.*).html$', '$1'],
     amd: true
   })).pipe(gulp.dest('.tmp'));
 });
@@ -52,7 +52,7 @@ gulp.task('bowerrjs', ['bower'], function (cb) {
   gulp.src("static/js/config.js").pipe(gulp.dest(".tmp"));
   var options = {
     config: ".tmp/config.js",
-    baseUrl: 'js',
+    baseUrl: 'static/js',
     transitive: true
   };
 
