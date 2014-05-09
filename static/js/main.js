@@ -1,4 +1,4 @@
-require(['app'], function (blsApp) {
+require(['app', 'bootstrap'], function (blsApp) {
   console.log('test');
   var options = {};
   blsApp.start(options);
