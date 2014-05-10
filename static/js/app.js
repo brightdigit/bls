@@ -1,4 +1,4 @@
-define(["backbone.marionette", "./router", 'views/navigation', 'models/home'], function (Marionette, Router, NavigationView, IndexModel) {
+define(["backbone.marionette", "./router", 'views/navigation', 'views/main', 'models/home'], function (Marionette, Router, NavigationView, MainView, IndexModel) {
   var app = new Marionette.Application();
 
   var Controller = Marionette.Controller.extend({
@@ -9,6 +9,9 @@ define(["backbone.marionette", "./router", 'views/navigation', 'models/home'], f
 
     index: function () {
       app.headerRegion.show(new NavigationView({
+
+      }));
+      app.mainRegion.show(new MainView({
 
       }));
     }

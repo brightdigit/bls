@@ -1,6 +1,6 @@
 {
   "name": "bls",
-  "version": "2.0.108",
+  "version": "2.0.124",
   "authors": [
     "Leo Dion <leogdion@brightdigit.com>"
   ],
@@ -17,6 +17,7 @@
   "dependencies": {
     "bootstrap": "~3.1.1",
     "marionette": "~1.8.4",
-    "requirejs": "~2.1.11"
+    "requirejs": "~2.1.11",
+    "d3": "~3.4.6"
   }
 }
