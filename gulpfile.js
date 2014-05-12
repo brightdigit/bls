@@ -19,7 +19,7 @@ gulp.task('default', ['JST', 'requirejs', 'less', 'beautify', 'lint', 'copy', 't
 gulp.task('heroku:development', ['default']);
 gulp.task('JST', function () {
   gulp.src('static/templates/**/*html').pipe(jstConcat('jst.js', {
-    renameKeys: ['^.*templates/(.*).html$', '$1'],
+    renameKeys: ['^.*templates[/|\\\\](.*).html$', '$1'],
     amd: true
   })).pipe(gulp.dest('.tmp'));
 });
