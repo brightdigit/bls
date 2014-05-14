@@ -12,9 +12,14 @@ var gulp = require('gulp'),
     es = require('event-stream'),
     coverageEnforcer = require("gulp-istanbul-enforcer"),
     jstConcat = require('gulp-jst-concat'),
-    jst = require('gulp-jst');
+    jst = require('gulp-jst'),
+    expressService = require('gulp-express-service');
 
 gulp.task('default', ['JST', 'requirejs', 'less', 'beautify', 'lint', 'copy', 'test', 'enforce-coverage', 'coveralls', 'bump']);
+
+gulp.task('express', ['requirejs', 'less', 'copy', 'bump'], function() {
+    return gulp.src(['./app/index/js']).pipe(expressService({file:'./app/index.js', NODE_ENV:'DEV'}));
+});
 
 gulp.task('heroku:development', ['default']);
 gulp.task('JST', function () {
