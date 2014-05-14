@@ -17,8 +17,9 @@ var gulp = require('gulp'),
 
 gulp.task('default', ['JST', 'requirejs', 'less', 'beautify', 'lint', 'copy', 'test', 'enforce-coverage', 'coveralls', 'bump']);
 
-gulp.task('express', ['requirejs', 'less', 'copy', 'bump'], function() {
-    return gulp.src(['./app/index/js']).pipe(expressService({file:'./app/index.js', NODE_ENV:'DEV'}));
+gulp.task('express', ['requirejs', 'less', 'copy', 'bump'], function(cb) {
+    gulp.src(['./app/index/js']).pipe(expressService({file:'./app/index.js', NODE_ENV:'DEV'}));
+    cb();
 });
 
 gulp.task('heroku:development', ['default']);
@@ -53,8 +54,12 @@ gulp.task('bower', function (cb) {
   // place code for your default task here
 });
 
-gulp.task('bowerrjs', ['bower'], function (cb) {
+gulp.task('copy-rjs-config', function () {
   gulp.src("static/js/config.js").pipe(gulp.dest(".tmp"));
+});
+
+
+gulp.task('bowerrjs', ['bower', 'copy-rjs-config'], function (cb) {
   var options = {
     config: ".tmp/config.js",
     baseUrl: 'static/js',
@@ -75,7 +80,7 @@ gulp.task('requirejs', ['bower', 'bowerrjs'], function (cb) {
     out: 'public/js/script.js',
     optimize: 'none'
   };
-
+  console.log('test');
   requirejs.optimize(config, cb.bind(undefined, undefined), cb);
 });
 
