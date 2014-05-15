@@ -1,10 +1,12 @@
-define(['backbone.marionette', 'templates', 'd3'], function (Marionette, templates, d3) {
+define(['backbone.marionette', 'templates', 'd3', 'bootstrap-daterangepicker-reset'], function (Marionette, templates, d3) {
   return Backbone.Marionette.ItemView.extend({
     template: templates.main,
     ui: {
-      graph: ".graph"
+      graph: ".graph",
+      daterange: "[name=\"daterange\"]"
     },
     onRender: function () {
+      this.ui.daterange.daterangepicker();
       var graph = d3.select(this.ui.graph.get(0)).append('svg').style("width", "100%").style("height", "100%").attr("width", "1px").attr("height", "1px").attr("viewBox", "0 0 1 1").append("g").attr("width", "100%").attr("height", "100%");
       var data = [];
       for (var index = 0; index < 100; index++) {

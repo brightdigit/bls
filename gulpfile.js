@@ -42,7 +42,7 @@ gulp.task('JST', ['clean'], function () {
 gulp.task('copy', ['clean', 'bower'], function () {
   //    gulp.src('src/**/*.html').pipe(gulp.dest('dist'));
   return es.merge(
-  gulp.src('bower_components/requirejs/require.js').pipe(gulp.dest('public/js')), gulp.src('static/html/*.html').pipe(gulp.dest('public')), gulp.src('static/images/**/*.*').pipe(gulp.dest('public/images')));
+  gulp.src('bower_components/requirejs/require.js').pipe(gulp.dest('public/js')), gulp.src('static/html/*.html').pipe(gulp.dest('public')), gulp.src('static/fonts/**/*.*').pipe(gulp.dest('public/fonts')), gulp.src('bower_components/bootstrap/fonts/*.*').pipe(gulp.dest('public/fonts/bootstrap')), gulp.src('static/images/**/*.*').pipe(gulp.dest('public/images')));
 });
 
 gulp.task('less', ['bower'], function () {

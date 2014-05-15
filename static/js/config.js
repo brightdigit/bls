@@ -8,6 +8,9 @@ require.config({
     },
     "backbone-d3": {
       deps: "d3"
+    },
+    'bootstrap-daterangepicker-reset': {
+      deps: ["bootstrap", "moment"]
     }
   }
 });
