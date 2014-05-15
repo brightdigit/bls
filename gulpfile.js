@@ -14,6 +14,8 @@ var gulp = require('gulp'),
     jstConcat = require('gulp-jst-concat'),
     jst = require('gulp-jst'),
     clean = require('gulp-clean'),
+    nimport = require('node-nimport'),
+    databaseConfig = require('./bls.ap.json'),
     expressService = require('gulp-express-service');
 
 gulp.task('default', ['requirejs', 'less', 'copy', 'test', 'enforce-coverage', 'coveralls', 'bump']);
@@ -29,6 +31,17 @@ gulp.task('express', ['requirejs', 'less', 'copy', 'bump'], function (cb) {
     file: './app/index.js',
     NODE_ENV: 'DEV'
   }));
+});
+
+gulp.task('database', function (cb) {
+  var run = nimport.run(databaseConfig);
+
+  run.on("error", function (error) {
+    console.log(error);
+    cb(error);
+  });
+
+  run.on("end", cb);
 });
 
 gulp.task('heroku:development', ['default']);
