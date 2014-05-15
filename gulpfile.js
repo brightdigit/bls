@@ -13,31 +13,41 @@ var gulp = require('gulp'),
     coverageEnforcer = require("gulp-istanbul-enforcer"),
     jstConcat = require('gulp-jst-concat'),
     jst = require('gulp-jst'),
+    clean = require('gulp-clean'),
     expressService = require('gulp-express-service');
 
-gulp.task('default', ['JST', 'requirejs', 'less', 'beautify', 'lint', 'copy', 'test', 'enforce-coverage', 'coveralls', 'bump']);
+gulp.task('default', ['requirejs', 'less', 'beautify', 'lint', 'copy', 'test', 'enforce-coverage', 'coveralls', 'bump']);
 
-gulp.task('express', ['requirejs', 'less', 'copy', 'bump'], function(cb) {
-    gulp.src(['./app/index/js']).pipe(expressService({file:'./app/index.js', NODE_ENV:'DEV'}));
-    cb();
+gulp.task('clean', function () {
+  return gulp.src(['public', '.tmp'], {
+    read: false
+  }).pipe(clean());
+});
+
+gulp.task('express', ['requirejs', 'less', 'copy', 'bump'], function (cb) {
+  return gulp.src(['./app/index/js']).pipe(expressService({
+    file: './app/index.js',
+    NODE_ENV: 'DEV'
+  }));
+  cb();
 });
 
 gulp.task('heroku:development', ['default']);
-gulp.task('JST', function () {
-  gulp.src('static/templates/**/*html').pipe(jstConcat('jst.js', {
+gulp.task('JST', ['clean'], function () {
+  return gulp.src('static/templates/**/*html').pipe(jstConcat('jst.js', {
     renameKeys: ['^.*templates[/|\\\\](.*).html$', '$1'],
     amd: true
   })).pipe(gulp.dest('.tmp'));
 });
 
-gulp.task('copy', function () {
+gulp.task('copy', ['clean', 'bower'], function () {
   //    gulp.src('src/**/*.html').pipe(gulp.dest('dist'));
-  es.merge(
+  return es.merge(
   gulp.src('bower_components/requirejs/require.js').pipe(gulp.dest('public/js')), gulp.src('static/html/*.html').pipe(gulp.dest('public')), gulp.src('static/images/**/*.*').pipe(gulp.dest('public/images')));
 });
 
 gulp.task('less', ['bower'], function () {
-  gulp.src('static/less/**/*.less').pipe(less()).pipe(gulp.dest('public/css'));
+  return gulp.src('static/less/**/*.less').pipe(less()).pipe(gulp.dest('public/css'));
 });
 
 gulp.task('bower', function (cb) {
@@ -54,8 +64,8 @@ gulp.task('bower', function (cb) {
   // place code for your default task here
 });
 
-gulp.task('copy-rjs-config', function () {
-  gulp.src("static/js/config.js").pipe(gulp.dest(".tmp"));
+gulp.task('copy-rjs-config', ['clean'], function () {
+  return gulp.src("static/js/config.js").pipe(gulp.dest(".tmp"));
 });
 
 
@@ -63,7 +73,7 @@ gulp.task('bowerrjs', ['bower', 'copy-rjs-config'], function (cb) {
   var options = {
     config: ".tmp/config.js",
     baseUrl: 'static/js',
-    transitive: true
+    transitive: false
   };
 
   bowerRequireJS(options, function (result) {
@@ -72,7 +82,7 @@ gulp.task('bowerrjs', ['bower', 'copy-rjs-config'], function (cb) {
   });
 });
 
-gulp.task('requirejs', ['bower', 'bowerrjs'], function (cb) {
+gulp.task('requirejs', ['bower', 'bowerrjs', 'JST'], function (cb) {
   var config = {
     mainConfigFile: ".tmp/config.js",
     baseUrl: 'static/js',
@@ -80,12 +90,11 @@ gulp.task('requirejs', ['bower', 'bowerrjs'], function (cb) {
     out: 'public/js/script.js',
     optimize: 'none'
   };
-  console.log('test');
   requirejs.optimize(config, cb.bind(undefined, undefined), cb);
 });
 
 gulp.task('coveralls', ['enforce-coverage'], function () {
-  gulp.src('coverage/**/lcov.info').pipe(coveralls());
+  return gulp.src('coverage/**/lcov.info').pipe(coveralls());
 });
 
 gulp.task('enforce-coverage', ['test'], function () {
@@ -116,8 +125,8 @@ gulp.task('bump', function () {
   })).pipe(gulp.dest('./'));
 });
 
-gulp.task('lint', function () {
-  gulp.src(['./app/**/*.js', './test/**/*.js', './gulpfile.js', 'static/js/**/*.js']).pipe(jshint()).pipe(jshint.reporter('default'));
+gulp.task('lint', ['beautify'], function () {
+  return gulp.src(['./app/**/*.js', './test/**/*.js', './gulpfile.js', 'static/js/**/*.js']).pipe(jshint()).pipe(jshint.reporter('default'));
 });
 
 gulp.task('beautify', function () {

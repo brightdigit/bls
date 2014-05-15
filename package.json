@@ -1,6 +1,6 @@
 {
   "name": "bls",
-  "version": "2.0.137",
+  "version": "2.0.165",
   "description": "\"BLS web project\"",
   "main": "app/index.js",
   "scripts": {
@@ -21,7 +21,9 @@
     "gulp": "^3.6.2",
     "gulp-beautify": "^1.0.3",
     "gulp-bump": "^0.1.7",
+    "gulp-clean": "^0.2.4",
     "gulp-coveralls": "^0.1.2",
+    "gulp-express-service": "^1.2.3",
     "gulp-istanbul": "^0.1.1",
     "gulp-istanbul-enforcer": "^1.0.2",
     "gulp-jshint": "^1.5.3",
