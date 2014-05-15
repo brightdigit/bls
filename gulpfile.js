@@ -16,7 +16,7 @@ var gulp = require('gulp'),
     clean = require('gulp-clean'),
     expressService = require('gulp-express-service');
 
-gulp.task('default', ['requirejs', 'less', 'beautify', 'lint', 'copy', 'test', 'enforce-coverage', 'coveralls', 'bump']);
+gulp.task('default', ['requirejs', 'less', 'copy', 'test', 'enforce-coverage', 'coveralls', 'bump']);
 
 gulp.task('clean', function () {
   return gulp.src(['public', '.tmp'], {
@@ -29,7 +29,6 @@ gulp.task('express', ['requirejs', 'less', 'copy', 'bump'], function (cb) {
     file: './app/index.js',
     NODE_ENV: 'DEV'
   }));
-  cb();
 });
 
 gulp.task('heroku:development', ['default']);
@@ -54,7 +53,7 @@ gulp.task('bower', function (cb) {
   var install = bower.commands.install();
 
   install.on('log', function (message) {
-    console.log(message);
+    //console.log(message);
   });
   install.on('error', function (error) {
     console.log(error);
@@ -73,7 +72,7 @@ gulp.task('bowerrjs', ['bower', 'copy-rjs-config'], function (cb) {
   var options = {
     config: ".tmp/config.js",
     baseUrl: 'static/js',
-    transitive: false
+    transitive: true
   };
 
   bowerRequireJS(options, function (result) {
@@ -82,7 +81,7 @@ gulp.task('bowerrjs', ['bower', 'copy-rjs-config'], function (cb) {
   });
 });
 
-gulp.task('requirejs', ['bower', 'bowerrjs', 'JST'], function (cb) {
+gulp.task('requirejs', ['bowerrjs', 'JST', 'beautify'], function (cb) {
   var config = {
     mainConfigFile: ".tmp/config.js",
     baseUrl: 'static/js',
