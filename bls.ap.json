@@ -1,8 +1,8 @@
 {
   "database":{
-    "database":"bls_ap",
-    "user":"bls_ap_user",
-    "password":"bls_ap_pw",
+    "database":"bls",
+    "user":"bls_user",
+    "password":"bls_pw",
     "dialect":"postgres"
   },
   "source":{
