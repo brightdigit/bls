@@ -1,4 +1,4 @@
-define(['backbone.marionette', 'templates', './types', './daterangepicker'], function (Marionette, templates, TypesView, DateRangePickerView) {
+define(['backbone.marionette', 'templates', './types', './daterangepicker', '../models/feedviewtype'], function (Marionette, templates, TypesView, DateRangePickerView, FeedViewType) {
   return Backbone.Marionette.Layout.extend({
     template: templates.feeds,
     regions: {
@@ -8,7 +8,14 @@ define(['backbone.marionette', 'templates', './types', './daterangepicker'], fun
     },
     onShow: function () {
       this.daterangepicker.show(new DateRangePickerView());
-      this.types.show(new TypesView());
+      this.types.show(new TypesView({
+        collection: new Backbone.Collection([{
+          name: "Item"
+        },
+        {
+          name: "Place"
+        }])
+      }));
       //this.feedcollection.show(new FeedCollectionView());
     }
 /*,

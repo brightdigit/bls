@@ -1,6 +1,8 @@
-define(['backbone.marionette', 'templates', 'd3', 'bootstrap-daterangepicker-reset'], function (Marionette, templates, d3) {
-  return Backbone.Marionette.Layout.extend({
-    template: templates.types
+define(['backbone.marionette', 'templates', './feedviewtypebutton'], function (Marionette, templates, FeedViewTypeButtonView) {
+  return Backbone.Marionette.CompositeView.extend({
+    template: templates.types,
+    itemView: FeedViewTypeButtonView,
+    itemViewContainer: ".btn-group"
 /*,
     ui: {
       graph: ".graph",
