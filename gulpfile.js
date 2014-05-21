@@ -44,7 +44,7 @@ gulp.task('database', function (cb) {
   run.on("end", cb);
 });
 
-gulp.task('heroku:development', ['default']);
+gulp.task('heroku:production', ['default']);
 gulp.task('JST', ['clean'], function () {
   return gulp.src('static/templates/**/*html').pipe(jstConcat('jst.js', {
     renameKeys: ['^.*templates[/|\\\\](.*).html$', '$1'],
