@@ -1,4 +1,4 @@
-define(['backbone.marionette', 'templates', 'd3', 'rx.async', 'bootstrap-daterangepicker-reset'], function (Marionette, templates, d3, Rx) {
+define(['backbone.marionette', 'templates', 'd3', 'bootstrap-daterangepicker-reset'], function (Marionette, templates, d3) {
   return Backbone.Marionette.ItemView.extend({
     //template: templates.main,
 /*
