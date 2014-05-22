@@ -1,6 +1,9 @@
 define(['backbone.marionette', 'templates'], function (Marionette, templates) {
   return Backbone.Marionette.ItemView.extend({
-    //template: templates.feed
+    template: templates.feedcollection,
+    'modelEvents': {
+      'change': 'render'
+    },
 /*,
     ui: {
       graph: ".graph",

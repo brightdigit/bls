@@ -1,22 +1,27 @@
-define(['backbone.marionette', 'templates', './types', './daterangepicker', '../models/feedviewtype'], function (Marionette, templates, TypesView, DateRangePickerView, FeedViewType) {
+define(['backbone.marionette', 'templates', './types', './daterangepicker', './feedcollection', '../models/feedviewtype', '../models/feedset'], function (Marionette, templates, TypesView, DateRangePickerView, FeedCollectionView, FeedViewType, FeedSet) {
   return Backbone.Marionette.Layout.extend({
     template: templates.feeds,
     regions: {
       daterangepicker: "#daterangepickerRegion",
       types: "#types",
-      //feedcollection: "#feedcollection"
+      feedcollection: "#feedcollection"
     },
     onShow: function () {
       this.daterangepicker.show(new DateRangePickerView());
       this.types.show(new TypesView({
-        collection: new Backbone.Collection([{
-          name: "Item"
-        },
-        {
+        collection: new Backbone.Collection([new FeedViewType({
+          name: "Item",
+          checked: true
+        }), new FeedViewType({
           name: "Place"
-        }])
+        })])
       }));
-      //this.feedcollection.show(new FeedCollectionView());
+      var feedset;
+      this.feedcollection.show(new FeedCollectionView({
+        model: (feedset = new FeedSet())
+      }));
+      feedset.attributes.items.add(["1234"]);
+      feedset.save();
     }
 /*,
     ui: {
