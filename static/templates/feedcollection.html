@@ -1,5 +1,6 @@
 <ul>
-        <% _.each(items, function(item){ %>
-            <li><%=item%></li>
+        <% _.each(items.models, function(item){ %>
+<%=console.log(item)%>
+            <li><%=item.get("name")%></li>
         <% }); %>
 </ul>

@@ -20,8 +20,9 @@ define(['backbone.marionette', 'templates', './types', './daterangepicker', './f
       this.feedcollection.show(new FeedCollectionView({
         model: (feedset = new FeedSet())
       }));
-      feedset.attributes.items.add(["1234"]);
-      feedset.save();
+      feedset.attributes.items.add([{
+        "name": "1234"
+      }]);
     }
 /*,
     ui: {
