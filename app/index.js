@@ -23,7 +23,44 @@ app.get('/api/v2/prices', function (req, res) {
     res.send(JSON.stringify(result));
   });
 });
+app.get('/api/v2/items', function (req, res) {
+  res.send({
+      "Ice Cream" : {
+        types : {
+          "Chocolate" : "F31211",
+          "Vanilla" : "FE1231"
+        },
+        tags : ["frozen", "dessert"]
+      },
+      "Ground Beef" : {
+        types : "AD12312",
+        tags : [
+          "meat"
+        ]
+      }
+  });
+});
+app.get('/api/v2/areas', function (req, res) {
+  res.send({
+    "E4ASDF" : {
+      "name" : "New York",
+      "shape" : [24, 32],
+      "size" : "metropolitian area",
+      "region" : "Northeast"
+    },
+    "0000" : {
+      "name" : "Average US City",
+      "size" : "average",
+      "region" : "national"
+    },
+    "3DQ12" : {
+      "name" : "Average Midwest Urban Area",
+      "size" : "urban",
+      "region" : "midwest"
+    }
 
+  });
+});
 var server = app.listen(port, function () {
   console.log("starting server...");
 });
