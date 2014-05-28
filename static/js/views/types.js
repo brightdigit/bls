@@ -2,7 +2,7 @@ define(['backbone.marionette', 'templates', './feedviewtypebutton'], function (M
   return Backbone.Marionette.CompositeView.extend({
     template: templates.types,
     itemView: FeedViewTypeButtonView,
-    itemViewContainer: ".btn-group"
+    itemViewContainer: ".btn-group[data-toggle]"
 /*,
     ui: {
       graph: ".graph",
