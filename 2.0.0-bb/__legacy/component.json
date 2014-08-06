@@ -1,0 +1,17 @@
+{ 
+  "name": "bls",
+  "version": "1.0.0",
+  "main": ["./app/static/js/main.js"],
+  "dependencies": {
+    "bootstrap": null,
+    "bootstrap-daterangepicker": null,
+    "datejs": null,
+    "jquery": null,
+    "jquery.cookie": null,
+    "processingjs": null,
+    "requirejs": null,
+    "html5shiv": null,
+    "waitjs":null,
+    "browser-logos":"git://github.com/paulirish/browser-logos.git"
+  }
+}
