@@ -1,0 +1,42 @@
+{
+  "name": "bls",
+  "version": "2.0.290",
+  "description": "\"BLS web project\"",
+  "main": "app/index.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://leogdion@bitbucket.org/leogdion/bls.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "bower": "^1.3.3",
+    "bower-requirejs": "^0.10.3",
+    "chai": "^1.9.1",
+    "chai-things": "^0.2.0",
+    "event-stream": "^3.1.5",
+    "gulp": "^3.6.2",
+    "gulp-beautify": "^1.0.3",
+    "gulp-bump": "^0.1.7",
+    "gulp-clean": "^0.2.4",
+    "gulp-coveralls": "^0.1.2",
+    "gulp-express-service": "^1.2.3",
+    "gulp-istanbul": "^0.1.1",
+    "gulp-istanbul-enforcer": "^1.0.2",
+    "gulp-jshint": "^1.5.3",
+    "gulp-jst": "^0.1.1",
+    "gulp-jst-concat": "git+https://github.com/jfmoy/gulp-jst-concat.git",
+    "gulp-less": "^1.2.3",
+    "gulp-mocha": "^0.4.1",
+    "node-nimport": "git+https://github.com/leogdion/node-nimport.git#release/0.1.0",
+    "requirejs": "^2.1.11"
+  },
+  "dependencies": {
+    "async": "^0.8.0",
+    "express": "^4.1.1",
+    "moment": "^2.6.0"
+  }
+}
