@@ -1,5 +1,18 @@
 @import url(//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic);
 
+.include-custom-font(@family: arial, @weight: normal, @style: normal){
+    @font-face{
+        font-family: @family;
+        src:url('../fonts/@{family}.eot');
+        src:url('../fonts/@{family}.eot?#iefix') format('embedded-opentype'),
+            url('../fonts/@{family}.ttf') format('truetype');
+        font-weight: @weight;
+        font-style: @style;
+    }
+}
+
+.include-custom-font(@family:GoudyBookletter1911);
+
 html, body {
   /*
   background-color: #333;
@@ -10,8 +23,8 @@ html, body {
 }
 
 html, body, input, select, option {
-  font-family: 'Lora', serif;
-  
+  font-family: 'GoudyBookletter1911', serif;
+
 }
 
 header > nav {
