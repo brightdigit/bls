@@ -20,6 +20,7 @@ html, body {
   */
   margin: 0;
   /*overflow-x: hidden;*/
+  height: 100%;
 }
 
 html, body, input, select, option {
@@ -66,4 +67,30 @@ header > nav {
 main {
   margin-top: 40px;
 
+}
+
+.data-select {
+  width: 20%;
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    text-indent: 0;
+  }
+}
+
+.data-display {
+  background-color: #CC0;
+}
+
+main {
+  display: table;
+  width: 100%;
+  height: 100%;
+  & > section {
+    display: table-cell;
+    &.data-display {
+      background-color: #CC0;
+    }
+  }
 }

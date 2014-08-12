@@ -1,6 +1,6 @@
 {
   "name": "bls",
-  "version": "2.0.11",
+  "version": "2.0.25",
   "prerelease": "alpha",
   "description": "sample project",
   "main": "server",
