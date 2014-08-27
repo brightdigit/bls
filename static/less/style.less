@@ -105,6 +105,10 @@ main {
       input[type=checkbox]:checked  ~ ul {
           opacity: 1.0;
       }
+        
+    input[type=checkbox] ~ ul input[type=checkbox] + label {
+        opacity: 0.5;
+    }
     }
   }
 }
