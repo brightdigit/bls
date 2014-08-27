@@ -93,19 +93,18 @@ main {
       li {
         margin-left: 15px;
       }
-      input[type=checkbox] {
-      /*
-          &:checked ~ ul label, & ~ ul label {
-            .opacity(1.0);
-          }
-          */
-          & + label {
-            .opacity(0.5);
-          }
-          &:checked + label {
-            .opacity(1.0);
-          }
-        }
+      input[type=checkbox] + label {
+          opacity: 0.5;
+      }
+      input[type=checkbox]:checked + label {
+          opacity: 1.0;
+      }
+      input[type=checkbox] ~ ul {
+          opacity: 0.5;
+      }        
+      input[type=checkbox]:checked  ~ ul {
+          opacity: 1.0;
+      }
     }
   }
 }
