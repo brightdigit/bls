@@ -1,5 +1,7 @@
 @import url(//fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic);
 
+@import "mixins";
+
 .include-custom-font(@family: arial, @weight: normal, @style: normal){
     @font-face{
         font-family: @family;
@@ -31,6 +33,11 @@ html, body, input, select, option {
 form {
   fieldset {
     border: none;
+    ul {
+      li {
+        
+      }
+    }
   }
 }
 
@@ -86,6 +93,19 @@ main {
       li {
         margin-left: 15px;
       }
+      input[type=checkbox] {
+      /*
+          &:checked ~ ul label, & ~ ul label {
+            .opacity(1.0);
+          }
+          */
+          & + label {
+            .opacity(0.5);
+          }
+          &:checked + label {
+            .opacity(1.0);
+          }
+        }
     }
   }
 }
