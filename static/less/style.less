@@ -84,9 +84,6 @@ main {
 
 .data-select {
   width: 20%;
-  select {
-    border:
-  }
   ul {
     list-style-type: none;
     margin: 0;
@@ -117,13 +114,45 @@ main {
 }
 
 main {
-  display: table;
-  width: 100%;
-  height: 100%;
-  & > section {
-    display: table-cell;
-    &.data-display {
-      background-color: #CC0;
+    width: 100%;
+    height: 100%;
+    & > section {
+      &.data-display {
+        background-color: #CC0;
+    width: 100%;
+    height: 100%;
+
+      }
+      &.data-select {
+        position: absolute;
+      opacity: 0.9;
+      background-color: #FFF;
+      
+      }
     }
   }
+
+@media (min-width: 55em) {
+  main {
+    display: table;
+    width: 100%;
+    height: 100%;
+    & > section {
+      display: table-cell;
+      &.data-display {
+        background-color: #CC0;
+    width: auto;
+    height: auto;
+
+      }
+    &.data-select {
+      position: static;
+      opacity: 1.0;
+    }
+
+    }
+  }
+}
+@media (max-width: 55em) {
+
 }
