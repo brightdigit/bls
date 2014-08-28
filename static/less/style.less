@@ -82,6 +82,7 @@ main {
 
 }
 
+/*
 .data-select {
   width: 20%;
   ul {
@@ -92,6 +93,42 @@ main {
     li {
       li {
         margin-left: 15px;
+      }
+      input[type=checkbox] + label {
+          opacity: 0.5;
+      }
+      input[type=checkbox]:checked + label {
+          opacity: 1.0;
+      }
+      input[type=checkbox] ~ ul {
+          opacity: 0.5;
+      }        
+      input[type=checkbox]:checked  ~ ul {
+          opacity: 1.0;
+      }
+    }
+  }
+}
+*/
+
+
+.data-select {
+  fieldset > div {
+    float: left;
+  }
+  .date-range > label:first-child {
+    display: none;
+  }
+  ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    text-indent: 0;
+    li {
+      float: left;
+      li {
+        margin-left: 15px;
+        display: none;
       }
       input[type=checkbox] + label {
           opacity: 0.5;
@@ -148,6 +185,22 @@ main {
     &.data-select {
       position: static;
       opacity: 1.0;
+      width: 20%;
+
+  fieldset > div {
+    float: none;
+  }
+      .date-range > label:first-child {
+        display: block;
+      }
+      ul {
+        li {
+          float: none;
+          li {
+            display: block;
+          }
+        }
+      }
     }
 
     }
